@@ -114,7 +114,7 @@ const PanditList = () => {
                 {/* Region */}
                 <div className="form-group">
                   <label className="label">Region/State</label>
-                  <input id="filter-region" type="text" value={filters.region} onChange={(e) => handleFilterChange('region', e.target.value)} placeholder="Maharashtra..." className="input-field" />
+                  <input id="filter-region" type="text" value={filters.region} onChange={(e) => handleFilterChange('region', e.target.value)} placeholder="Karnataka..." className="input-field" />
                 </div>
 
                 {/* Ritual */}

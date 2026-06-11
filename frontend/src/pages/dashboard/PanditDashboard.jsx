@@ -364,11 +364,11 @@ const PanditDashboard = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="form-group">
                           <label htmlFor="pandit-city" className="label">City</label>
-                          <input id="pandit-city" type="text" value={profileForm.city} onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })} placeholder="Mumbai" className="input-field" />
+                          <input id="pandit-city" type="text" value={profileForm.city} onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })} placeholder="Bengaluru" className="input-field" />
                         </div>
                         <div className="form-group">
                           <label htmlFor="pandit-region" className="label">Region</label>
-                          <input id="pandit-region" type="text" value={profileForm.region} onChange={(e) => setProfileForm({ ...profileForm, region: e.target.value })} placeholder="Maharashtra" className="input-field" />
+                          <input id="pandit-region" type="text" value={profileForm.region} onChange={(e) => setProfileForm({ ...profileForm, region: e.target.value })} placeholder="Karnataka" className="input-field" />
                         </div>
                         <div className="form-group">
                           <label htmlFor="pandit-exp" className="label">Years of Experience</label>
@@ -377,7 +377,7 @@ const PanditDashboard = () => {
                       </div>
                       <div className="form-group">
                         <label htmlFor="pandit-languages" className="label">Languages Spoken <span className="text-stone-400 font-normal">(comma separated)</span></label>
-                        <input id="pandit-languages" type="text" value={profileForm.languagesSpoken} onChange={(e) => setProfileForm({ ...profileForm, languagesSpoken: e.target.value })} placeholder="Hindi, Sanskrit, Marathi" className="input-field" />
+                        <input id="pandit-languages" type="text" value={profileForm.languagesSpoken} onChange={(e) => setProfileForm({ ...profileForm, languagesSpoken: e.target.value })} placeholder="Kannada, Sanskrit, Hindi" className="input-field" />
                       </div>
 
                       {/* Supported rituals */}

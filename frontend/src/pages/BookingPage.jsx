@@ -255,16 +255,16 @@ const BookingPage = () => {
                 <div className="space-y-3">
                   <div className="form-group">
                     <label htmlFor="booking-address" className="label">Address <span className="text-crimson-500">*</span></label>
-                    <input id="booking-address" type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="House/Flat No., Street..." className="input-field" />
+                    <input id="booking-address" type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="House/Flat No., Street (e.g. Rajajinagar)..." className="input-field" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="form-group">
                       <label htmlFor="booking-city" className="label">City</label>
-                      <input id="booking-city" type="text" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Mumbai" className="input-field" />
+                      <input id="booking-city" type="text" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Bengaluru" className="input-field" />
                     </div>
                     <div className="form-group">
                       <label htmlFor="booking-region" className="label">State/Region</label>
-                      <input id="booking-region" type="text" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} placeholder="Maharashtra" className="input-field" />
+                      <input id="booking-region" type="text" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} placeholder="Karnataka" className="input-field" />
                     </div>
                   </div>
                 </div>

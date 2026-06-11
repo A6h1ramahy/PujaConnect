@@ -90,7 +90,7 @@ const Home = () => {
                     type="text"
                     value={searchCity}
                     onChange={(e) => setSearchCity(e.target.value)}
-                    placeholder="Enter your city (e.g. Mumbai, Delhi...)"
+                    placeholder="Enter your city (e.g. Bengaluru, Delhi...)"
                     className="flex-1 bg-transparent text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none text-sm"
                   />
                 </div>

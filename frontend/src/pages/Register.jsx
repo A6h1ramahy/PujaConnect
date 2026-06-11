@@ -113,14 +113,14 @@ const Register = () => {
                 <label htmlFor="reg-phone" className="label">Phone <span className="text-stone-400 font-normal">(optional)</span></label>
                 <div className="relative">
                   <HiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
-                  <input id="reg-phone" type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+91 XXXXX XXXXX" className="input-field pl-11" />
+                  <input id="reg-phone" type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="9876543210" className="input-field pl-11" />
                 </div>
               </div>
               <div className="form-group">
                 <label htmlFor="reg-city" className="label">City <span className="text-stone-400 font-normal">(optional)</span></label>
                 <div className="relative">
                   <HiLocationMarker className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
-                  <input id="reg-city" type="text" name="city" value={form.city} onChange={handleChange} placeholder="Mumbai" className="input-field pl-11" />
+                  <input id="reg-city" type="text" name="city" value={form.city} onChange={handleChange} placeholder="Bengaluru" className="input-field pl-11" />
                 </div>
               </div>
             </div>
