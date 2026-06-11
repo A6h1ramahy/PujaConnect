@@ -118,12 +118,6 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Demo creds */}
-          <div className="mt-5 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800">
-            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">Demo Admin:</p>
-            <p className="text-xs text-amber-600 dark:text-amber-500">admin@pujaconnect.com / Admin@1234</p>
-          </div>
-
           <p className="text-center text-sm text-stone-500 dark:text-stone-400 mt-6">
             Don't have an account?{' '}
             <Link to="/register" id="go-to-register" className="text-saffron-600 dark:text-saffron-400 font-semibold hover:underline">

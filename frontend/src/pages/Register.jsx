@@ -130,7 +130,7 @@ const Register = () => {
               <label htmlFor="reg-password" className="label">Password</label>
               <div className="relative">
                 <HiLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
-                <input id="reg-password" type={showPwd ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="Min 6 characters" className="input-field pl-11 pr-11" autoComplete="new-password" />
+                <input id="reg-password" type={showPwd ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="Min 8 characters (1 uppercase, 1 digit)" className="input-field pl-11 pr-11" autoComplete="new-password" />
                 <button type="button" id="toggle-reg-pwd" onClick={() => setShowPwd(!showPwd)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors">
                   {showPwd ? <HiEyeOff /> : <HiEye />}
                 </button>
