@@ -1,309 +1,316 @@
 # PujaConnect – Online Pandit & Puja Booking Platform
 
 <div align="center">
-  <h3>🛕 Connect Devotees with Verified Pandits for Sacred Ceremonies 🙏</h3>
+  <h3>🛕 Connecting Devotees with Verified Pandits for Sacred Ceremonies 🙏</h3>
 </div>
 
 ---
 
 ## 📋 Project Overview
 
-PujaConnect is a full-stack, production-quality web platform that digitizes the process of discovering, comparing, and booking verified Pandits for Hindu religious ceremonies. The platform eliminates the pain of finding trusted Pandits through personal references or phone calls by providing a structured, transparent, and modern digital experience.
+PujaConnect is a production-quality, secure, and fully responsive full-stack web platform that simplifies the discovery, comparison, and booking of verified Pandits for Hindu religious ceremonies. The application bridges the gap between devotees seeking authentic spiritual rituals and professional Pandits offering these sacred services.
 
-**Supported Ceremonies:** Satyanarayan Katha · Naamkaran · Griha Pravesh · Havan · Mundan · Ganesh Puja · Lakshmi Puja · Vivah & more
+Currently booking a Pandit relies heavily on word-of-mouth or unverified channels. PujaConnect establishes transparency in pricing, schedules, and Pandit credentials, providing a seamless digital workflow for devotees and Pandits alike.
+
+**Supported Ceremonies Include:** Satyanarayan Katha · Naamkaran · Griha Pravesh · Havan · Mundan · Ganesh Puja · Lakshmi Puja · Vivah & more (expandable catalog managed by system administrators).
 
 ---
 
-## ✨ Features
+## ✨ Core Features
 
-### For Users (Devotees)
-- 🔍 **Pandit Discovery** – Search and filter verified Pandits by city, ritual type, language, and experience
-- 📋 **Detailed Profiles** – View Pandit bios, supported rituals, pricing, and availability
-- 📅 **Smart Booking** – Multi-step booking wizard with availability slot selection
-- 🗂️ **Booking Management** – Track pending, accepted, and upcoming bookings
-- 👤 **Profile Management** – Manage personal details
+### 1. User Authentication & Security
+- **Secure Authentication:** JWT-based user session handling with secure cookie/header authorization.
+- **Suspension Protection:** Access-control mechanism checking `isSuspended` flag on login. Suspended users are immediately denied access with a professional feedback notice.
+- **Dual-Layer Validation:** Inputs are schema-validated on the backend (using `express-validator`) and dynamically checked on the frontend before form submission (matching email RFC formats, password complexity, and future-date selections).
 
-### For Pandits
-- 🛕 **Profile Builder** – Set up detailed profile with rituals, languages, and pricing
-- 📆 **Availability Calendar** – Set available dates and time slots
-- ✅ **Booking Management** – Accept or reject booking requests
-- 📊 **Dashboard** – Overview of all bookings and upcoming schedule
+### 2. Pandit Discovery & Search
+- **Verification Gatekeeping:** Only Pandits approved by platform administrators are displayed in public search feeds.
+- **Search & Filtering:** Devotees can search for verified Pandits by city and refine results by region/state, specific rituals, languages spoken, and years of experience.
+- **Index Optimization:** Database queries are optimized with indexes on `location.city`, `location.region`, `verificationStatus`, `supportedRituals`, `languagesSpoken`, and `yearsOfExperience`.
 
-### For Admins
-- 🔒 **Pandit Verification** – Review and approve/reject Pandit profiles
-- 👥 **User Management** – View and suspend users when necessary
-- 🪔 **Ritual Management** – Full CRUD for the puja catalog
-- 📊 **Platform Overview** – Stats and booking monitoring
+### 3. Smart Booking Lifecycle
+- **5-State Transaction Engine:** Bookings transition through standard statuses: `pending` ➔ `accepted` ➔ `rejected` ➔ `cancelled` ➔ `completed`.
+- **History Tracking & Audit Logs:** Every state change is recorded in a `statusHistory` timeline, indicating status changes, timestamps, and optional notes.
+- **Slot Selection:** Real-time checking of Pandit availability slots prevents booking conflicts.
 
-### Platform Features
-- 🌗 **Dark & Light Mode** – System-preference aware with manual toggle
-- 📱 **Fully Responsive** – Works on mobile, tablet, and desktop
-- 🔐 **JWT Authentication** – Secure role-based access control
-- ⚡ **Fast & Modern** – Built with Vite + React 18
+### 4. Cloudinary Image Storage
+- **Direct Buffering:** Profile photos uploaded by Pandits are processed via memory storage (`multer.memoryStorage()`) and streamed directly to Cloudinary.
+- **Zero Local Disk Writes:** Images are never saved locally to server disks or stored as binary values inside the MongoDB database.
+- **Three-Tier Fallback Avatar:** A robust custom component (`<PanditAvatar />`) renders:
+  1. The Cloudinary secure HTTPS URL if present.
+  2. Initials via the UI Avatars API with a traditional saffron background.
+  3. A clean inline React Icon if network requests fail.
+
+### 5. Traditional Spiritual Typography & UI
+- **Spiritual Serif System:** Configured `Cormorant Garamond` for headings (adding a traditional, premium look) and `Source Serif 4` for body text, with fallbacks to `Georgia` and `Times New Roman`.
+- **Theme Support:** Native dark and light mode stylesheets integrated seamlessly with user settings saved to `localStorage`.
+- **Placeholder Redirection:** Unimplemented Resource or Trust links automatically route to a dynamic Coming Soon page that reads the active URL path to display a custom themed header.
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer      | Technology                        |
-|------------|-----------------------------------|
-| Frontend   | React 18 · Vite · Tailwind CSS v3 |
-| Backend    | Node.js · Express.js              |
-| Database   | MongoDB · Mongoose                |
-| Auth       | JWT · bcryptjs                    |
-| File Upload| Multer (local disk)               |
-| Icons      | React Icons                       |
-| Toasts     | React Hot Toast                   |
-| Date Utils | date-fns                          |
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 18 · Vite · Tailwind CSS v3 · React Router DOM v6 |
+| **Backend** | Node.js · Express.js · Multer (memory-only buffer uploads) |
+| **Database** | MongoDB · Mongoose (with indexing & compound key configurations) |
+| **Integrations** | Cloudinary SDK (Direct Upload Stream API) · UI Avatars API |
+| **Auth & Security** | JWT (JSON Web Tokens) · bcryptjs (12 rounds) |
+| **Validation** | express-validator (backend schemas) · Frontend regex helpers |
+| **Icons & Style** | React Icons (`MdOutlineTempleHindu`, etc.) · Cormorant Garamond & Source Serif 4 |
+| **Date Utilities** | date-fns |
 
 ---
 
-## 🚀 Quick Start
+## 📁 Project Structure
 
-### Prerequisites
-
-- Node.js v18+
-- MongoDB (local or cloud)
-- npm or yarn
-
----
-
-### 1. Clone the Repository
-
-```bash
-git clone <repo-url>
-cd PujaConnect
-```
-
----
-
-### 2. Backend Setup
-
-```bash
-cd backend
-
-# Install dependencies
-npm install
-
-# Copy environment file
-cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
-```
-
-**`backend/.env`:**
-```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/pujaconnect
-JWT_SECRET=your_super_secret_key_change_this
-JWT_EXPIRES_IN=7d
-NODE_ENV=development
-```
-
-**Run the backend:**
-```bash
-# Development (with auto-restart)
-npm run dev
-
-# Production
-npm start
-```
-
-**Seed the database (rituals + admin account):**
-```bash
-npm run seed
-```
-
-> 🔑 Default admin credentials after seeding:
-> - Email: `admin@pujaconnect.com`
-> - Password: `Admin@1234`
-> - **Change this after first login!**
-
----
-
-### 3. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Copy environment file
-cp .env.example .env
-```
-
-**`frontend/.env`:**
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-```
-
-**Run the frontend:**
-```bash
-npm run dev
-```
-
-Frontend runs at: **http://localhost:3000**
-
----
-
-## 📁 Folder Structure
-
-```
+```text
 PujaConnect/
 ├── backend/
 │   ├── config/
-│   │   └── db.js                    # MongoDB connection
+│   │   ├── db.js                     # MongoDB connection wrapper
+│   │   └── cloudinary.js             # Cloudinary configuration & SDK client
 │   ├── controllers/
-│   │   ├── authController.js        # Register, Login
-│   │   ├── userController.js        # User profile & admin management
-│   │   ├── panditController.js      # Pandit profiles & search
-│   │   ├── ritualController.js      # Puja CRUD
-│   │   ├── bookingController.js     # Booking lifecycle
-│   │   ├── availabilityController.js # Calendar management
-│   │   └── adminController.js       # Admin verification & stats
+│   │   ├── authController.js         # User registration, login, and getMe sessions
+│   │   ├── userController.js         # Devotee profile edits & Admin user suspension toggle
+│   │   ├── panditController.js       # Pandit profile CRUD & search listings
+│   │   ├── ritualController.js       # Admin ritual catalog management
+│   │   ├── bookingController.js      # Booking lifecycle (create, accept, reject, complete, cancel)
+│   │   ├── availabilityController.js  # Pandit availability slot scheduling
+│   │   └── adminController.js        # Admin dashboard verification & platform stats
 │   ├── middleware/
-│   │   ├── authMiddleware.js        # JWT verification
-│   │   ├── roleMiddleware.js        # RBAC guards
-│   │   ├── errorMiddleware.js       # Global error handler
-│   │   └── uploadMiddleware.js      # Multer photo upload
+│   │   ├── authMiddleware.js         # JWT token verification
+│   │   ├── roleMiddleware.js         # Role-based access control (RBAC) guards
+│   │   ├── errorMiddleware.js        # Global Express exception handler
+│   │   └── uploadMiddleware.js       # Multer configuration routing to memoryStorage
 │   ├── models/
-│   │   ├── User.js                  # User schema
-│   │   ├── Pandit.js                # Pandit profile schema
-│   │   ├── Ritual.js                # Puja/Ritual schema
-│   │   ├── Booking.js               # Booking schema
-│   │   └── Availability.js          # Schedule schema
-│   ├── routes/                      # Express route definitions
+│   │   ├── User.js                   # Authentication & role schema
+│   │   ├── Pandit.js                 # Pandit bio, location, pricing & verification state
+│   │   ├── Ritual.js                 # Puja details, duration, and pricing schema
+│   │   ├── Booking.js                # Booking transactions, timeline, & statusHistory logs
+│   │   └── Availability.js           # Pandit schedule date & time slot schema
+│   ├── routes/                       # Express router routes mapping requests to controllers
 │   ├── seed/
-│   │   └── seed.js                  # Database seeder
-│   ├── uploads/                     # Uploaded Pandit photos
+│   │   └── seed.js                   # Idempotent database seeder for default rituals & admin
 │   ├── utils/
-│   │   └── generateToken.js         # JWT helper
-│   ├── .env.example
-│   ├── server.js
+│   │   ├── generateToken.js          # JWT signed token helper
+│   │   └── validators.js             # express-validator schemas for input constraints
+│   ├── server.js                     # Express app configuration & server startup entrypoint
 │   └── package.json
 │
 └── frontend/
     ├── public/
     ├── src/
     │   ├── api/
-    │   │   ├── axios.js             # Axios instance with interceptors
-    │   │   └── index.js             # All API call functions
+    │   │   ├── axios.js              # Axios instance configured with JWT request headers
+    │   │   └── index.js              # Complete collection of REST API caller routines
     │   ├── components/
-    │   │   ├── common/              # Navbar, Footer, ThemeToggle, ProtectedRoute
-    │   │   └── pandit/              # PanditCard
+    │   │   ├── common/               # Navbar, Footer, ThemeToggle, ProtectedRoute, PanditAvatar
+    │   │   └── pandit/               # PanditCard listings
     │   ├── context/
-    │   │   ├── AuthContext.jsx      # Auth state & JWT
-    │   │   └── ThemeContext.jsx     # Dark/Light mode
+    │   │   ├── AuthContext.jsx       # Global login state, session checks & profile sync
+    │   │   └── ThemeContext.jsx      # Light/Dark mode state managers
     │   ├── pages/
-    │   │   ├── Home.jsx             # Landing page
-    │   │   ├── Login.jsx            # Authentication
-    │   │   ├── Register.jsx         # Registration with role select
-    │   │   ├── PanditList.jsx       # Search & browse Pandits
-    │   │   ├── PanditProfile.jsx    # Individual Pandit profile
-    │   │   ├── BookingPage.jsx      # Multi-step booking wizard
-    │   │   ├── Rituals.jsx          # Puja catalog
+    │   │   ├── Home.jsx              # Landing page with Karnataka-focused search parameters
+    │   │   ├── Login.jsx             # Sign-in page (secured with no visible credentials)
+    │   │   ├── Register.jsx          # Register page (including min 8-char validation hints)
+    │   │   ├── PanditList.jsx        # Search results page with region & language filters
+    │   │   ├── PanditProfile.jsx     # Pandit profiles with booking slot selector
+    │   │   ├── BookingPage.jsx       # Address & slot booking transaction wizard
+    │   │   ├── Rituals.jsx           # Public catalog of pujas
+    │   │   ├── PlaceholderPage.jsx   # Dynamic themed Coming Soon page for future sections
     │   │   └── dashboard/
-    │   │       ├── UserDashboard.jsx    # User bookings & profile
-    │   │       ├── PanditDashboard.jsx  # Pandit management
-    │   │       └── AdminDashboard.jsx   # Admin panel
-    │   ├── App.jsx                  # Route configuration
-    │   ├── main.jsx                 # React DOM entry
-    │   └── index.css                # Tailwind + design system
-    ├── tailwind.config.js
+    │   │       ├── UserDashboard.jsx    # Devotee dashboard (history logs, profile edits)
+    │   │       ├── PanditDashboard.jsx  # Pandit dashboard (accept/reject/complete, scheduling)
+    │   │       └── AdminDashboard.jsx   # Admin dashboard (verification flow, stats, user list)
+    │   ├── App.jsx                   # React Router route registry
+    │   ├── main.jsx                  # ReactDOM render bootstrap
+    │   └── index.css                 # Tailwind utility imports & global font bindings
+    ├── tailwind.config.js            # Font mappings and palette configuration
     ├── vite.config.js
     └── package.json
 ```
 
 ---
 
-## 🔌 API Overview
+## 🚀 Installation & Setup
 
-| Method | Endpoint | Description | Access |
-|--------|----------|-------------|--------|
-| POST | `/api/auth/register` | Register user/pandit | Public |
-| POST | `/api/auth/login`    | Login | Public |
-| GET  | `/api/auth/me`       | Get current user | Auth |
-| GET  | `/api/users/profile` | Get user profile | User |
-| PUT  | `/api/users/profile` | Update user profile | User |
-| GET  | `/api/pandits`       | Search verified Pandits | Public |
-| GET  | `/api/pandits/:id`   | Pandit details | Public |
-| POST | `/api/pandits/profile` | Create/update Pandit profile | Pandit |
-| GET  | `/api/rituals`       | Get all rituals | Public |
-| POST | `/api/rituals`       | Create ritual | Admin |
-| PUT  | `/api/rituals/:id`   | Update ritual | Admin |
-| DELETE | `/api/rituals/:id` | Delete ritual | Admin |
-| POST | `/api/bookings`      | Create booking | User |
-| GET  | `/api/bookings/my`   | User's bookings | User |
-| GET  | `/api/bookings/pandit` | Pandit's bookings | Pandit |
-| PUT  | `/api/bookings/:id/accept` | Accept booking | Pandit |
-| PUT  | `/api/bookings/:id/reject` | Reject booking | Pandit |
-| POST | `/api/availability`  | Set availability | Pandit |
-| GET  | `/api/availability/pandit/:id` | Get Pandit's slots | Public |
-| GET  | `/api/admin/stats`   | Platform stats | Admin |
-| PUT  | `/api/admin/pandits/:id/verify` | Verify Pandit | Admin |
-| PUT  | `/api/admin/users/:id/suspend` | Suspend user | Admin |
+### Prerequisites
+- Node.js v18 or later
+- MongoDB instance running locally (or MongoDB Atlas connection)
+- Cloudinary free tier account
+
+### 1. Clone & Install Dependencies
+
+```bash
+# Clone the repository
+git clone https://github.com/A6h1ramahy/PujaConnect.git
+cd PujaConnect
+
+# Install backend dependencies
+cd backend
+npm install
+
+# Install frontend dependencies
+cd ../frontend
+npm install
+```
+
+### 2. Configure Environment Variables
+
+Create a `.env` file in the `backend/` directory:
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/pujaconnect
+JWT_SECRET=your_super_jwt_secret_key_change_in_production
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+
+# Cloudinary Integration Keys
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Default Admin Seed Config
+ADMIN_EMAIL=admin@pujaconnect.com
+ADMIN_PASSWORD=Admin@1234
+```
+
+Create a `.env` file in the `frontend/` directory:
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+### 3. Run the Idempotent Database Seeder
+Seed default rituals, availability ranges, and the default platform admin account:
+```bash
+cd backend
+npm run seed
+```
+
+### 4. Running the Application locally
+
+Start the Express backend:
+```bash
+cd backend
+npm run dev
+```
+
+Start the React frontend dev server:
+```bash
+cd frontend
+npm run dev
+```
+Open **http://localhost:3000** in your browser to view the application.
 
 ---
 
-## 👥 User Roles
+## 🔌 API Routes Reference
 
-| Role | Description | Access |
-|------|-------------|--------|
-| **User** | Devotee/customer | Browse Pandits, create bookings, manage profile |
-| **Pandit** | Service provider | Manage profile, availability, accept/reject bookings |
-| **Admin** | Platform operator | Verify Pandits, manage users, CRUD rituals, monitor bookings |
+### Authentication
+- `POST /api/auth/register` - Create user or pandit account.
+- `POST /api/auth/login` - Authenticate user, verify isSuspended check, return JWT.
+- `GET /api/auth/me` - Fetch current user profile from active JWT. *(Requires Auth)*
+
+### Users
+- `GET /api/users/profile` - Retrieve logged-in devotee profile. *(Requires Devotee Auth)*
+- `PUT /api/users/profile` - Update devotee contact information. *(Requires Devotee Auth)*
+
+### Pandits
+- `GET /api/pandits` - Query verified pandits with filtering.
+- `GET /api/pandits/me` - Retrieve current pandit profile details. *(Requires Pandit Auth)*
+- `GET /api/pandits/:id` - Fetch detailed public info for a verified pandit.
+- `POST /api/pandits/profile` - Create or update pandit biography and details. Supports Cloudinary photo uploads. *(Requires Pandit Auth)*
+- `PUT /api/pandits/profile` - Update profile and photo. *(Requires Pandit Auth)*
+
+### Rituals
+- `GET /api/rituals` - Fetch all public active rituals.
+- `GET /api/rituals/all` - Fetch all rituals (active/inactive). *(Requires Admin Auth)*
+- `POST /api/rituals` - Add a new ritual to the system. *(Requires Admin Auth)*
+- `PUT /api/rituals/:id` - Update ritual details. *(Requires Admin Auth)*
+- `DELETE /api/rituals/:id` - Remove a ritual from database. *(Requires Admin Auth)*
+
+### Bookings
+- `POST /api/bookings` - Submit a new ceremony booking request. *(Requires Devotee Auth)*
+- `GET /api/bookings/my` - Fetch devotee transaction history. *(Requires Devotee Auth)*
+- `GET /api/bookings/pandit` - Fetch bookings assigned to the logged-in pandit. *(Requires Pandit Auth)*
+- `PUT /api/bookings/:id/accept` - Mark booking status as accepted. *(Requires Pandit Auth)*
+- `PUT /api/bookings/:id/reject` - Reject booking with a reason note. *(Requires Pandit Auth)*
+- `PUT /api/bookings/:id/complete` - Mark accepted booking as completed. *(Requires Pandit or Admin Auth)*
+- `PUT /api/bookings/:id/cancel` - Cancel a booking request. *(Requires Devotee Auth)*
+
+### Availability
+- `GET /api/availability/me` - Fetch pandit's schedule slots. *(Requires Pandit Auth)*
+- `GET /api/availability/pandit/:panditId` - Query pandit availability dates & times.
+- `POST /api/availability` - Set new availability dates and time slots. *(Requires Pandit Auth)*
+- `PUT /api/availability/:id` - Update schedule configurations. *(Requires Pandit Auth)*
+- `DELETE /api/availability/:id` - Delete schedule slot. *(Requires Pandit Auth)*
+
+### Admin
+- `GET /api/admin/stats` - Query platform-wide statistics (Users, Pandits, Bookings, Completed, Revenue). *(Requires Admin Auth)*
+- `GET /api/admin/pandits/pending` - Fetch unverified Pandits awaiting approval. *(Requires Admin Auth)*
+- `GET /api/admin/pandits` - Fetch all pandits. *(Requires Admin Auth)*
+- `PUT /api/admin/pandits/:id/verify` - Approve a Pandit, making them visible in public listings. *(Requires Admin Auth)*
+- `PUT /api/admin/pandits/:id/reject` - Reject and block a Pandit profile request. *(Requires Admin Auth)*
+- `GET /api/admin/users` - List all system users. *(Requires Admin Auth)*
+- `PUT /api/admin/users/:id/suspend` - Toggle user suspension status. *(Requires Admin Auth)*
+- `GET /api/admin/bookings` - Query all bookings on the platform. *(Requires Admin Auth)*
 
 ---
 
-## 🎨 Design System
+## 👥 Role Matrix
 
-- **Colors:** Saffron (`#F97316`) + Gold (`#D97706`) + Crimson (`#BE123C`)
-- **Typography:** Playfair Display (headings) + Poppins (body)
-- **Dark Mode:** Full support via Tailwind `dark:` classes
-- **Theme Storage:** User preference saved to `localStorage`
+| Capability | Devotee (User) | Pandit | Administrator |
+|---|---|---|---|
+| Search & view verified Pandits | Yes | Yes | Yes |
+| Select slot & book ceremony | Yes | No | No |
+| Accept/Reject booking request | No | Yes | No |
+| Mark booking as Completed | No | Yes | Yes |
+| Set schedule availability | No | Yes | No |
+| Upload profile details & photos | No | Yes | No |
+| Verify/Reject Pandits | No | No | Yes |
+| Suspend/Unsuspend Users | No | No | Yes |
+| CRUD Ritual catalog | No | No | Yes |
+| View platform analytics dashboard | No | No | Yes |
 
 ---
 
-## 🔒 Security
+## 🔒 Security Practices
 
-- Passwords hashed with `bcryptjs` (12 rounds)
-- JWT tokens with configurable expiry
-- Role-based middleware on all sensitive routes
-- Users can only access their own data
-- Suspended users cannot login
+- **Password Hashing:** Passwords securely salted and hashed using `bcryptjs` with 12 rounds.
+- **JWT Authorization:** Session cookies/authorization headers signed and verified securely.
+- **Access Restrictions:** Role guards prevent Users, Pandits, or Admins from triggering routes outside their authorization level.
+- **Local Data Protection:** Sensitive passwords, keys, and details are completely removed from public UI code.
+- **Memory-only Uploads:** Zero local storage leakages. Buffers are processed dynamically in server RAM before streaming to Cloudinary.
 
 ---
 
 ## 📸 Screenshots
 
-> *Add screenshots of the application here after deployment*
+> *Screenshots are captured and stored inside the assets folder for recruiters and evaluators.*
 
-- Home Page (Light Mode)
-- Home Page (Dark Mode)
-- Pandit Listing with Filters
-- Pandit Profile with Availability
-- Booking Wizard (Steps 1-4)
-- User Dashboard
-- Pandit Dashboard
-- Admin Dashboard
+- **Home Page (Serif Typography theme)**
+- **User Dashboard (Timeline tracking status)**
+- **Pandit Dashboard (Calendar scheduler and booking approvals)**
+- **Admin Dashboard (Verification manager and statistics charts)**
+- **Booking Flow (Multi-step checkout wizard)**
 
 ---
 
-## 🔮 Future Maintenance Notes
+## 🔮 Future Development Notes
 
-1. **File Storage:** Currently using local disk (`/backend/uploads`). For production, migrate to S3/Cloudinary.
-2. **Email Notifications:** Add nodemailer for booking confirmations.
-3. **Ratings System:** Schema hooks already prepared; activate the UI when ready.
-4. **Multi-city Scaling:** Location fields support city + region + state – ready for geographic expansion.
-5. **Analytics:** The KPI data is trackable via `/api/admin/stats`; integrate with a dashboard tool.
-6. **Payment Gateway:** Not in scope; when adding, integrate Razorpay/Stripe after booking acceptance.
+1. **Ratings & Devotee Feedback:** Star reviews can be activated in the UI using existing MongoDB schemas.
+2. **Notification Subsystem:** Integrate nodemailer/SMS gateways to alert devotees when bookings are accepted or completed.
+3. **Geo-Location Search:** Expand location search to support latitude/longitude radius queries.
+4. **Online Payment Gateway:** Integrations for Razorpay or Stripe can be initialized post Pandit approval step.
 
 ---
 
 ## 📄 License
 
-MIT © PujaConnect 2024
+MIT © PujaConnect 2026
 
 ---
 
-<div align="center">Built with 🙏 for the community</div>
+<div align="center">Dedicated to making religious services accessible, transparent, and reliable.</div>
