@@ -15,6 +15,7 @@ import PanditList    from './pages/PanditList';
 import PanditProfile from './pages/PanditProfile';
 import BookingPage   from './pages/BookingPage';
 import Rituals       from './pages/Rituals';
+import PlaceholderPage from './pages/PlaceholderPage';
 import UserDashboard   from './pages/dashboard/UserDashboard';
 import PanditDashboard from './pages/dashboard/PanditDashboard';
 import AdminDashboard  from './pages/dashboard/AdminDashboard';
@@ -58,6 +59,16 @@ function App() {
             <Route path="/pandits"    element={<Layout><PanditList /></Layout>} />
             <Route path="/pandits/:id" element={<Layout><PanditProfile /></Layout>} />
             <Route path="/rituals"    element={<Layout><Rituals /></Layout>} />
+
+            {/* Placeholder routes */}
+            <Route path="/resources/puja-guide" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/resources/ritual-info" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/resources/faq" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/resources/support" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/trust/verified-pandits" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/trust/secure-booking" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/trust/guidelines" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/trust/support" element={<Layout><PlaceholderPage /></Layout>} />
 
             {/* User-only routes */}
             <Route path="/dashboard" element={
