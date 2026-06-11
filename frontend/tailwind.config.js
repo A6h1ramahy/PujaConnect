@@ -57,8 +57,8 @@ export default {
         },
       },
       fontFamily: {
-        sans:    ['Poppins', 'sans-serif'],
-        display: ['Playfair Display', 'serif'],
+        sans:    ['Source Serif 4', 'Georgia', 'Times New Roman', 'serif'],
+        display: ['Cormorant Garamond', 'Georgia', 'Times New Roman', 'serif'],
       },
       backgroundImage: {
         'saffron-gradient': 'linear-gradient(135deg, #F97316 0%, #D97706 50%, #B91C1C 100%)',
