@@ -8,6 +8,32 @@ const ritualSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
+    slug: {
+      type: String,
+      required: [true, 'Slug is required'],
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    category: {
+      type: String,
+      required: [true, 'Category is required'],
+      enum: [
+        'Griha & Property Pujas',
+        'Marriage & Family Rituals',
+        'Child & Sanskar Ceremonies',
+        'Business & Career Pujas',
+        'Health & Protection Pujas',
+        'Festival Pujas',
+        'Shiva Pujas',
+        'Vishnu Pujas',
+        'Devi Pujas',
+        'Navagraha Pujas',
+        'Homa & Havan Rituals',
+        'Special Vedic Ceremonies',
+      ],
+      trim: true,
+    },
     description: {
       type: String,
       required: [true, 'Description is required'],
@@ -35,6 +61,18 @@ const ritualSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
+    popular: {
+      type: Boolean,
+      default: false,
+    },
+    searchKeywords: {
+      type: [String],
+      default: [],
+    },
     imageUrl: {
       type: String,
       default: '',
@@ -42,5 +80,11 @@ const ritualSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Indexes for query performance
+ritualSchema.index({ category: 1 });
+ritualSchema.index({ searchKeywords: 1 });
+ritualSchema.index({ popular: 1 });
+ritualSchema.index({ featured: 1 });
 
 module.exports = mongoose.model('Ritual', ritualSchema);

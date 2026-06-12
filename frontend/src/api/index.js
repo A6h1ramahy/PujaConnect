@@ -5,7 +5,7 @@ export const getPanditById   = (id)     => api.get(`/pandits/${id}`);
 export const getMyProfile    = ()       => api.get('/pandits/me');
 export const updateMyProfile = (data)   => api.post('/pandits/profile', data);
 
-export const getRituals = () => api.get('/rituals');
+export const getRituals = (params) => api.get('/rituals', { params });
 
 export const getMyBookings    = ()       => api.get('/bookings/my');
 export const getPanditBookings = ()      => api.get('/bookings/pandit');
