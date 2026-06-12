@@ -55,7 +55,8 @@ const Home = () => {
   const [popularRituals, setPopularRituals] = useState([]);
   const [recentRituals, setRecentRituals] = useState([]);
   const [featuredRituals, setFeaturedRituals] = useState([]);
-  const [activeTab, setActiveTab] = useState('featured'); // 'featured', 'popular', 'recent'
+  const [karnatakaRituals, setKarnatakaRituals] = useState([]);
+  const [activeTab, setActiveTab] = useState('featured'); // 'featured', 'popular', 'recent', 'karnataka'
   const [featuredPandits, setFeaturedPandits] = useState([]);
   const [loadingPandits, setLoadingPandits] = useState(true);
   const [loadingRituals, setLoadingRituals] = useState(true);
@@ -63,15 +64,17 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [popularRes, recentRes, featuredRes, panditsRes] = await Promise.all([
+        const [popularRes, recentRes, featuredRes, karnatakaRes, panditsRes] = await Promise.all([
           getRituals({ popular: true, limit: 8 }),
           getRituals({ sort: 'recent', limit: 8 }),
           getRituals({ featured: true, limit: 8 }),
+          getRituals({ region: 'Karnataka', limit: 8 }),
           getPandits({ limit: 3 }),
         ]);
         setPopularRituals(popularRes.data.rituals || []);
         setRecentRituals(recentRes.data.rituals || []);
         setFeaturedRituals(featuredRes.data.rituals || []);
+        setKarnatakaRituals(karnatakaRes.data.rituals || []);
         setFeaturedPandits(panditsRes.data.pandits || []);
       } catch (err) {
         console.error('Failed to load homepage data:', err);
@@ -91,6 +94,7 @@ const Home = () => {
   const getActiveRituals = () => {
     if (activeTab === 'popular') return popularRituals;
     if (activeTab === 'recent') return recentRituals;
+    if (activeTab === 'karnataka') return karnatakaRituals;
     return featuredRituals;
   };
 
@@ -193,6 +197,7 @@ const Home = () => {
             {[
               { id: 'featured', label: 'Featured Pujas', icon: '⭐' },
               { id: 'popular', label: 'Most Popular', icon: '🔥' },
+              { id: 'karnataka', label: 'Popular in Karnataka', icon: '📍' },
               { id: 'recent', label: 'Recently Added', icon: '🆕' }
             ].map((tab) => (
               <button
@@ -217,7 +222,7 @@ const Home = () => {
               {getActiveRituals().map((ritual, i) => (
                 <Link
                   key={ritual._id}
-                  to={`/rituals?search=${encodeURIComponent(ritual.pujaName)}`}
+                  to={`/rituals/${ritual.slug}`}
                   id={`ritual-card-${ritual._id}`}
                   className="card p-5 group flex flex-col justify-between h-full bg-white dark:bg-dark-card border border-light-border dark:border-dark-border hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300 animate-fade-in"
                 >
@@ -231,8 +236,13 @@ const Home = () => {
                     <h3 className="font-semibold text-stone-900 dark:text-stone-100 group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors text-sm mb-1 line-clamp-1">
                       {ritual.pujaName}
                     </h3>
+                    {ritual.localNames?.kannada && (
+                      <p className="text-[10px] text-saffron-600 dark:text-saffron-400 font-medium italic mb-1.5 truncate">
+                        Kannada: {ritual.localNames.kannada}
+                      </p>
+                    )}
                     <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-2 leading-normal mb-3">
-                      {ritual.description}
+                      {ritual.shortDescription || ritual.description}
                     </p>
                   </div>
                   <div>

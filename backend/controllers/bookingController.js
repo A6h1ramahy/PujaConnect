@@ -213,6 +213,14 @@ const completeBooking = async (req, res, next) => {
     pushHistory(booking, 'completed', req.user._id);
     await booking.save();
 
+    // Increment bookingCount of the ritual
+    if (booking.ritual) {
+      const Ritual = require('../models/Ritual');
+      await Ritual.findByIdAndUpdate(booking.ritual, { $inc: { bookingCount: 1 } }).catch((err) => {
+        console.error('Failed to increment ritual bookingCount:', err);
+      });
+    }
+
     res.json({ message: 'Booking marked as completed', booking });
   } catch (error) {
     next(error);

@@ -90,7 +90,7 @@ const deleteRitual = async (req, res, next) => {
 // @access Public
 const getRituals = async (req, res, next) => {
   try {
-    const { search, category, locationType, popular, featured, deity, keyword, sort, limit } = req.query;
+    const { search, category, locationType, popular, featured, deity, keyword, occasion, region, sort, limit } = req.query;
 
     const query = { isActive: true };
 
@@ -137,6 +137,16 @@ const getRituals = async (req, res, next) => {
       query.featured = true;
     }
 
+    // Occasion filter (inside occasionTags array)
+    if (occasion) {
+      query.occasionTags = occasion;
+    }
+
+    // Region filter (inside supportedRegions array)
+    if (region) {
+      query.supportedRegions = region;
+    }
+
     // Deity / Keyword specific filter (inside searchKeywords array)
     if (deity || keyword) {
       query.searchKeywords = new RegExp(deity || keyword, 'i');
@@ -160,6 +170,21 @@ const getRituals = async (req, res, next) => {
   }
 };
 
+// @desc  Get a single ritual by slug (public)
+// @route GET /api/rituals/:slug
+// @access Public
+const getRitualBySlug = async (req, res, next) => {
+  try {
+    const ritual = await Ritual.findOne({ slug: req.params.slug, isActive: true });
+    if (!ritual) {
+      return res.status(404).json({ message: 'Ritual not found' });
+    }
+    res.json({ ritual });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc  Get all rituals (admin – includes inactive)
 // @route GET /api/rituals/all
 // @access Admin
@@ -172,4 +197,4 @@ const getAllRituals = async (req, res, next) => {
   }
 };
 
-module.exports = { createRitual, updateRitual, deleteRitual, getRituals, getAllRituals };
+module.exports = { createRitual, updateRitual, deleteRitual, getRituals, getRitualBySlug, getAllRituals };

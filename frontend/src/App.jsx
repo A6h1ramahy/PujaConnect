@@ -15,6 +15,7 @@ import PanditList    from './pages/PanditList';
 import PanditProfile from './pages/PanditProfile';
 import BookingPage   from './pages/BookingPage';
 import Rituals       from './pages/Rituals';
+import RitualDetail  from './pages/RitualDetail';
 import PlaceholderPage from './pages/PlaceholderPage';
 import UserDashboard   from './pages/dashboard/UserDashboard';
 import PanditDashboard from './pages/dashboard/PanditDashboard';
@@ -59,6 +60,7 @@ function App() {
             <Route path="/pandits"    element={<Layout><PanditList /></Layout>} />
             <Route path="/pandits/:id" element={<Layout><PanditProfile /></Layout>} />
             <Route path="/rituals"    element={<Layout><Rituals /></Layout>} />
+            <Route path="/rituals/:slug" element={<Layout><RitualDetail /></Layout>} />
 
             {/* Placeholder routes */}
             <Route path="/resources/puja-guide" element={<Layout><PlaceholderPage /></Layout>} />

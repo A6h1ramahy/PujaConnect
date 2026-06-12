@@ -57,6 +57,7 @@ const Rituals = () => {
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [locationType, setLocationType] = useState(searchParams.get('locationType') || '');
   const [popularOnly, setPopularOnly] = useState(searchParams.get('popular') === 'true');
+  const [occasion, setOccasion] = useState(searchParams.get('occasion') || '');
   
   const [rituals, setRituals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,6 +81,7 @@ const Rituals = () => {
         if (category) params.category = category;
         if (locationType) params.locationType = locationType;
         if (popularOnly) params.popular = true;
+        if (occasion) params.occasion = occasion;
 
         const { data } = await getRituals(params);
         setRituals(data.rituals || []);
@@ -100,18 +102,20 @@ const Rituals = () => {
       if (category) nextParams.category = category;
       if (locationType) nextParams.locationType = locationType;
       if (popularOnly) nextParams.popular = 'true';
+      if (occasion) nextParams.occasion = occasion;
       setSearchParams(nextParams, { replace: true });
 
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [search, category, locationType, popularOnly]);
+  }, [search, category, locationType, popularOnly, occasion]);
 
   const handleResetFilters = () => {
     setSearch('');
     setCategory('');
     setLocationType('');
     setPopularOnly(false);
+    setOccasion('');
     setSearchParams({}, { replace: true });
   };
 
@@ -121,6 +125,7 @@ const Rituals = () => {
     if (category) count++;
     if (locationType) count++;
     if (popularOnly) count++;
+    if (occasion) count++;
     return count;
   };
 
@@ -245,6 +250,29 @@ const Rituals = () => {
                 </label>
               </div>
 
+              {/* Occasion Filter */}
+              <div className="flex flex-col gap-2 pb-2 border-b border-light-border dark:border-dark-border">
+                <label className="text-xs font-bold text-stone-600 dark:text-stone-400 uppercase tracking-wider">Occasion</label>
+                <select
+                  id="catalog-occasion-select"
+                  value={occasion}
+                  onChange={(e) => setOccasion(e.target.value)}
+                  className="w-full text-xs py-2 px-3 rounded-xl bg-stone-100 dark:bg-stone-900/60 border border-light-border dark:border-dark-border/40 focus:outline-none focus:ring-1 focus:ring-saffron-500 text-stone-700 dark:text-stone-300 font-medium cursor-pointer"
+                >
+                  <option value="">All Occasions</option>
+                  <option value="New Home">New Home</option>
+                  <option value="Marriage">Marriage</option>
+                  <option value="Prosperity">Prosperity</option>
+                  <option value="Protection">Protection</option>
+                  <option value="Health">Health</option>
+                  <option value="Festival">Festival</option>
+                  <option value="Business Opening">Business Opening</option>
+                  <option value="Career Growth">Career Growth</option>
+                  <option value="Education">Education</option>
+                  <option value="Peace & Ancestors">Peace & Ancestors</option>
+                </select>
+              </div>
+
               {/* Categories List */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-stone-600 dark:text-stone-400 uppercase tracking-wider">Categories</label>
@@ -332,6 +360,12 @@ const Rituals = () => {
                       <HiX className="cursor-pointer text-amber-400 hover:text-amber-600" onClick={() => setPopularOnly(false)} />
                     </span>
                   )}
+                  {occasion && (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-indigo-50 dark:bg-indigo-950/20 text-indigo-750 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/30">
+                      🏷️ {occasion}
+                      <HiX className="cursor-pointer text-indigo-400 hover:text-indigo-600" onClick={() => setOccasion('')} />
+                    </span>
+                  )}
                   <button 
                     onClick={handleResetFilters}
                     className="text-xs text-saffron-600 dark:text-saffron-400 hover:underline font-semibold ml-2"
@@ -376,36 +410,57 @@ const Rituals = () => {
                     )}
                     
                     <div>
-                      <div className="flex items-center gap-3 mb-4">
+                      <div className="flex items-start gap-3 mb-4">
                         <div className="w-12 h-12 rounded-xl bg-saffron-gradient flex items-center justify-center text-xl shadow-glow-saffron shrink-0">
                           {ICONS[i % ICONS.length]}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border tracking-wide inline-block ${getCategoryColor(ritual.category)}`}>
                             {ritual.category}
                           </span>
                           <h2 className="font-display font-bold text-base text-stone-900 dark:text-stone-100 group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors mt-0.5 line-clamp-1">
-                            {ritual.pujaName}
+                            <Link to={`/rituals/${ritual.slug}`}>{ritual.pujaName}</Link>
                           </h2>
+                          {ritual.localNames?.kannada && (
+                            <p className="text-[10px] text-saffron-600 dark:text-saffron-400 font-medium italic mt-0.5 truncate">
+                              Kannada: {ritual.localNames.kannada}
+                            </p>
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 text-[10px] text-stone-500 dark:text-stone-400 mb-3 font-semibold bg-stone-50 dark:bg-stone-900/40 p-2 rounded-lg border border-light-border dark:border-dark-border/40">
-                        <span className="flex items-center gap-1"><HiClock className="text-gold-500 text-sm" /> {ritual.duration}</span>
-                        <span className="text-stone-300 dark:text-stone-700">|</span>
-                        <span className="flex items-center gap-1">
+                      <div className="flex flex-wrap gap-1.5 text-[10px] text-stone-500 dark:text-stone-400 mb-3 font-semibold">
+                        <span className="flex items-center gap-1 bg-stone-50 dark:bg-stone-900/40 p-1.5 rounded border border-light-border dark:border-dark-border/40">
+                          <HiClock className="text-gold-500 text-sm" /> {ritual.duration} ({ritual.durationMinutes}m)
+                        </span>
+                        <span className="flex items-center gap-1 bg-stone-50 dark:bg-stone-900/40 p-1.5 rounded border border-light-border dark:border-dark-border/40">
                           {ritual.locationType === 'Home' ? (
                             <HiHome className="text-emerald-500 text-sm" />
                           ) : (
                             <MdOutlineTempleHindu className="text-saffron-500 text-sm" />
                           )}
-                          Supports {ritual.locationType}
+                          {ritual.locationType}
                         </span>
+                        {ritual.estimatedMaterialCost > 0 && (
+                          <span className="flex items-center gap-1 bg-stone-50 dark:bg-stone-900/40 p-1.5 rounded border border-light-border dark:border-dark-border/40">
+                            Mat: ₹{ritual.estimatedMaterialCost}
+                          </span>
+                        )}
                       </div>
 
                       <p className="text-xs text-stone-600 dark:text-stone-350 leading-relaxed mb-4 line-clamp-3">
-                        {ritual.description}
+                        {ritual.shortDescription || ritual.description}
                       </p>
+
+                      {ritual.occasionTags?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {ritual.occasionTags.slice(0, 3).map(tag => (
+                            <span key={tag} className="text-[9px] text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-850 px-2 py-0.5 rounded-full font-medium">
+                              🏷️ {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="border-t border-light-border dark:border-dark-border pt-4 mt-auto">
@@ -415,12 +470,20 @@ const Rituals = () => {
                           ₹{ritual.priceRange?.min?.toLocaleString('en-IN')} – ₹{ritual.priceRange?.max?.toLocaleString('en-IN')}
                         </span>
                       </div>
-                      <Link 
-                        to={`/pandits?ritual=${encodeURIComponent(ritual.pujaName)}`}
-                        className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-saffron-50 dark:bg-saffron-950/20 text-saffron-700 dark:text-saffron-400 border border-saffron-100 dark:border-saffron-900/30 hover:bg-saffron-600 hover:text-white dark:hover:bg-saffron-700 dark:hover:text-white transition-all duration-300"
-                      >
-                        Find Available Pandits 🕉️
-                      </Link>
+                      <div className="flex gap-2">
+                        <Link 
+                          to={`/rituals/${ritual.slug}`}
+                          className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-bold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors border border-transparent"
+                        >
+                          Details 👁️
+                        </Link>
+                        <Link 
+                          to={`/pandits?ritual=${encodeURIComponent(ritual.pujaName)}`}
+                          className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-bold bg-saffron-50 dark:bg-saffron-950/20 text-saffron-700 dark:text-saffron-400 border border-saffron-100 dark:border-saffron-900/30 hover:bg-saffron-600 hover:text-white dark:hover:bg-saffron-700 dark:hover:text-white transition-all duration-300"
+                        >
+                          Find Pandits 🕉️
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}
