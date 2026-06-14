@@ -183,11 +183,6 @@ const RitualDetail = () => {
             
             {/* Header info */}
             <div>
-              {ritual.localNames?.kannada && (
-                <p className="text-lg font-display text-saffron-600 dark:text-saffron-400 italic mb-1 font-medium">
-                  Kannada: {ritual.localNames.kannada}
-                </p>
-              )}
               <h1 className="section-title text-4xl leading-tight mb-3 text-gradient">
                 {ritual.pujaName}
               </h1>
@@ -238,7 +233,7 @@ const RitualDetail = () => {
                   {ritual.occasionTags.map((tag) => (
                     <span 
                       key={tag} 
-                      className="px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-100 dark:bg-stone-850 text-stone-600 dark:text-stone-300 border border-light-border dark:border-dark-border"
+                      className="px-3 py-1.5 rounded-full text-xs font-bold bg-saffron-50 dark:bg-saffron-950/20 text-saffron-800 dark:text-saffron-300 border border-saffron-200 dark:border-saffron-900/50"
                     >
                       🏷️ {tag}
                     </span>

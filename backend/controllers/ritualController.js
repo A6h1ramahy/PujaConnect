@@ -35,7 +35,6 @@ const createRitual = async (req, res, next) => {
       searchKeywords,
       occasionTags,
       supportedRegions,
-      localNames,
       imageUrl,
     } = req.body;
 
@@ -62,8 +61,7 @@ const createRitual = async (req, res, next) => {
       popular: popular === true || popular === 'true',
       searchKeywords: Array.isArray(searchKeywords) ? searchKeywords : [],
       occasionTags: Array.isArray(occasionTags) ? occasionTags : [],
-      supportedRegions: Array.isArray(supportedRegions) ? supportedRegions : ['Karnataka'],
-      localNames: localNames || { kannada: '' },
+      supportedRegions: Array.isArray(supportedRegions) ? supportedRegions : [],
       imageUrl: imageUrl || '',
     });
 

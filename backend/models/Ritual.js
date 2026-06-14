@@ -97,13 +97,7 @@ const ritualSchema = new mongoose.Schema(
     },
     supportedRegions: {
       type: [String],
-      default: ['Karnataka'],
-    },
-    localNames: {
-      kannada: {
-        type: String,
-        default: '',
-      },
+      default: [],
     },
     imageUrl: {
       type: String,

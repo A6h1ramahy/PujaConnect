@@ -66,8 +66,7 @@ const AdminDashboard = () => {
     requiredMaterials: '',
     searchKeywords: '',
     occasionTags: '',
-    supportedRegions: 'Karnataka',
-    kannadaName: '',
+    supportedRegions: '',
     imageUrl: '',
     bookingCount: 0
   });
@@ -195,8 +194,7 @@ const AdminDashboard = () => {
       requiredMaterials: '',
       searchKeywords: '',
       occasionTags: '',
-      supportedRegions: 'Karnataka',
-      kannadaName: '',
+      supportedRegions: '',
       imageUrl: '',
       bookingCount: 0
     });
@@ -226,7 +224,6 @@ const AdminDashboard = () => {
         searchKeywords:        ritualForm.searchKeywords.split(',').map((k) => k.trim()).filter(Boolean),
         occasionTags:          ritualForm.occasionTags.split(',').map((t) => t.trim()).filter(Boolean),
         supportedRegions:      ritualForm.supportedRegions.split(',').map((r) => r.trim()).filter(Boolean),
-        localNames:            { kannada: ritualForm.kannadaName },
         imageUrl:              ritualForm.imageUrl,
       };
 
@@ -276,7 +273,6 @@ const AdminDashboard = () => {
       searchKeywords:        (ritual.searchKeywords || []).join(', '),
       occasionTags:          (ritual.occasionTags || []).join(', '),
       supportedRegions:      (ritual.supportedRegions || []).join(', '),
-      kannadaName:           ritual.localNames?.kannada || '',
       imageUrl:              ritual.imageUrl || '',
       bookingCount:          ritual.bookingCount || 0,
     });
@@ -507,16 +503,10 @@ const AdminDashboard = () => {
                         </div>
                       </div>
 
-                      {/* Row 2: Kannada Local Name & Short Desc */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="form-group">
-                          <label htmlFor="ritual-kannada" className="label">Kannada Name</label>
-                          <input id="ritual-kannada" type="text" value={ritualForm.kannadaName} onChange={(e) => setRitualForm({ ...ritualForm, kannadaName: e.target.value })} placeholder="ಕನ್ನಡ ಹೆಸರು..." className="input-field" />
-                        </div>
-                        <div className="form-group md:col-span-2">
-                          <label htmlFor="ritual-short-desc" className="label">Short Description</label>
-                          <input id="ritual-short-desc" type="text" value={ritualForm.shortDescription} onChange={(e) => setRitualForm({ ...ritualForm, shortDescription: e.target.value })} placeholder="One sentence summary of the ritual..." className="input-field" required />
-                        </div>
+                      {/* Row 2: Short Description */}
+                      <div className="form-group">
+                        <label htmlFor="ritual-short-desc" className="label">Short Description</label>
+                        <input id="ritual-short-desc" type="text" value={ritualForm.shortDescription} onChange={(e) => setRitualForm({ ...ritualForm, shortDescription: e.target.value })} placeholder="One sentence summary of the ritual..." className="input-field" required />
                       </div>
 
                       {/* Row 3: Full Description */}
@@ -575,7 +565,7 @@ const AdminDashboard = () => {
                         </div>
                         <div className="form-group">
                           <label htmlFor="ritual-regions" className="label">Supported Regions <span className="text-stone-400 font-normal">(comma-separated)</span></label>
-                          <input id="ritual-regions" type="text" value={ritualForm.supportedRegions} onChange={(e) => setRitualForm({ ...ritualForm, supportedRegions: e.target.value })} placeholder="Karnataka, Tamil Nadu..." className="input-field" />
+                          <input id="ritual-regions" type="text" value={ritualForm.supportedRegions} onChange={(e) => setRitualForm({ ...ritualForm, supportedRegions: e.target.value })} placeholder="Enter state or region" className="input-field" />
                         </div>
                       </div>
 
@@ -743,11 +733,6 @@ const AdminDashboard = () => {
                   {selectedRitual.category}
                 </span>
                 <h3 className="font-display font-bold text-xl text-stone-900 dark:text-stone-100 mt-1">{selectedRitual.pujaName}</h3>
-                {selectedRitual.localNames?.kannada && (
-                  <p className="text-xs text-saffron-600 dark:text-saffron-400 font-medium italic mt-0.5">
-                    Kannada: {selectedRitual.localNames.kannada}
-                  </p>
-                )}
               </div>
             </div>
 

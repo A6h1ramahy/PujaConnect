@@ -240,11 +240,6 @@ const Home = () => {
                     <h3 className="font-semibold text-stone-900 dark:text-stone-100 group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors text-sm mb-1 line-clamp-1">
                       {ritual.pujaName}
                     </h3>
-                    {ritual.localNames?.kannada && (
-                      <p className="text-[10px] text-saffron-600 dark:text-saffron-400 font-medium italic mb-1.5 truncate">
-                        Kannada: {ritual.localNames.kannada}
-                      </p>
-                    )}
                     <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-2 leading-normal mb-3">
                       {ritual.shortDescription || ritual.description}
                     </p>

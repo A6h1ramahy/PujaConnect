@@ -423,11 +423,6 @@ const Rituals = () => {
                           <h2 className="font-display font-bold text-base text-stone-900 dark:text-stone-100 group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors mt-0.5 line-clamp-1">
                             <Link to={`/rituals/${ritual.slug}`}>{ritual.pujaName}</Link>
                           </h2>
-                          {ritual.localNames?.kannada && (
-                            <p className="text-[10px] text-saffron-600 dark:text-saffron-400 font-medium italic mt-0.5 truncate">
-                              Kannada: {ritual.localNames.kannada}
-                            </p>
-                          )}
                         </div>
                       </div>
 

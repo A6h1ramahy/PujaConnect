@@ -17,7 +17,6 @@ const ritualsData = [
     searchKeywords: ['housewarming', 'new home', 'home entry', 'vastu', 'graha pravesh', 'grihapravesh', 'entering house'],
     occasionTags: ['New Home', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
-    localNames: { kannada: 'ಗೃಹ ಪ್ರವೇಶ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -37,7 +36,6 @@ const ritualsData = [
     searchKeywords: ['land purchase', 'construction', 'plot puja', 'foundation', 'bhumi devi', 'new build'],
     occasionTags: ['New Home'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಭೂಮಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -57,7 +55,6 @@ const ritualsData = [
     searchKeywords: ['vastu dosh', 'home peace', 'architectural defect', 'vastu shanti', 'harmony', 'energy check'],
     occasionTags: ['New Home', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ವಾಸ್ತು ಶಾಂತಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -77,7 +74,6 @@ const ritualsData = [
     searchKeywords: ['new office', 'shop opening', 'inauguration', 'business startup', 'workplace', 'new business'],
     occasionTags: ['Business Opening', 'Career Growth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಕಚೇರಿ ಉದ್ಘಾಟನಾ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -96,8 +92,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['door entry', 'entrance puja', 'protection', 'threshold', 'main gate'],
     occasionTags: ['New Home', 'Protection'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ದ್ವಾರ ಪೂಜೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -117,7 +112,6 @@ const ritualsData = [
     searchKeywords: ['foundation stone', 'construction start', 'stone laying', 'masonry', 'building foundation'],
     occasionTags: ['New Home'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶಿಲಾ ನ್ಯಾಸ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -136,8 +130,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['water boring', 'tube well', 'well digging', 'groundwater', 'boring puja'],
     occasionTags: ['New Home', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಬೋರಿಂಗ್ ಪೂಜೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -157,7 +150,6 @@ const ritualsData = [
     searchKeywords: ['earth fire', 'purification', 'land Homa', 'bhoomi devi', 'soil blessing'],
     occasionTags: ['New Home'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಭೂಮಿ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -176,8 +168,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['selling property', 'real estate sale', 'remove obstacles', 'buyer attraction', 'sell house'],
     occasionTags: ['Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಆಸ್ತಿ ಮಾರಾಟ ಪೂಜೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -196,8 +187,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['karnataka housewarming', 'gruhapravesha', 'vastu homa', 'new home fire'],
     occasionTags: ['New Home', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಗೃಹ ಪ್ರವೇಶ ಹೋಮ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -219,7 +209,6 @@ const ritualsData = [
     searchKeywords: ['marriage', 'wedding', 'shaadi', 'matrimony', 'sacred vows', 'saptapadi', 'vivaha'],
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
-    localNames: { kannada: 'ವೇದೋಕ್ತ ವಿವಾಹ ಮಹೋತ್ಸವ' },
     imageUrl: ''
   },
   {
@@ -239,7 +228,6 @@ const ritualsData = [
     searchKeywords: ['satyanarayan vrata', 'karnataka satyanarayana', 'purnima katha', 'family prosperity', 'vishnu puja'],
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ಸತ್ಯನಾರಾಯಣ ಸ್ವಾಮಿ ವ್ರತ' },
     imageUrl: ''
   },
   {
@@ -259,7 +247,6 @@ const ritualsData = [
     searchKeywords: ['engagement', 'ring ceremony', 'sagai', 'mangni', 'pre-wedding', 'promise'],
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ನಿಶ್ಚಿತಾರ್ಥ ಕಾರ್ಯಕ್ರಮ' },
     imageUrl: ''
   },
   {
@@ -279,7 +266,6 @@ const ritualsData = [
     searchKeywords: ['marriage harmony', 'shiva parvati', 'marital peace', 'relationship', 'family union'],
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಗೌರಿ ಶಂಕರ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -299,7 +285,6 @@ const ritualsData = [
     searchKeywords: ['roka', 'alliance', 'marriage consent', 'pre wedding', 'first agreement'],
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ರೋಕಾ ನಿಶ್ಚಿತಾರ್ಥ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -319,7 +304,6 @@ const ritualsData = [
     searchKeywords: ['ancestor worship', 'death anniversary', 'pinda daan', 'shraddha', 'pitru', 'remembrance'],
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ವಾರ್ಷಿಕ ಶ್ರಾದ್ಧ ಕಾರ್ಯ' },
     imageUrl: ''
   },
   {
@@ -339,7 +323,6 @@ const ritualsData = [
     searchKeywords: ['kanyadaan', 'wedding gift', 'wedding ritual', 'daughter wedding', 'giving hand'],
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಕನ್ಯಾದಾನ ಪ್ರಕ್ರಿಯೆ' },
     imageUrl: ''
   },
   {
@@ -359,7 +342,6 @@ const ritualsData = [
     searchKeywords: ['tulsi wedding', 'karthika vivaha', 'shaligram marriage', 'tulasi habba', 'holy basil'],
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ತುಳಸಿ ವಿವಾಹ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -379,7 +361,6 @@ const ritualsData = [
     searchKeywords: ['husband long life', 'savitri vrat', 'banyan tree', 'married women', 'protection husband'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ವಟ ಸಾವಿತ್ರಿ ಪೂಜೆ' },
     imageUrl: ''
   },
 
@@ -401,7 +382,6 @@ const ritualsData = [
     searchKeywords: ['naming ceremony', 'newborn baby', 'naming child', 'naamkaran', 'sanskar', 'child birth', 'baby name'],
     occasionTags: ['Child Birth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ನಾಮಕರಣ ಸಂಸ್ಕಾರ' },
     imageUrl: ''
   },
   {
@@ -421,7 +401,6 @@ const ritualsData = [
     searchKeywords: ['tonsure', 'baby haircut', 'shaving head', 'mundan', 'child ceremony', 'hair cutting', 'cleansing'],
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಚೌಲ ಅಥವಾ ಮುಂಡನ ಸಂಸ್ಕಾರ' },
     imageUrl: ''
   },
   {
@@ -441,7 +420,6 @@ const ritualsData = [
     searchKeywords: ['sacred thread', 'janeu', 'upanayan', 'spiritual initiation', 'boy ceremony', 'thread ceremony', 'muni thread'],
     occasionTags: ['Education', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಉಪನಯನ ಸಂಸ್ಕಾರ (ಮುಂಜಿ)' },
     imageUrl: ''
   },
   {
@@ -461,7 +439,6 @@ const ritualsData = [
     searchKeywords: ['first solid food', 'feeding baby', 'kheer feeding', 'annaprashan', 'baby health food'],
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಅನ್ನಪ್ರಾಶನ ಸಂಸ್ಕಾರ' },
     imageUrl: ''
   },
   {
@@ -481,7 +458,6 @@ const ritualsData = [
     searchKeywords: ['pregnancy puja', 'baby shower', 'garbh sanskar', 'safe delivery', 'mother blessing', 'child birth blessing'],
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಸೀಮಂತೋನ್ನಯನ (ಗರ್ಭ ಸಂಸ್ಕಾರ)' },
     imageUrl: ''
   },
   {
@@ -500,8 +476,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['ear piercing', 'karnavedha', 'earlobe piercing', 'child health', 'acupuncture'],
     occasionTags: ['Child Birth', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಕರ್ಣವೇಧ ಸಂಸ್ಕಾರ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -521,7 +496,6 @@ const ritualsData = [
     searchKeywords: ['starting school', 'education start', 'saraswati write', 'vidyarambh', 'writing letters', 'kid schooling'],
     occasionTags: ['Education'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ವಿದ್ಯಾರಂಭ ಸಂಸ್ಕಾರ' },
     imageUrl: ''
   },
   {
@@ -540,8 +514,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['birth ritual', 'father feeding', 'jatakarma', 'newborn baby', 'first touch'],
     occasionTags: ['Child Birth'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಜಾತಕರ್ಮ ಸಂಸ್ಕಾರ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -560,8 +533,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['first outing', 'sun worship', 'moon worship', 'nishkramana', 'baby outdoors'],
     occasionTags: ['Child Birth', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ನಿಷ್ಕ್ರಮಣ ಸಂಸ್ಕಾರ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -580,8 +552,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['shikha tuft', 'chudakarana', 'tonsure hair', 'spiritual health', 'shikha ceremony'],
     occasionTags: ['Child Birth', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಚೂಡಾಕರಣ ಸಂಸ್ಕಾರ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -603,7 +574,6 @@ const ritualsData = [
     searchKeywords: ['business start', 'ganesha business', 'remove blocks', 'profit puja', 'ganesh puja', 'business opening', 'shop success'],
     occasionTags: ['Business Opening', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ವ್ಯವಹಾರ ಗಣೇಶ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -623,7 +593,6 @@ const ritualsData = [
     searchKeywords: ['wealth puja', 'kuber coin', 'money block', 'financial growth', 'lakshmi puja', 'wealth creation', 'business growth'],
     occasionTags: ['Business Opening', 'Prosperity', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಲಕ್ಷ್ಮೀ ಕುಬೇರ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -642,8 +611,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['sales growth', 'business success', 'shop puja', 'client attraction', 'increase footfall', 'commercial'],
     occasionTags: ['Business Opening', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ವ್ಯಾಪಾರ ವೃದ್ಧಿ ಪೂಜೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -663,7 +631,6 @@ const ritualsData = [
     searchKeywords: ['factory puja', 'machine worship', 'tool blessing', 'engineers day', 'industrial', 'vehicle puja', 'computers'],
     occasionTags: ['Business Opening', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ವಿಶ್ವಕರ್ಮ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -683,7 +650,6 @@ const ritualsData = [
     searchKeywords: ['exam success', 'job promotion', 'career growth', 'saraswati book', 'clear memory', 'passing test', 'education'],
     occasionTags: ['Education', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ವೃತ್ತಿಪರ ಸರಸ್ವತಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -703,7 +669,6 @@ const ritualsData = [
     searchKeywords: ['job stability', 'layoff protection', 'shani job', 'career hurdle', 'boss problems', 'protection'],
     occasionTags: ['Career Growth', 'Protection'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಉದ್ಯೋಗ ಸ್ಥಿರತೆಗಾಗಿ ಶನಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -722,8 +687,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['government job', 'promotion', 'authority', 'sun worship', 'fame', 'reputation boost', 'career growth'],
     occasionTags: ['Career Growth', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಉದ್ಯೋಗ ಪ್ರಗತಿಗಾಗಿ ಸೂರ್ಯ ಪೂಜೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -742,8 +706,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['partner conflict', 'business peace', 'moon cooling', 'clear decision', 'cool mind'],
     occasionTags: ['Prosperity', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಚಂದ್ರ ಪೂಜೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -765,7 +728,6 @@ const ritualsData = [
     searchKeywords: ['health recovery', 'cure illness', 'shiva health', 'mrityunjay', 'long life', 'protection', 'fear of death', 'disease recovery'],
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
-    localNames: { kannada: 'ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ' },
     imageUrl: ''
   },
   {
@@ -785,7 +747,6 @@ const ritualsData = [
     searchKeywords: ['ayurveda god', 'healing body', 'chronic pain', 'doctor blessing', 'dhanwantari', 'good health', 'disease cure'],
     occasionTags: ['Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ಧನ್ವಂತರಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -805,7 +766,6 @@ const ritualsData = [
     searchKeywords: ['protective shield', 'evil eye', 'black magic removal', 'durga armor', 'accident safety', 'protection', 'fear relief'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಶ್ರೀ ದುರ್ಗಾ ಕವಚ ಪಠಣ' },
     imageUrl: ''
   },
   {
@@ -825,7 +785,6 @@ const ritualsData = [
     searchKeywords: ['courage', 'strength', 'hanuman chalisa', 'fear removal', 'bajrang bali', 'ghost defense', 'protection', 'good health'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಹನುಮಾನ್ ಚಾಲೀಸಾ ಪಾರಾಯಣ' },
     imageUrl: ''
   },
   {
@@ -845,7 +804,6 @@ const ritualsData = [
     searchKeywords: ['subramanya swamy', 'kukke karthikeya', 'skin disease cure', 'snakes', 'protection', 'shashti puja'],
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ಸುಬ್ರಹ್ಮಣ್ಯ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -865,7 +823,6 @@ const ritualsData = [
     searchKeywords: ['sudarshana chakra', 'jealousy clearing', 'career block removal', 'protection', 'vishnu disk'],
     occasionTags: ['Protection', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ಸುದರ್ಶನ ಅರ್ಚನೆ' },
     imageUrl: ''
   },
   {
@@ -884,8 +841,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['patient healing', 'dhanvantari', 'medicine blessing', 'archana', 'good health'],
     occasionTags: ['Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಶ್ರೀ ಧನ್ವಂತರಿ ಅರ್ಚನೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -907,7 +863,6 @@ const ritualsData = [
     searchKeywords: ['diwali', 'lakshmi puja', 'deepavali', 'wealth invitation', 'new year business', 'prosperity', 'wealth'],
     occasionTags: ['Prosperity', 'Wealth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ದೀಪಾವಳಿ ಲಕ್ಷ್ಮೀ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -927,7 +882,6 @@ const ritualsData = [
     searchKeywords: ['ganeshutsav', 'ganpati sthapana', 'chaturthi', 'clay ganesha', 'modak offering', 'education', 'remove obstacles'],
     occasionTags: ['Education', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra', 'Tamil Nadu'],
-    localNames: { kannada: 'ಗಣೇಶ ಚತುರ್ಥಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -947,7 +901,6 @@ const ritualsData = [
     searchKeywords: ['varalakshmi vrata', 'karnataka shravan friday', 'gold puja', 'varamahalakshmi', 'married women festival', 'wealth', 'prosperity'],
     occasionTags: ['Prosperity', 'Wealth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ' },
     imageUrl: ''
   },
   {
@@ -967,7 +920,6 @@ const ritualsData = [
     searchKeywords: ['navratri start', 'ghat sthapana', 'kalash installation', 'durga puja', 'nine nights', 'protection'],
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಘಟಸ್ಥಾಪನೆ (ನವರಾತ್ರಿ ಉದ್ಘಾಟನೆ)' },
     imageUrl: ''
   },
   {
@@ -987,7 +939,6 @@ const ritualsData = [
     searchKeywords: ['shivratri abhishek', 'shiva night', 'wish fulfillment', 'dhatura', 'bhaang', 'health', 'protection'],
     occasionTags: ['Health', 'Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra', 'Tamil Nadu'],
-    localNames: { kannada: 'ಮಹಾ ಶಿವರಾತ್ರಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1007,7 +958,6 @@ const ritualsData = [
     searchKeywords: ['krishna birth', 'gokulashtami', 'swing lord', 'butter bhog', 'janmashtami', 'child health'],
     occasionTags: ['Child Birth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1026,8 +976,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['gowri habba', 'karnataka gowri puja', 'bagina offering', 'parvati worship', 'marriage luck'],
     occasionTags: ['Marriage', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಸ್ವರ್ಣ ಗೌರಿ ವ್ರತ (ಗೌರಿ ಹಬ್ಬ)' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1047,7 +996,6 @@ const ritualsData = [
     searchKeywords: ['kannada new year', 'ugadi bevu bella', 'panchanga sravanam', 'chaitra new year', 'prosperity start'],
     occasionTags: ['Prosperity', 'New Home'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಯುಗಾದಿ ಹಬ್ಬದ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1067,7 +1015,6 @@ const ritualsData = [
     searchKeywords: ['rakhi tying', 'brother sister bond', 'family festival', 'shravan purnima', 'protection brother'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ರಕ್ಷಾಬಂಧನ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1087,7 +1034,6 @@ const ritualsData = [
     searchKeywords: ['karva chauth', 'fasting end', 'udyapan', 'married women gifts', 'husband longevity'],
     occasionTags: ['Marriage', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಕರ್ವಾ ಚೌತ್ ವ್ರತ ಉದ್ಯಾಪನೆ' },
     imageUrl: ''
   },
   {
@@ -1107,7 +1053,6 @@ const ritualsData = [
     searchKeywords: ['chhath puja', 'sun setting', 'river bank', 'thekua prasad', 'bihar festival', 'health children'],
     occasionTags: ['Health', 'Child Birth'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಛತ್ ಪೂಜೆ ಸೂರ್ಯ ಅರ್ಘ್ಯ' },
     imageUrl: ''
   },
   {
@@ -1127,7 +1072,6 @@ const ritualsData = [
     searchKeywords: ['holika dahan', 'bonfire puja', 'good over evil', 'spring festival', 'burn disease'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಹೋಲಿಕಾ ದಹನ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1147,7 +1091,6 @@ const ritualsData = [
     searchKeywords: ['sun transit', 'sankranti', 'sesame offering', 'kite festival', 'crop thank'],
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra', 'Tamil Nadu'],
-    localNames: { kannada: 'ಮಕರ ಸಂಕ್ರಾಂತಿ ಸೂರ್ಯ ತರ್ಪಣ' },
     imageUrl: ''
   },
   {
@@ -1167,7 +1110,6 @@ const ritualsData = [
     searchKeywords: ['hanuman birthday', 'sundarkand path', 'ramayana reading', 'mental confidence', 'protection fear'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಹನುಮದ್ ಜಯಂತಿ ಸುಂದರಕಾಂಡ ಪಾರಾಯಣ' },
     imageUrl: ''
   },
   {
@@ -1186,8 +1128,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['light lamps', 'karnataka temple light', 'karthika deepotsava', 'dharmasthala lights', 'prosperity light'],
     occasionTags: ['Prosperity', 'Wealth'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಲಕ್ಷ ದೀಪೋತ್ಸವ ಸೇವೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -1209,7 +1150,6 @@ const ritualsData = [
     searchKeywords: ['mahadev', 'shiva', 'rudra', 'abhishek', 'rudrabhishek', 'cleansing', 'peace of mind', 'health recovery'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ರುದ್ರಾಭಿಷೇಕ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1229,7 +1169,6 @@ const ritualsData = [
     searchKeywords: ['heavy shiva', 'multi pandit', 'rudram recitation', 'illness cure', 'special Havan'],
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಲಘು ರುದ್ರ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1249,7 +1188,6 @@ const ritualsData = [
     searchKeywords: ['ultimate shiva', 'yajna', '11 pandits', 'community blessing', 'protection country', 'huge fire'],
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಮಹಾ ರುದ್ರ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1269,7 +1207,6 @@ const ritualsData = [
     searchKeywords: ['1000 shiva names', 'archana', 'bel path', 'focus boost', 'education mind', 'peace'],
     occasionTags: ['Education', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶಿವ ಸಹಸ್ರನಾಮ ಅರ್ಚನೆ' },
     imageUrl: ''
   },
   {
@@ -1289,7 +1226,6 @@ const ritualsData = [
     searchKeywords: ['solah somvar', '16 mondays', 'find husband', 'vrat end', 'marriage blessing', 'wellness'],
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಸೋಮವಾರ ವ್ರತ ಉದ್ಯಾಪನೆ' },
     imageUrl: ''
   },
   {
@@ -1309,7 +1245,6 @@ const ritualsData = [
     searchKeywords: ['trayodashi', 'twilight prayer', 'karmic clearing', 'pradosham', 'mental health', 'peace'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಪ್ರದೋಷ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1328,8 +1263,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['kedarnath', 'gauri shankar', 'marriage compatibility', 'early marriage', 'couple union'],
     occasionTags: ['Marriage', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಗೌರಿ ಶಂಕರ ಅರ್ಚನೆ ಸೇವೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1348,8 +1282,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['bel leaves', 'three leaf', 'self realization', 'simple shiva', 'focus mind', 'intellect'],
     occasionTags: ['Education', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಬಿಲ್ವಪತ್ರೆ ಅರ್ಚನೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1368,8 +1301,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['karthika somavara', 'monday shiva', 'milk bath', 'karnataka shiva puja', 'ancestor peace'],
     occasionTags: ['Health', 'Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಕಾರ್ತಿಕ ಸೋಮವಾರ ಶಿವ ಅಭಿಷೇಕ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -1391,7 +1323,6 @@ const ritualsData = [
     searchKeywords: ['1000 vishnu names', 'tulsi offering', 'stress relief', 'anxiety relief', 'shanti', 'peace', 'prosperity'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ವಿಷ್ಣು ಸಹಸ್ರನಾಮ ಪಾರಾಯಣ' },
     imageUrl: ''
   },
   {
@@ -1411,7 +1342,6 @@ const ritualsData = [
     searchKeywords: ['shaligram', 'conch shell', 'righteousness', 'tulsi water', 'home peace', 'ancestor clean'],
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಶಾಲಿಗ್ರಾಮ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1431,7 +1361,6 @@ const ritualsData = [
     searchKeywords: ['adhik maas', 'leap month', 'purushottam', 'karma cleanse', 'malpua bhog', 'charity', 'prosperity'],
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಪುರುಷೋತ್ತಮ ಮಾಸ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1451,7 +1380,6 @@ const ritualsData = [
     searchKeywords: ['ananta thread', 'infinite protection', '14 knots', 'lost fortune', 'chaturdashi', 'recovery'],
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಅನಂತ ಚತುರ್ದಶಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1471,7 +1399,6 @@ const ritualsData = [
     searchKeywords: ['rama protection', 'stotra path', 'court issue', 'fear removal', 'shielding', 'courage'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ರಾಮ ರಕ್ಷಾ ಸ್ತೋತ್ರ ಪಾರಾಯಣ' },
     imageUrl: ''
   },
   {
@@ -1491,7 +1418,6 @@ const ritualsData = [
     searchKeywords: ['bhagavad gita', 'krishna guidance', 'discrimination', 'clear confusion', 'career focus', 'education clarity'],
     occasionTags: ['Education', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಭಗವದ್ಗೀತಾ ಪಾರಾಯಣ' },
     imageUrl: ''
   },
   {
@@ -1511,7 +1437,6 @@ const ritualsData = [
     searchKeywords: ['balaji puja', 'venkateshwara karnataka', 'tirupati lord', 'wealth creation', 'career growth', 'financial success'],
     occasionTags: ['Prosperity', 'Wealth', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ವೆಂಕಟೇಶ್ವರ ಸ್ವಾಮಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1530,8 +1455,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['debt trap', 'financial crisis', 'gajendra', 'crocodile escape', 'heavy relief', 'wealth recovery'],
     occasionTags: ['Prosperity', 'Wealth'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಗಜೇಂದ್ರ ಮೋಕ್ಷ ಪಾರಾಯಣ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1551,7 +1475,6 @@ const ritualsData = [
     searchKeywords: ['lord balaji wedding', 'srinivasa kalyana', 'marital harmony', 'family wealth', 'tirupati kalyanam'],
     occasionTags: ['Marriage', 'Wealth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ಶ್ರೀನಿವಾಸ ಕಲ್ಯಾಣ ಮಹೋತ್ಸವ' },
     imageUrl: ''
   },
 
@@ -1573,7 +1496,6 @@ const ritualsData = [
     searchKeywords: ['durga path', 'saptashati', 'chandi', 'obstacle removal', 'court success', 'protection', 'reputation boost'],
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಶ್ರೀ ಚಂಡೀ ಪಾರಾಯಣ' },
     imageUrl: ''
   },
   {
@@ -1593,7 +1515,6 @@ const ritualsData = [
     searchKeywords: ['vasant panchami', 'artistic skills', 'music blessing', 'saraswati devi', 'education', 'exam blessing', 'children study'],
     occasionTags: ['Education'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಸರಸ್ವತಿ ಪೂಜೆ (ಜ್ಞಾನಾರ್ಜನೆ)' },
     imageUrl: ''
   },
   {
@@ -1613,7 +1534,6 @@ const ritualsData = [
     searchKeywords: ['shravan friday', 'south india puja', 'married women luck', 'varalakshmi', 'gold worship', 'wealth', 'prosperity'],
     occasionTags: ['Prosperity', 'Wealth', 'Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ವರಲಕ್ಷ್ಮಿ ವ್ರತ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1633,7 +1553,6 @@ const ritualsData = [
     searchKeywords: ['kumkum archana', 'lalita devi', 'tripura sundari', 'grace', '1000 devi names', 'family wellness'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಲಲಿತಾ ಸಹಸ್ರನಾಮ ಅರ್ಚನೆ' },
     imageUrl: ''
   },
   {
@@ -1653,7 +1572,6 @@ const ritualsData = [
     searchKeywords: ['gayatri devi', 'mantra jaap', 'aura clean', 'intellect boost', 'education', 'wisdom'],
     occasionTags: ['Education', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಗಾಯತ್ರೀ ಮಂತ್ರ ಜಪ ಸೇವೆ' },
     imageUrl: ''
   },
   {
@@ -1673,7 +1591,6 @@ const ritualsData = [
     searchKeywords: ['kali maa', 'darkness fear', 'anxiety cure', 'entities removal', 'protection', 'fear relief'],
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ಕಾಳಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1692,8 +1609,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['16 fridays', 'chana gur', 'satisfaction goddess', 'vrat end', 'family peace', 'harmony'],
     occasionTags: ['Prosperity', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಸಂತೋಷಿ ಮಾತಾ ವ್ರತ ಉದ್ಯಾಪನೆ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1713,7 +1629,6 @@ const ritualsData = [
     searchKeywords: ['love couple', 'family dispute', 'krishna radha', 'unconditional love', 'marriage happiness', 'harmony'],
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
-    localNames: { kannada: 'ರಾಧಾ ಕೃಷ್ಣ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -1732,8 +1647,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['durga fire', 'protection havan', 'remove fear', 'karnataka durga', 'safety', 'accident prevent'],
     occasionTags: ['Protection', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಶ್ರೀ ದುರ್ಗಾ ಹೋಮ' },
+    supportedRegions: [],
     imageUrl: ''
   },
 
@@ -1755,7 +1669,6 @@ const ritualsData = [
     searchKeywords: ['ganesha havan', 'morning homa', 'obstacle free', 'ganapathi homa', 'karnataka homa', 'new business', 'new home'],
     occasionTags: ['New Home', 'Business Opening', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ಗಣಪತಿ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1775,7 +1688,6 @@ const ritualsData = [
     searchKeywords: ['chandi havan', 'heavy fire ritual', 'career barrier', 'durga fire', 'fortune', 'victory', 'court win'],
     occasionTags: ['Protection', 'Career Growth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ಚಂಡೀ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1795,7 +1707,6 @@ const ritualsData = [
     searchKeywords: ['birthday homa', 'longevity', 'vitality', 'ayushya', 'elderly health', 'karnataka homa', 'baby first birthday'],
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ಆಯುಷ್ಯ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1815,7 +1726,6 @@ const ritualsData = [
     searchKeywords: ['enemy removal', 'jealousy clearing', 'weapon disc', 'sudarshana chakra', 'heavy havan', 'protection', 'business guard'],
     occasionTags: ['Protection', 'Career Growth', 'Business Opening'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ಸುದರ್ಶನ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1835,7 +1745,6 @@ const ritualsData = [
     searchKeywords: ['critical illness fire', 'shiva fire', 'mrityunjaya havan', 'save life', 'health recovery', 'protection', 'karnataka homa'],
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶ್ರೀ ಮೃತ್ಯುಂಜಯ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1855,7 +1764,6 @@ const ritualsData = [
     searchKeywords: ['education fire', 'exam boost havan', 'saraswati havan', 'memory fire', 'passing tests', 'school start'],
     occasionTags: ['Education'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ಸರಸ್ವತಿ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1874,8 +1782,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['wealth homa', 'family wealth', 'marriage harmony', 'lakshmi narayana', 'karnataka homa', 'prosperity', 'wealth'],
     occasionTags: ['Prosperity', 'Wealth', 'Marriage'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಶ್ರೀ ಲಕ್ಷ್ಮೀ ನಾರಾಯಣ ಹೋಮ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1895,7 +1802,6 @@ const ritualsData = [
     searchKeywords: ['rudra havan', 'ancestral curse', 'shiva fire homa', 'wellness', 'protection'],
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶ್ರೀ ರುದ್ರ ಹೋಮ' },
     imageUrl: ''
   },
   {
@@ -1914,8 +1820,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['debt burn', 'saturday fire', 'sesame offering', 'financial relief', 'wealth recovery'],
     occasionTags: ['Prosperity', 'Wealth'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ದಾರಿದ್ರ್ಯ ದಹನ ಹೋಮ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1934,8 +1839,7 @@ const ritualsData = [
     popular: true,
     searchKeywords: ['satyanarayan homa', 'vishnu fire', 'karnataka Homa', 'family prosperity', 'quick results'],
     occasionTags: ['Prosperity', 'Health'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ಶ್ರೀ ಸತ್ಯನಾರಾಯಣ ಹೋಮ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1954,8 +1858,7 @@ const ritualsData = [
     popular: false,
     searchKeywords: ['grains fire', 'agricultural success', 'food abundance', 'sankranti homa', 'prosperity'],
     occasionTags: ['Prosperity'],
-    supportedRegions: ['Karnataka'],
-    localNames: { kannada: 'ನವಧಾನ್ಯ ಹೋಮ' },
+    supportedRegions: [],
     imageUrl: ''
   },
   {
@@ -1975,7 +1878,6 @@ const ritualsData = [
     searchKeywords: ['litigation escape', 'kartikeya fire', 'rivalry clearing', 'protection', 'property guard'],
     occasionTags: ['Protection', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶತ್ರು ಸಂಹಾರ ಹೋಮ' },
     imageUrl: ''
   },
 
@@ -1997,7 +1899,6 @@ const ritualsData = [
     searchKeywords: ['ancestor peace', 'gaya puja', 'pitru dosh', 'family block', 'pinda daan', 'peace', 'family harmony'],
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಪಿತೃ ದೋಷ ನಿವಾರಣಾ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -2017,7 +1918,6 @@ const ritualsData = [
     searchKeywords: ['accidental death', 'unnatural death', 'soul release', 'narayan bali', 'heavy ancestor', 'protection'],
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ನಾರಾಯಣ ಬಲಿ ಪೂಜೆ' },
     imageUrl: ''
   },
   {
@@ -2037,7 +1937,6 @@ const ritualsData = [
     searchKeywords: ['60th birthday', 'vow renewal', 'elderly health', 'shastipoorthi', 'abhishek', 'good health', 'longevity'],
     occasionTags: ['Health', 'Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಷಷ್ಟಿಪೂರ್ತಿ ಮಹೋತ್ಸವ (ಅರವತ್ತನೇ ವರ್ಷದ ಶಾಂತಿ)' },
     imageUrl: ''
   },
   {
@@ -2057,7 +1956,6 @@ const ritualsData = [
     searchKeywords: ['80th birthday', '1000 moons', 'sathabhishekam', 'longevity blessing', 'good health'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಶತಾಭಿಷೇಕ ಮಹೋತ್ಸವ' },
     imageUrl: ''
   },
   {
@@ -2077,7 +1975,6 @@ const ritualsData = [
     searchKeywords: ['70th birthday', 'bheema ratha', 'mrityunjaya blessing', 'good health', 'longevity'],
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
-    localNames: { kannada: 'ಭೀಮರಥ ಶಾಂತಿ ಮಹೋತ್ಸವ' },
     imageUrl: ''
   },
   {
@@ -2097,7 +1994,6 @@ const ritualsData = [
     searchKeywords: ['shatchandi', 'royal yajna', '3 days ritual', 'public fame', '5 pandits', 'victory', 'wealth'],
     occasionTags: ['Prosperity', 'Wealth', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಶತ ಚಂಡೀ ಮಹಾ ಯಾಗ' },
     imageUrl: ''
   },
   {
@@ -2117,7 +2013,6 @@ const ritualsData = [
     searchKeywords: ['atirudra', '11 days yajna', '111 pandits', 'ultimate positive energy', 'protection', 'shiva fire'],
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
-    localNames: { kannada: 'ಅತಿರುದ್ರ ಮಹಾ ಯಾಗ' },
     imageUrl: ''
   },
   {
@@ -2137,7 +2032,6 @@ const ritualsData = [
     searchKeywords: ['home conflicts', 'peace yajna', 'shanti karan', 'family peace', 'harmony'],
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
-    localNames: { kannada: 'ಶಾಂತಿ ಕರಣ ಹೋಮ' },
     imageUrl: ''
   }
 ];
