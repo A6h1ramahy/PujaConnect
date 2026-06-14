@@ -343,7 +343,7 @@ const Rituals = () => {
                     </span>
                   )}
                   {category && (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-saffron-50 dark:bg-saffron-950/20 text-saffron-750 dark:text-saffron-400 border border-saffron-100 dark:border-saffron-900/30">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-saffron-50 dark:bg-saffron-950/20 text-saffron-700 dark:text-saffron-400 border border-saffron-100 dark:border-saffron-900/30">
                       {category}
                       <HiX className="cursor-pointer text-saffron-400 hover:text-saffron-600" onClick={() => setCategory('')} />
                     </span>
@@ -452,7 +452,7 @@ const Rituals = () => {
                       {ritual.occasionTags?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
                           {ritual.occasionTags.slice(0, 3).map(tag => (
-                            <span key={tag} className="text-[9px] font-bold bg-saffron-50/80 dark:bg-saffron-950/30 text-saffron-800 dark:text-saffron-300 border border-saffron-100 dark:border-saffron-900/40 px-2 py-0.5 rounded-full hover:bg-saffron-100 dark:hover:bg-saffron-950/50 transition-all duration-300">
+                            <span key={tag} className="text-[9px] font-bold bg-[#2D0B12] text-[#FBBF24] border border-[#F59E0B]/40 px-2 py-0.5 rounded-full hover:bg-[#3d121c] hover:border-[#FBBF24]/60 hover:shadow-[0_0_6px_rgba(251,191,36,0.25)] transition-all duration-300">
                               🏷️ {tag}
                             </span>
                           ))}
