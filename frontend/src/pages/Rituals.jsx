@@ -401,7 +401,7 @@ const Rituals = () => {
                   <div 
                     key={ritual._id} 
                     id={`ritual-detail-${ritual._id}`} 
-                    className="card p-6 flex flex-col justify-between h-full bg-white dark:bg-dark-card border border-light-border dark:border-dark-border hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300 animate-fade-in group relative overflow-hidden"
+                    className="card p-5 flex flex-col justify-between h-full bg-white dark:bg-dark-card border border-light-border dark:border-dark-border hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300 animate-fade-in group relative overflow-hidden"
                   >
                     {ritual.popular && (
                       <div className="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg shadow-sm tracking-wider uppercase">
@@ -410,7 +410,7 @@ const Rituals = () => {
                     )}
                     
                     <div>
-                      <div className="flex items-start gap-3 mb-4">
+                      <div className="flex items-start gap-3 mb-3">
                         <img 
                           src={ritual.imageUrl || '/default-om.png'} 
                           alt={ritual.pujaName} 
@@ -426,7 +426,7 @@ const Rituals = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-1.5 text-[10px] text-stone-500 dark:text-stone-400 mb-3 font-semibold">
+                      <div className="flex flex-wrap gap-1.5 text-[10px] text-stone-500 dark:text-stone-400 mb-2.5 font-semibold">
                         <span className="flex items-center gap-1 bg-stone-50 dark:bg-stone-900/40 p-1.5 rounded border border-light-border dark:border-dark-border/40">
                           <HiClock className="text-gold-500 text-sm" /> {ritual.duration} ({ritual.durationMinutes}m)
                         </span>
@@ -445,14 +445,14 @@ const Rituals = () => {
                         )}
                       </div>
 
-                      <p className="text-xs text-stone-600 dark:text-stone-350 leading-relaxed mb-4 line-clamp-3">
+                      <p className="text-xs text-stone-600 dark:text-stone-350 leading-relaxed mb-3 line-clamp-3">
                         {ritual.shortDescription || ritual.description}
                       </p>
 
                       {ritual.occasionTags?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-4">
+                        <div className="flex flex-wrap gap-1 mb-3">
                           {ritual.occasionTags.slice(0, 3).map(tag => (
-                            <span key={tag} className="text-[9px] text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-850 px-2 py-0.5 rounded-full font-medium">
+                            <span key={tag} className="text-[9px] font-bold bg-saffron-50/80 dark:bg-saffron-950/30 text-saffron-800 dark:text-saffron-300 border border-saffron-100 dark:border-saffron-900/40 px-2 py-0.5 rounded-full hover:bg-saffron-100 dark:hover:bg-saffron-950/50 transition-all duration-300">
                               🏷️ {tag}
                             </span>
                           ))}
@@ -460,8 +460,8 @@ const Rituals = () => {
                       )}
                     </div>
 
-                    <div className="border-t border-light-border dark:border-dark-border pt-4 mt-auto">
-                      <div className="flex justify-between items-center mb-3">
+                    <div className="border-t border-light-border dark:border-dark-border pt-3 mt-auto">
+                      <div className="flex justify-between items-center mb-2.5">
                         <span className="text-[10px] text-stone-400 dark:text-stone-500 uppercase tracking-wider font-bold">Estimated Cost</span>
                         <span className="text-sm font-bold text-stone-900 dark:text-stone-100">
                           ₹{ritual.priceRange?.min?.toLocaleString('en-IN')} – ₹{ritual.priceRange?.max?.toLocaleString('en-IN')}

@@ -807,7 +807,7 @@ const AdminDashboard = () => {
                   <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Occasion Tags</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedRitual.occasionTags.map(t => (
-                      <span key={t} className="text-xs bg-amber-50 dark:bg-amber-950/10 text-amber-700 dark:text-amber-450 px-2.5 py-1 rounded-lg font-medium">🏷️ {t}</span>
+                      <span key={t} className="text-xs font-bold bg-saffron-50/80 dark:bg-saffron-950/30 text-saffron-800 dark:text-saffron-300 border border-saffron-200/60 dark:border-saffron-900/60 px-2.5 py-1 rounded-lg hover:bg-saffron-100 dark:hover:bg-saffron-950/50 transition-all duration-300">🏷️ {t}</span>
                     ))}
                   </div>
                 </div>

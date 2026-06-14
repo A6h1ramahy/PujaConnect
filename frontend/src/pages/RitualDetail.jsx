@@ -233,7 +233,7 @@ const RitualDetail = () => {
                   {ritual.occasionTags.map((tag) => (
                     <span 
                       key={tag} 
-                      className="px-3 py-1.5 rounded-full text-xs font-bold bg-saffron-50 dark:bg-saffron-950/20 text-saffron-800 dark:text-saffron-300 border border-saffron-200 dark:border-saffron-900/50"
+                      className="px-3 py-1.5 rounded-full text-xs font-bold bg-saffron-50/80 dark:bg-saffron-950/40 text-saffron-800 dark:text-saffron-300 border border-saffron-200/60 dark:border-saffron-900/60 hover:bg-saffron-100 dark:hover:bg-saffron-950/60 transition-all duration-300 hover:shadow-[0_0_6px_rgba(249,115,22,0.2)]"
                     >
                       🏷️ {tag}
                     </span>
