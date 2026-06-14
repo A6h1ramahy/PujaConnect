@@ -32,11 +32,14 @@ export const getAllUsers        = ()              => api.get('/admin/users');
 export const toggleSuspend     = (id)            => api.put(`/admin/users/${id}/suspend`);
 export const getAllBookingsAdmin = (params)       => api.get('/admin/bookings', { params });
 
-// Rituals (admin)
 export const createRitual = (data) => api.post('/rituals', data);
 export const updateRitual = (id, data) => api.put(`/rituals/${id}`, data);
 export const deleteRitual = (id)   => api.delete(`/rituals/${id}`);
 export const getAllRitualsAdmin = () => api.get('/rituals/all');
+export const uploadRitualImage = (formData, onUploadProgress) => api.post('/rituals/upload', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+  onUploadProgress
+});
 
 // User profile
 export const getUserProfile   = ()     => api.get('/users/profile');

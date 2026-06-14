@@ -25,16 +25,23 @@ const upload = multer({
  * @param {string} folder   - Cloudinary folder name
  * @returns {Promise<string>} Cloudinary secure_url
  */
-const uploadToCloudinary = (buffer, folder = 'pujaconnect/pandits') => {
+const uploadToCloudinary = (buffer, folder = 'pujaconnect/pandits', isRitual = false) => {
   return new Promise((resolve, reject) => {
+    const transformation = isRitual
+      ? [
+          { width: 600, height: 400, crop: 'fill', gravity: 'center' },
+          { quality: 'auto', fetch_format: 'auto' },
+        ]
+      : [
+          { width: 400, height: 400, crop: 'fill', gravity: 'face' },
+          { quality: 'auto', fetch_format: 'auto' },
+        ];
+
     const stream = cloudinary.uploader.upload_stream(
       {
         folder,
         resource_type: 'image',
-        transformation: [
-          { width: 400, height: 400, crop: 'fill', gravity: 'face' },
-          { quality: 'auto', fetch_format: 'auto' },
-        ],
+        transformation,
       },
       (error, result) => {
         if (error) return reject(error);

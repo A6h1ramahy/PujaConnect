@@ -1,16 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash } from 'react-icons/hi';
+import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash, HiEye, HiUpload } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import {
   getAdminStats, getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPanditAdmin,
   getAllUsers, toggleSuspend, getAllBookingsAdmin, getAllRitualsAdmin,
-  createRitual, updateRitual, deleteRitual,
+  createRitual, updateRitual, deleteRitual, uploadRitualImage
 } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PanditAvatar from '../../components/common/PanditAvatar';
+
+const getCategoryColor = (category) => {
+  switch (category) {
+    case 'Shiva Pujas':
+      return 'bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400 border-purple-100 dark:border-purple-900/50';
+    case 'Vishnu Pujas':
+      return 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border-blue-100 dark:border-blue-900/50';
+    case 'Devi Pujas':
+      return 'bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400 border-pink-100 dark:border-pink-900/50';
+    case 'Griha & Property Pujas':
+      return 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-100 dark:border-amber-900/50';
+    case 'Marriage & Family Rituals':
+      return 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400 border-rose-100 dark:border-rose-900/50';
+    case 'Child & Sanskar Ceremonies':
+      return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50';
+    case 'Festival Pujas':
+      return 'bg-yellow-50 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400 border-yellow-100 dark:border-yellow-900/50';
+    case 'Business & Career Pujas':
+      return 'bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400 border-teal-100 dark:border-teal-900/50';
+    case 'Health & Protection Pujas':
+      return 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/50';
+    case 'Homa & Havan Rituals':
+      return 'bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border-orange-100 dark:border-orange-900/50';
+    default:
+      return 'bg-stone-50 text-stone-700 dark:bg-stone-900/30 dark:text-stone-400 border-stone-100 dark:border-stone-850';
+  }
+};
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -21,9 +48,36 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [rituals, setRituals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [ritualForm, setRitualForm] = useState({ pujaName: '', description: '', duration: '', locationType: 'Both', priceMin: 0, priceMax: 0, requiredMaterials: '' });
+  const [ritualForm, setRitualForm] = useState({
+    pujaName: '',
+    slug: '',
+    category: 'Griha & Property Pujas',
+    description: '',
+    shortDescription: '',
+    duration: '',
+    durationMinutes: 120,
+    estimatedMaterialCost: 0,
+    priceMin: 0,
+    priceMax: 0,
+    locationType: 'Both',
+    isActive: true,
+    featured: false,
+    popular: false,
+    requiredMaterials: '',
+    searchKeywords: '',
+    occasionTags: '',
+    supportedRegions: 'Karnataka',
+    kannadaName: '',
+    imageUrl: '',
+    bookingCount: 0
+  });
   const [editingRitual, setEditingRitual] = useState(null);
+  const [selectedRitual, setSelectedRitual] = useState(null);
   const [savingRitual, setSavingRitual] = useState(false);
+
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => { fetchAll(); }, []);
   useEffect(() => {
@@ -83,18 +137,99 @@ const AdminDashboard = () => {
     } catch { toast.error('Failed to update user'); }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError('Only image files (jpg, png, webp) are allowed');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('File size must be under 5MB');
+      return;
+    }
+
+    setUploadError('');
+    setUploadingImage(true);
+    setUploadProgress(0);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const { data } = await uploadRitualImage(formData, (progressEvent) => {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        setUploadProgress(percentCompleted);
+      });
+
+      setRitualForm((prev) => ({ ...prev, imageUrl: data.imageUrl }));
+      toast.success('Image uploaded successfully!');
+    } catch (err) {
+      console.error(err);
+      setUploadError(err?.response?.data?.message || 'Failed to upload image');
+      toast.error('Image upload failed');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const resetRitualForm = () => {
+    setEditingRitual(null);
+    setRitualForm({
+      pujaName: '',
+      slug: '',
+      category: 'Griha & Property Pujas',
+      description: '',
+      shortDescription: '',
+      duration: '',
+      durationMinutes: 120,
+      estimatedMaterialCost: 0,
+      priceMin: 0,
+      priceMax: 0,
+      locationType: 'Both',
+      isActive: true,
+      featured: false,
+      popular: false,
+      requiredMaterials: '',
+      searchKeywords: '',
+      occasionTags: '',
+      supportedRegions: 'Karnataka',
+      kannadaName: '',
+      imageUrl: '',
+      bookingCount: 0
+    });
+    setUploadError('');
+    setUploadProgress(0);
+  };
+
   const handleRitualSubmit = async (e) => {
     e.preventDefault();
     setSavingRitual(true);
     try {
       const payload = {
-        pujaName:         ritualForm.pujaName,
-        description:      ritualForm.description,
-        duration:         ritualForm.duration,
-        locationType:     ritualForm.locationType,
-        priceRange:       { min: Number(ritualForm.priceMin), max: Number(ritualForm.priceMax) },
-        requiredMaterials: ritualForm.requiredMaterials.split(',').map((m) => m.trim()).filter(Boolean),
+        pujaName:              ritualForm.pujaName,
+        slug:                  ritualForm.slug,
+        category:              ritualForm.category,
+        description:           ritualForm.description,
+        shortDescription:      ritualForm.shortDescription,
+        duration:              ritualForm.duration,
+        durationMinutes:       Number(ritualForm.durationMinutes) || 120,
+        estimatedMaterialCost: Number(ritualForm.estimatedMaterialCost) || 0,
+        priceRange:            { min: Number(ritualForm.priceMin), max: Number(ritualForm.priceMax) },
+        locationType:          ritualForm.locationType,
+        isActive:              ritualForm.isActive,
+        featured:              ritualForm.featured,
+        popular:               ritualForm.popular,
+        requiredMaterials:     ritualForm.requiredMaterials.split(',').map((m) => m.trim()).filter(Boolean),
+        searchKeywords:        ritualForm.searchKeywords.split(',').map((k) => k.trim()).filter(Boolean),
+        occasionTags:          ritualForm.occasionTags.split(',').map((t) => t.trim()).filter(Boolean),
+        supportedRegions:      ritualForm.supportedRegions.split(',').map((r) => r.trim()).filter(Boolean),
+        localNames:            { kannada: ritualForm.kannadaName },
+        imageUrl:              ritualForm.imageUrl,
       };
+
       if (editingRitual) {
         await updateRitual(editingRitual, payload);
         toast.success('Ritual updated');
@@ -102,8 +237,7 @@ const AdminDashboard = () => {
         await createRitual(payload);
         toast.success('Ritual created');
       }
-      setRitualForm({ pujaName: '', description: '', duration: '', locationType: 'Both', priceMin: 0, priceMax: 0, requiredMaterials: '' });
-      setEditingRitual(null);
+      resetRitualForm();
       fetchRituals();
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to save ritual');
@@ -124,13 +258,27 @@ const AdminDashboard = () => {
   const editRitual = (ritual) => {
     setEditingRitual(ritual._id);
     setRitualForm({
-      pujaName:         ritual.pujaName,
-      description:      ritual.description,
-      duration:         ritual.duration,
-      locationType:     ritual.locationType,
-      priceMin:         ritual.priceRange?.min || 0,
-      priceMax:         ritual.priceRange?.max || 0,
-      requiredMaterials: (ritual.requiredMaterials || []).join(', '),
+      pujaName:              ritual.pujaName,
+      slug:                  ritual.slug || '',
+      category:              ritual.category || 'Griha & Property Pujas',
+      description:           ritual.description || '',
+      shortDescription:      ritual.shortDescription || '',
+      duration:              ritual.duration || '',
+      durationMinutes:       ritual.durationMinutes || 120,
+      estimatedMaterialCost: ritual.estimatedMaterialCost || 0,
+      priceMin:              ritual.priceRange?.min || 0,
+      priceMax:              ritual.priceRange?.max || 0,
+      locationType:          ritual.locationType || 'Both',
+      isActive:              ritual.isActive !== undefined ? ritual.isActive : true,
+      featured:              ritual.featured || false,
+      popular:               ritual.popular || false,
+      requiredMaterials:     (ritual.requiredMaterials || []).join(', '),
+      searchKeywords:        (ritual.searchKeywords || []).join(', '),
+      occasionTags:          (ritual.occasionTags || []).join(', '),
+      supportedRegions:      (ritual.supportedRegions || []).join(', '),
+      kannadaName:           ritual.localNames?.kannada || '',
+      imageUrl:              ritual.imageUrl || '',
+      bookingCount:          ritual.bookingCount || 0,
     });
     setActiveTab('rituals');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -324,71 +472,241 @@ const AdminDashboard = () => {
               {activeTab === 'rituals' && (
                 <div className="animate-fade-in space-y-6">
                   {/* Form */}
-                  <div className="card p-6">
+                  <div className="card p-6 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border shadow-sm">
                     <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100 mb-4">
                       {editingRitual ? 'Edit Ritual' : 'Add New Ritual'}
                     </h3>
                     <form id="ritual-form" onSubmit={handleRitualSubmit} className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="form-group">
+                      
+                      {/* Row 1: Basic Info */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="form-group md:col-span-2">
                           <label htmlFor="ritual-name" className="label">Puja Name</label>
                           <input id="ritual-name" type="text" value={ritualForm.pujaName} onChange={(e) => setRitualForm({ ...ritualForm, pujaName: e.target.value })} className="input-field" required />
                         </div>
                         <div className="form-group">
-                          <label htmlFor="ritual-duration" className="label">Duration</label>
-                          <input id="ritual-duration" type="text" value={ritualForm.duration} onChange={(e) => setRitualForm({ ...ritualForm, duration: e.target.value })} placeholder="2-3 hours" className="input-field" required />
+                          <label htmlFor="ritual-slug" className="label">Slug</label>
+                          <input id="ritual-slug" type="text" value={ritualForm.slug} onChange={(e) => setRitualForm({ ...ritualForm, slug: e.target.value })} placeholder="leave empty to auto-generate" className="input-field" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="ritual-category" className="label">Category</label>
+                          <select id="ritual-category" value={ritualForm.category} onChange={(e) => setRitualForm({ ...ritualForm, category: e.target.value })} className="input-field" required>
+                            <option value="Griha & Property Pujas">Griha & Property Pujas</option>
+                            <option value="Marriage & Family Rituals">Marriage & Family Rituals</option>
+                            <option value="Child & Sanskar Ceremonies">Child & Sanskar Ceremonies</option>
+                            <option value="Business & Career Pujas">Business & Career Pujas</option>
+                            <option value="Health & Protection Pujas">Health & Protection Pujas</option>
+                            <option value="Festival Pujas">Festival Pujas</option>
+                            <option value="Shiva Pujas">Shiva Pujas</option>
+                            <option value="Vishnu Pujas">Vishnu Pujas</option>
+                            <option value="Devi Pujas">Devi Pujas</option>
+                            <option value="Navagraha Pujas">Navagraha Pujas</option>
+                            <option value="Homa & Havan Rituals">Homa & Havan Rituals</option>
+                            <option value="Special Vedic Ceremonies">Special Vedic Ceremonies</option>
+                          </select>
                         </div>
                       </div>
-                      <div className="form-group">
-                        <label htmlFor="ritual-desc" className="label">Description</label>
-                        <textarea id="ritual-desc" value={ritualForm.description} onChange={(e) => setRitualForm({ ...ritualForm, description: e.target.value })} rows={3} className="input-field resize-none" required />
+
+                      {/* Row 2: Kannada Local Name & Short Desc */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="form-group">
+                          <label htmlFor="ritual-kannada" className="label">Kannada Name</label>
+                          <input id="ritual-kannada" type="text" value={ritualForm.kannadaName} onChange={(e) => setRitualForm({ ...ritualForm, kannadaName: e.target.value })} placeholder="ಕನ್ನಡ ಹೆಸರು..." className="input-field" />
+                        </div>
+                        <div className="form-group md:col-span-2">
+                          <label htmlFor="ritual-short-desc" className="label">Short Description</label>
+                          <input id="ritual-short-desc" type="text" value={ritualForm.shortDescription} onChange={(e) => setRitualForm({ ...ritualForm, shortDescription: e.target.value })} placeholder="One sentence summary of the ritual..." className="input-field" required />
+                        </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                      {/* Row 3: Full Description */}
+                      <div className="form-group">
+                        <label htmlFor="ritual-desc" className="label">Full Description</label>
+                        <textarea id="ritual-desc" value={ritualForm.description} onChange={(e) => setRitualForm({ ...ritualForm, description: e.target.value })} rows={4} className="input-field resize-none" required />
+                      </div>
+
+                      {/* Row 4: Specifications */}
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div className="form-group">
+                          <label htmlFor="ritual-duration" className="label">Duration (Display)</label>
+                          <input id="ritual-duration" type="text" value={ritualForm.duration} onChange={(e) => setRitualForm({ ...ritualForm, duration: e.target.value })} placeholder="2-3 hours" className="input-field" required />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="ritual-duration-mins" className="label">Duration (Minutes)</label>
+                          <input id="ritual-duration-mins" type="number" min="0" value={ritualForm.durationMinutes} onChange={(e) => setRitualForm({ ...ritualForm, durationMinutes: e.target.value })} className="input-field" required />
+                        </div>
                         <div className="form-group">
                           <label htmlFor="ritual-loc-type" className="label">Location Type</label>
                           <select id="ritual-loc-type" value={ritualForm.locationType} onChange={(e) => setRitualForm({ ...ritualForm, locationType: e.target.value })} className="input-field">
-                            <option>Home</option>
-                            <option>Temple</option>
-                            <option>Both</option>
+                            <option value="Home">Home</option>
+                            <option value="Temple">Temple</option>
+                            <option value="Both">Both</option>
                           </select>
                         </div>
                         <div className="form-group">
-                          <label htmlFor="ritual-price-min" className="label">Price Min (₹)</label>
-                          <input id="ritual-price-min" type="number" min="0" value={ritualForm.priceMin} onChange={(e) => setRitualForm({ ...ritualForm, priceMin: e.target.value })} className="input-field" />
+                          <label htmlFor="ritual-materials-cost" className="label">Est. Material Cost (₹)</label>
+                          <input id="ritual-materials-cost" type="number" min="0" value={ritualForm.estimatedMaterialCost} onChange={(e) => setRitualForm({ ...ritualForm, estimatedMaterialCost: e.target.value })} className="input-field" />
+                        </div>
+                        <div className="form-group col-span-2 md:col-span-1">
+                          <label className="label">Price Range (₹)</label>
+                          <div className="flex gap-2">
+                            <input id="ritual-price-min" type="number" min="0" placeholder="Min" value={ritualForm.priceMin} onChange={(e) => setRitualForm({ ...ritualForm, priceMin: e.target.value })} className="input-field w-1/2" />
+                            <input id="ritual-price-max" type="number" min="0" placeholder="Max" value={ritualForm.priceMax} onChange={(e) => setRitualForm({ ...ritualForm, priceMax: e.target.value })} className="input-field w-1/2" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Row 5: Comma separated arrays */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="form-group">
+                          <label htmlFor="ritual-materials" className="label">Required Materials <span className="text-stone-400 font-normal">(comma-separated)</span></label>
+                          <input id="ritual-materials" type="text" value={ritualForm.requiredMaterials} onChange={(e) => setRitualForm({ ...ritualForm, requiredMaterials: e.target.value })} placeholder="Flowers, Ghee, Coconut..." className="input-field" />
                         </div>
                         <div className="form-group">
-                          <label htmlFor="ritual-price-max" className="label">Price Max (₹)</label>
-                          <input id="ritual-price-max" type="number" min="0" value={ritualForm.priceMax} onChange={(e) => setRitualForm({ ...ritualForm, priceMax: e.target.value })} className="input-field" />
+                          <label htmlFor="ritual-keywords" className="label">Search Keywords <span className="text-stone-400 font-normal">(comma-separated)</span></label>
+                          <input id="ritual-keywords" type="text" value={ritualForm.searchKeywords} onChange={(e) => setRitualForm({ ...ritualForm, searchKeywords: e.target.value })} placeholder="diwali, laxmi, wealth..." className="input-field" />
                         </div>
                       </div>
-                      <div className="form-group">
-                        <label htmlFor="ritual-materials" className="label">Required Materials <span className="text-stone-400 font-normal">(comma-separated)</span></label>
-                        <input id="ritual-materials" type="text" value={ritualForm.requiredMaterials} onChange={(e) => setRitualForm({ ...ritualForm, requiredMaterials: e.target.value })} placeholder="Flowers, Ghee, Coconut..." className="input-field" />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="form-group">
+                          <label htmlFor="ritual-occasions" className="label">Occasion Tags <span className="text-stone-400 font-normal">(comma-separated)</span></label>
+                          <input id="ritual-occasions" type="text" value={ritualForm.occasionTags} onChange={(e) => setRitualForm({ ...ritualForm, occasionTags: e.target.value })} placeholder="New Home, Marriage, Festival..." className="input-field" />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor="ritual-regions" className="label">Supported Regions <span className="text-stone-400 font-normal">(comma-separated)</span></label>
+                          <input id="ritual-regions" type="text" value={ritualForm.supportedRegions} onChange={(e) => setRitualForm({ ...ritualForm, supportedRegions: e.target.value })} placeholder="Karnataka, Tamil Nadu..." className="input-field" />
+                        </div>
                       </div>
-                      <div className="flex gap-3">
-                        <button type="submit" id="save-ritual" disabled={savingRitual} className="btn-primary">
+
+                      {/* Row 6: Image Upload with Progress & Preview */}
+                      <div className="border border-dashed border-light-border dark:border-dark-border p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center bg-stone-50 dark:bg-stone-900/30">
+                        <div className="relative w-28 h-20 rounded-xl overflow-hidden border border-light-border dark:border-dark-border shadow-sm shrink-0 bg-white dark:bg-dark-card flex items-center justify-center">
+                          <img 
+                            src={ritualForm.imageUrl || '/default-om.png'} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover" 
+                          />
+                        </div>
+                        <div className="flex-1 space-y-2 w-full">
+                          <span className="text-xs font-bold text-stone-600 dark:text-stone-400 uppercase tracking-wider block">Ritual Photograph</span>
+                          
+                          <div className="flex flex-wrap gap-2 items-center">
+                            <label className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border text-stone-700 dark:text-stone-300 rounded-xl text-xs font-semibold cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-850 transition-colors shadow-sm">
+                              <HiUpload /> Upload Image File
+                              <input 
+                                type="file" 
+                                accept="image/jpeg,image/png,image/webp,image/jpg" 
+                                onChange={handleImageUpload} 
+                                className="hidden" 
+                              />
+                            </label>
+
+                            {ritualForm.imageUrl && (
+                              <button 
+                                type="button" 
+                                onClick={() => setRitualForm((prev) => ({ ...prev, imageUrl: '' }))}
+                                className="px-3 py-2 border border-crimson-100 dark:border-crimson-900/30 text-crimson-600 dark:text-crimson-400 rounded-xl text-xs font-semibold hover:bg-crimson-50 dark:hover:bg-crimson-950/20 transition-colors"
+                              >
+                                Revert to Default
+                              </button>
+                            )}
+                          </div>
+
+                          {uploadingImage && (
+                            <div className="w-full space-y-1">
+                              <div className="flex justify-between text-[10px] text-stone-400 font-bold uppercase">
+                                <span>Uploading to Cloudinary...</span>
+                                <span>{uploadProgress}%</span>
+                              </div>
+                              <div className="w-full bg-stone-200 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
+                                <div className="bg-saffron-500 h-full transition-all duration-150" style={{ width: `${uploadProgress}%` }} />
+                              </div>
+                            </div>
+                          )}
+
+                          {uploadError && (
+                            <p className="text-xs text-crimson-500 font-medium">{uploadError}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Row 7: Checkbox Switches */}
+                      <div className="flex flex-wrap gap-6 py-2 border-t border-b border-light-border dark:border-dark-border">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input 
+                            type="checkbox" 
+                            checked={ritualForm.isActive} 
+                            onChange={(e) => setRitualForm({ ...ritualForm, isActive: e.target.checked })} 
+                            className="w-4 h-4 text-saffron-600 focus:ring-saffron-500 border-stone-300 rounded" 
+                          />
+                          <span className="text-xs font-semibold text-stone-700 dark:text-stone-350">Active Status (Visible to users)</span>
+                        </label>
+
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input 
+                            type="checkbox" 
+                            checked={ritualForm.featured} 
+                            onChange={(e) => setRitualForm({ ...ritualForm, featured: e.target.checked })} 
+                            className="w-4 h-4 text-saffron-600 focus:ring-saffron-500 border-stone-300 rounded" 
+                          />
+                          <span className="text-xs font-semibold text-stone-700 dark:text-stone-350">Featured Ritual</span>
+                        </label>
+
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input 
+                            type="checkbox" 
+                            checked={ritualForm.popular} 
+                            onChange={(e) => setRitualForm({ ...ritualForm, popular: e.target.checked })} 
+                            className="w-4 h-4 text-saffron-600 focus:ring-saffron-500 border-stone-300 rounded" 
+                          />
+                          <span className="text-xs font-semibold text-stone-700 dark:text-stone-350">Popular Status</span>
+                        </label>
+
+                        {editingRitual && (
+                          <div className="ml-auto flex items-center text-xs font-bold text-stone-400 dark:text-stone-500 bg-stone-50 dark:bg-stone-900/50 px-3 py-1 rounded-lg border border-light-border dark:border-dark-border/40">
+                            📊 Bookings: {ritualForm.bookingCount || 0}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Submit Buttons */}
+                      <div className="flex gap-3 pt-2">
+                        <button type="submit" id="save-ritual" disabled={savingRitual || uploadingImage} className="btn-primary flex items-center gap-1">
                           <HiPlus /> {editingRitual ? 'Update Ritual' : 'Create Ritual'}
                         </button>
-                        {editingRitual && (
-                          <button type="button" onClick={() => { setEditingRitual(null); setRitualForm({ pujaName: '', description: '', duration: '', locationType: 'Both', priceMin: 0, priceMax: 0, requiredMaterials: '' }); }} className="btn-secondary">
-                            Cancel
-                          </button>
-                        )}
+                        <button type="button" onClick={resetRitualForm} className="btn-secondary">
+                          {editingRitual ? 'Cancel' : 'Reset Form'}
+                        </button>
                       </div>
                     </form>
                   </div>
 
                   {/* Ritual list */}
                   <div>
-                    <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100 mb-3">Ritual Catalog</h3>
-                    <div className="space-y-2">
+                    <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100 mb-3">Ritual Catalog ({rituals.length})</h3>
+                    <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
                       {rituals.map((r) => (
-                        <div key={r._id} id={`ritual-item-${r._id}`} className="card p-4 flex items-center gap-3">
-                          <div className="flex-1">
-                            <p className="font-medium text-stone-900 dark:text-stone-100 text-sm">{r.pujaName}</p>
-                            <p className="text-xs text-stone-400">{r.duration} · {r.locationType} · ₹{r.priceRange?.min?.toLocaleString('en-IN')}–₹{r.priceRange?.max?.toLocaleString('en-IN')}</p>
+                        <div key={r._id} id={`ritual-item-${r._id}`} className="card p-4 flex items-center gap-3 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border hover:border-saffron-200 dark:hover:border-saffron-800 transition-colors">
+                          <img 
+                            src={r.imageUrl || '/default-om.png'} 
+                            alt={r.pujaName} 
+                            className="w-12 h-12 rounded-xl object-cover border border-light-border dark:border-dark-border shadow-sm shrink-0" 
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold text-stone-900 dark:text-stone-100 text-sm truncate">{r.pujaName}</p>
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${getCategoryColor(r.category)}`}>
+                                {r.category}
+                              </span>
+                              {!r.isActive && <span className="bg-stone-100 dark:bg-stone-850 text-stone-400 border border-stone-200 text-[9px] font-bold px-1.5 py-0.5 rounded-full">Inactive</span>}
+                              {r.featured && <span className="bg-saffron-50 dark:bg-saffron-950/20 text-saffron-700 border border-saffron-100 text-[9px] font-bold px-1.5 py-0.5 rounded-full">★ Featured</span>}
+                              {r.popular && <span className="bg-amber-50 dark:bg-amber-950/20 text-amber-700 border border-amber-100 text-[9px] font-bold px-1.5 py-0.5 rounded-full">🔥 Popular</span>}
+                            </div>
+                            <p className="text-xs text-stone-400 mt-0.5">{r.duration} · {r.locationType} · ₹{r.priceRange?.min?.toLocaleString('en-IN')}–₹{r.priceRange?.max?.toLocaleString('en-IN')}</p>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 shrink-0">
+                            <button id={`view-ritual-${r._id}`} onClick={() => setSelectedRitual(r)} className="p-2 rounded-lg text-stone-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors" title="View Details"><HiEye /></button>
                             <button id={`edit-ritual-${r._id}`} onClick={() => editRitual(r)} className="p-2 rounded-lg text-stone-400 hover:text-saffron-500 hover:bg-saffron-50 dark:hover:bg-saffron-900/20 transition-colors" title="Edit"><HiPencil /></button>
                             <button id={`delete-ritual-${r._id}`} onClick={() => handleDeleteRitual(r._id)} className="p-2 rounded-lg text-stone-400 hover:text-crimson-500 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 transition-colors" title="Delete"><HiTrash /></button>
                           </div>
@@ -402,6 +720,131 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Detail inspect modal */}
+      {selectedRitual && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <button 
+              onClick={() => setSelectedRitual(null)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-850 text-stone-500 transition-colors"
+            >
+              <HiX className="text-xl" />
+            </button>
+
+            <div className="flex gap-4 items-start mb-6">
+              <img 
+                src={selectedRitual.imageUrl || '/default-om.png'} 
+                alt={selectedRitual.pujaName} 
+                className="w-20 h-20 rounded-2xl object-cover border border-light-border dark:border-dark-border shadow-md shrink-0 bg-white"
+              />
+              <div>
+                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${getCategoryColor(selectedRitual.category)}`}>
+                  {selectedRitual.category}
+                </span>
+                <h3 className="font-display font-bold text-xl text-stone-900 dark:text-stone-100 mt-1">{selectedRitual.pujaName}</h3>
+                {selectedRitual.localNames?.kannada && (
+                  <p className="text-xs text-saffron-600 dark:text-saffron-400 font-medium italic mt-0.5">
+                    Kannada: {selectedRitual.localNames.kannada}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-4 text-sm">
+              <div>
+                <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Short Description</h4>
+                <p className="text-stone-700 dark:text-stone-300 mt-0.5 font-medium">{selectedRitual.shortDescription || 'N/A'}</p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Full Description</h4>
+                <p className="text-stone-600 dark:text-stone-400 mt-0.5 whitespace-pre-line leading-relaxed">{selectedRitual.description}</p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 border-t border-b border-light-border dark:border-dark-border">
+                <div>
+                  <h4 className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase">Duration</h4>
+                  <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">{selectedRitual.duration}</p>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase">Min Duration</h4>
+                  <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">{selectedRitual.durationMinutes}m</p>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase">Location</h4>
+                  <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">{selectedRitual.locationType}</p>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase">Material Cost</h4>
+                  <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">₹{selectedRitual.estimatedMaterialCost || 0}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Price Range</h4>
+                  <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">
+                    ₹{selectedRitual.priceRange?.min?.toLocaleString('en-IN')} – ₹{selectedRitual.priceRange?.max?.toLocaleString('en-IN')}
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Booking Count</h4>
+                  <p className="font-bold text-stone-800 dark:text-stone-200 mt-0.5">📊 {selectedRitual.bookingCount || 0} bookings</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                <span className={`text-xs px-2.5 py-1 rounded-lg text-center font-semibold border ${selectedRitual.isActive ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' : 'bg-stone-50 dark:bg-stone-850 text-stone-500 border-stone-200'}`}>
+                  {selectedRitual.isActive ? '● Active' : '○ Inactive'}
+                </span>
+                <span className={`text-xs px-2.5 py-1 rounded-lg text-center font-semibold border ${selectedRitual.featured ? 'bg-saffron-50 dark:bg-saffron-950/20 text-saffron-700 dark:text-saffron-400 border-saffron-100 dark:border-saffron-900/30' : 'bg-stone-50 dark:bg-stone-850 text-stone-500 border-stone-200'}`}>
+                  {selectedRitual.featured ? '★ Featured' : '☆ Not Featured'}
+                </span>
+                <span className={`text-xs px-2.5 py-1 rounded-lg text-center font-semibold border ${selectedRitual.popular ? 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/30' : 'bg-stone-50 dark:bg-stone-850 text-stone-500 border-stone-200'}`}>
+                  {selectedRitual.popular ? '🔥 Popular' : '♢ Not Popular'}
+                </span>
+              </div>
+
+              {selectedRitual.requiredMaterials?.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Required Materials</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedRitual.requiredMaterials.map(m => (
+                      <span key={m} className="text-xs bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 px-2.5 py-1 rounded-lg font-medium">{m}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedRitual.occasionTags?.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Occasion Tags</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedRitual.occasionTags.map(t => (
+                      <span key={t} className="text-xs bg-amber-50 dark:bg-amber-950/10 text-amber-700 dark:text-amber-450 px-2.5 py-1 rounded-lg font-medium">🏷️ {t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedRitual.supportedRegions?.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Supported Regions</h4>
+                  <p className="text-stone-700 dark:text-stone-300 font-medium">{selectedRitual.supportedRegions.join(', ')}</p>
+                </div>
+              )}
+
+              {selectedRitual.searchKeywords?.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Search Keywords</h4>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 font-mono bg-stone-50 dark:bg-stone-900/60 p-2 rounded-xl border border-light-border dark:border-dark-border">{selectedRitual.searchKeywords.join(', ')}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -80,7 +80,7 @@ const RitualDetail = () => {
 
   if (!ritual) return null;
 
-  const defaultPlaceholder = 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=800';
+  const defaultPlaceholder = '/default-om.png';
 
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg pb-20 animate-fade-in">

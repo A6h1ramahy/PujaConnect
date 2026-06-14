@@ -1,4 +1,5 @@
 const Ritual = require('../models/Ritual');
+const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 
 const slugify = (text) => {
   return text
@@ -21,17 +22,25 @@ const createRitual = async (req, res, next) => {
       slug,
       category,
       description,
+      shortDescription,
       duration,
+      durationMinutes,
       requiredMaterials,
+      estimatedMaterialCost,
       priceRange,
       locationType,
+      isActive,
       featured,
       popular,
       searchKeywords,
+      occasionTags,
+      supportedRegions,
+      localNames,
+      imageUrl,
     } = req.body;
 
-    if (!pujaName || !description || !duration || !category) {
-      return res.status(400).json({ message: 'pujaName, category, description, and duration are required' });
+    if (!pujaName || !description || !shortDescription || !duration || !category) {
+      return res.status(400).json({ message: 'pujaName, category, description, shortDescription, and duration are required' });
     }
 
     const finalSlug = slug || slugify(pujaName);
@@ -41,13 +50,21 @@ const createRitual = async (req, res, next) => {
       slug: finalSlug,
       category,
       description,
+      shortDescription,
       duration,
+      durationMinutes: durationMinutes !== undefined ? Number(durationMinutes) : 120,
       requiredMaterials: Array.isArray(requiredMaterials) ? requiredMaterials : [],
+      estimatedMaterialCost: estimatedMaterialCost !== undefined ? Number(estimatedMaterialCost) : 0,
       priceRange: priceRange || { min: 0, max: 0 },
       locationType: locationType || 'Both',
+      isActive: isActive === undefined ? true : (isActive === true || isActive === 'true'),
       featured: featured === true || featured === 'true',
       popular: popular === true || popular === 'true',
       searchKeywords: Array.isArray(searchKeywords) ? searchKeywords : [],
+      occasionTags: Array.isArray(occasionTags) ? occasionTags : [],
+      supportedRegions: Array.isArray(supportedRegions) ? supportedRegions : ['Karnataka'],
+      localNames: localNames || { kannada: '' },
+      imageUrl: imageUrl || '',
     });
 
     res.status(201).json({ message: 'Ritual created', ritual });
@@ -197,4 +214,19 @@ const getAllRituals = async (req, res, next) => {
   }
 };
 
-module.exports = { createRitual, updateRitual, deleteRitual, getRituals, getRitualBySlug, getAllRituals };
+// @desc  Upload a ritual image (admin only)
+// @route POST /api/rituals/upload
+// @access Admin
+const uploadRitualImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided' });
+    }
+    const imageUrl = await uploadToCloudinary(req.file.buffer, 'pujaconnect/rituals', true);
+    res.json({ imageUrl });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createRitual, updateRitual, deleteRitual, getRituals, getRitualBySlug, getAllRituals, uploadRitualImage };

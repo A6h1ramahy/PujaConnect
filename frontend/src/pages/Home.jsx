@@ -228,7 +228,11 @@ const Home = () => {
                 >
                   <div>
                     <div className="flex justify-between items-start gap-2 mb-3">
-                      <div className="text-3xl">{PUJA_ICONS[i % PUJA_ICONS.length]}</div>
+                      <img 
+                        src={ritual.imageUrl || '/default-om.png'} 
+                        alt={ritual.pujaName} 
+                        className="w-12 h-12 rounded-xl object-cover shrink-0 border border-light-border dark:border-dark-border shadow-md"
+                      />
                       <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${getCategoryColor(ritual.category)}`}>
                         {ritual.category.split(' & ')[0]}
                       </span>

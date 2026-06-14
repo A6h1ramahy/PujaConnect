@@ -150,8 +150,8 @@ const Rituals = () => {
           
           {/* ── Filter Sidebar (Desktop) / Drawer (Mobile) ── */}
           <div className={`
-            fixed inset-0 z-40 lg:z-0 lg:relative lg:block
-            ${showMobileFilters ? 'block' : 'hidden'}
+            fixed inset-0 z-40 lg:z-10 lg:relative lg:w-72 lg:shrink-0
+            ${showMobileFilters ? 'block' : 'hidden lg:block'}
           `}>
             {/* Backdrop for mobile drawer */}
             <div 
@@ -159,7 +159,7 @@ const Rituals = () => {
               onClick={() => setShowMobileFilters(false)}
             />
 
-            <div className="absolute top-0 bottom-0 left-0 w-80 max-w-[90vw] lg:w-72 bg-white dark:bg-dark-card border-r lg:border border-light-border dark:border-dark-border lg:rounded-2xl p-6 overflow-y-auto h-full lg:h-auto shadow-card-light dark:shadow-card-dark flex flex-col gap-6">
+            <div className="absolute top-0 bottom-0 left-0 w-80 max-w-[90vw] lg:w-72 lg:relative lg:top-auto lg:bottom-auto lg:left-auto bg-white dark:bg-dark-card border-r lg:border border-light-border dark:border-dark-border lg:rounded-2xl p-6 overflow-y-auto h-full lg:h-auto shadow-card-light dark:shadow-card-dark flex flex-col gap-6">
               
               <div className="flex justify-between items-center lg:hidden pb-2 border-b border-light-border dark:border-dark-border">
                 <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
@@ -411,9 +411,11 @@ const Rituals = () => {
                     
                     <div>
                       <div className="flex items-start gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-saffron-gradient flex items-center justify-center text-xl shadow-glow-saffron shrink-0">
-                          {ICONS[i % ICONS.length]}
-                        </div>
+                        <img 
+                          src={ritual.imageUrl || '/default-om.png'} 
+                          alt={ritual.pujaName} 
+                          className="w-12 h-12 rounded-xl object-cover shrink-0 border border-light-border dark:border-dark-border shadow-md"
+                        />
                         <div className="min-w-0">
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border tracking-wide inline-block ${getCategoryColor(ritual.category)}`}>
                             {ritual.category}

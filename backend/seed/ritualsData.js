@@ -18,7 +18,7 @@ const ritualsData = [
     occasionTags: ['New Home', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
     localNames: { kannada: 'ಗೃಹ ಪ್ರವೇಶ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Bhumi Puja',
@@ -38,7 +38,7 @@ const ritualsData = [
     occasionTags: ['New Home'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಭೂಮಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Vastu Shanti Puja',
@@ -58,7 +58,7 @@ const ritualsData = [
     occasionTags: ['New Home', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ವಾಸ್ತು ಶಾಂತಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1585909693684-0e1322099454?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Office Inauguration Puja',
@@ -78,7 +78,7 @@ const ritualsData = [
     occasionTags: ['Business Opening', 'Career Growth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಕಚೇರಿ ಉದ್ಘಾಟನಾ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Dwar Puja',
@@ -98,7 +98,7 @@ const ritualsData = [
     occasionTags: ['New Home', 'Protection'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ದ್ವಾರ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shila Nyas Puja',
@@ -118,7 +118,7 @@ const ritualsData = [
     occasionTags: ['New Home'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶಿಲಾ ನ್ಯಾಸ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Boring / Water Well Puja',
@@ -138,7 +138,7 @@ const ritualsData = [
     occasionTags: ['New Home', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಬೋರಿಂಗ್ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Bhoomi Homa',
@@ -147,7 +147,7 @@ const ritualsData = [
     description: 'A sacred fire ritual dedicated to Mother Earth (Bhoomi Devi) to seek forgiveness for any ecological disruptions during construction and purify the soil.',
     shortDescription: 'Sacred fire ritual to bless the land and purify the soil.',
     duration: '2.5 hours',
-    requiredMinutes: 150,
+    durationMinutes: 150,
     requiredMaterials: ['Havan Samagri', 'Ghee', 'Bhoomi Devi photo', 'Flowers', 'Herbs', 'Clay pot'],
     estimatedMaterialCost: 1500,
     priceRange: { min: 3500, max: 7000 },
@@ -158,7 +158,7 @@ const ritualsData = [
     occasionTags: ['New Home'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಭೂಮಿ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Property Sale Puja',
@@ -178,7 +178,7 @@ const ritualsData = [
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಆಸ್ತಿ ಮಾರಾಟ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Gruha Pravesha Homa',
@@ -187,7 +187,7 @@ const ritualsData = [
     description: 'An elaborate homa performed specifically in Karnataka alongside housewarming, including Vastu Homa and Navadhanya Homa to bring ultimate auspiciousness.',
     shortDescription: 'Traditional Karnataka-style housewarming fire ceremony.',
     duration: '4 hours',
-    requiredMinutes: 240,
+    durationMinutes: 240,
     requiredMaterials: ['Mango leaves', 'Havan samagri', 'Navadhanya', 'Panchamrit', 'Ghee', 'Coconuts', 'Sweets'],
     estimatedMaterialCost: 2500,
     priceRange: { min: 5000, max: 11000 },
@@ -198,7 +198,7 @@ const ritualsData = [
     occasionTags: ['New Home', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಗೃಹ ಪ್ರವೇಶ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 2. Marriage & Family Rituals (9) ──
@@ -220,7 +220,7 @@ const ritualsData = [
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
     localNames: { kannada: 'ವೇದೋಕ್ತ ವಿವಾಹ ಮಹೋತ್ಸವ' },
-    imageUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Satyanarayana Swamy Vrata',
@@ -240,7 +240,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ಸತ್ಯನಾರಾಯಣ ಸ್ವಾಮಿ ವ್ರತ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Sagai (Engagement Ceremony)',
@@ -260,7 +260,7 @@ const ritualsData = [
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ನಿಶ್ಚಿತಾರ್ಥ ಕಾರ್ಯಕ್ರಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Gauri Shankar Puja',
@@ -280,7 +280,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಗೌರಿ ಶಂಕರ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Roka Ceremony Puja',
@@ -300,7 +300,7 @@ const ritualsData = [
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ರೋಕಾ ನಿಶ್ಚಿತಾರ್ಥ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Varshik Shraddh',
@@ -320,7 +320,7 @@ const ritualsData = [
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ವಾರ್ಷಿಕ ಶ್ರಾದ್ಧ ಕಾರ್ಯ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Kanya Daan Ceremony',
@@ -340,7 +340,7 @@ const ritualsData = [
     occasionTags: ['Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಕನ್ಯಾದಾನ ಪ್ರಕ್ರಿಯೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Tulasi Vivaha',
@@ -360,7 +360,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ತುಳಸಿ ವಿವಾಹ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Vat Savitri Puja',
@@ -380,7 +380,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ವಟ ಸಾವಿತ್ರಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 3. Child & Sanskar Ceremonies (10) ──
@@ -402,7 +402,7 @@ const ritualsData = [
     occasionTags: ['Child Birth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ನಾಮಕರಣ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1581952976147-5a2d15560349?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Mundan Sanskar (Tonsure)',
@@ -422,7 +422,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಚೌಲ ಅಥವಾ ಮುಂಡನ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Upanayana (Janeu Ceremony)',
@@ -442,7 +442,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಉಪನಯನ ಸಂಸ್ಕಾರ (ಮುಂಜಿ)' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Annaprashan Sanskar',
@@ -462,7 +462,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಅನ್ನಪ್ರಾಶನ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1581952976147-5a2d15560349?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Garbh Sanskar / Seemantonayana',
@@ -482,7 +482,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಸೀಮಂತೋನ್ನಯನ (ಗರ್ಭ ಸಂಸ್ಕಾರ)' },
-    imageUrl: 'https://images.unsplash.com/photo-1581952976147-5a2d15560349?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Karnavedha Sanskar',
@@ -502,7 +502,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಕರ್ಣವೇಧ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Vidyarambh Sanskar',
@@ -522,7 +522,7 @@ const ritualsData = [
     occasionTags: ['Education'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ವಿದ್ಯಾರಂಭ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Jatakarma Sanskar',
@@ -542,7 +542,7 @@ const ritualsData = [
     occasionTags: ['Child Birth'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಜಾತಕರ್ಮ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1581952976147-5a2d15560349?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Nishkramana Sanskar',
@@ -562,7 +562,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ನಿಷ್ಕ್ರಮಣ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1581952976147-5a2d15560349?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Chudakarana Sanskar',
@@ -582,7 +582,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಚೂಡಾಕರಣ ಸಂಸ್ಕಾರ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 4. Business & Career Pujas (8) ──
@@ -604,7 +604,7 @@ const ritualsData = [
     occasionTags: ['Business Opening', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ವ್ಯವಹಾರ ಗಣೇಶ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Lakshmi Kuber Puja',
@@ -624,7 +624,7 @@ const ritualsData = [
     occasionTags: ['Business Opening', 'Prosperity', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಲಕ್ಷ್ಮೀ ಕುಬೇರ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Vyapar Vriddhi Puja',
@@ -644,7 +644,7 @@ const ritualsData = [
     occasionTags: ['Business Opening', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ವ್ಯಾಪಾರ ವೃದ್ಧಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Vishwakarma Puja',
@@ -664,7 +664,7 @@ const ritualsData = [
     occasionTags: ['Business Opening', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ವಿಶ್ವಕರ್ಮ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Saraswati Puja for Career',
@@ -684,7 +684,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ವೃತ್ತಿಪರ ಸರಸ್ವತಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shani Dev Puja for Job Stability',
@@ -704,7 +704,7 @@ const ritualsData = [
     occasionTags: ['Career Growth', 'Protection'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಉದ್ಯೋಗ ಸ್ಥಿರತೆಗಾಗಿ ಶನಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Surya Puja for Promotion',
@@ -724,7 +724,7 @@ const ritualsData = [
     occasionTags: ['Career Growth', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಉದ್ಯೋಗ ಪ್ರಗತಿಗಾಗಿ ಸೂರ್ಯ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Chandra Puja for Business Peace',
@@ -744,7 +744,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಚಂದ್ರ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 5. Health & Protection Pujas (7) ──
@@ -766,7 +766,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Maharashtra'],
     localNames: { kannada: 'ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Dhanvantari Puja',
@@ -786,7 +786,7 @@ const ritualsData = [
     occasionTags: ['Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ಧನ್ವಂತರಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Durga Kavach Path',
@@ -806,7 +806,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಶ್ರೀ ದುರ್ಗಾ ಕವಚ ಪಠಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Hanuman Chalisa Path & Puja',
@@ -826,7 +826,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಹನುಮಾನ್ ಚಾಲೀಸಾ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Subrahmanya Puja',
@@ -846,7 +846,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ಸುಬ್ರಹ್ಮಣ್ಯ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Sudarsana Archana',
@@ -866,7 +866,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ಸುದರ್ಶನ ಅರ್ಚನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Dhanvantari Archana',
@@ -886,7 +886,7 @@ const ritualsData = [
     occasionTags: ['Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಶ್ರೀ ಧನ್ವಂತರಿ ಅರ್ಚನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 6. Festival Pujas (15) ──
@@ -908,7 +908,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ದೀಪಾವಳಿ ಲಕ್ಷ್ಮೀ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Ganesh Chaturthi Puja',
@@ -928,7 +928,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra', 'Tamil Nadu'],
     localNames: { kannada: 'ಗಣೇಶ ಚತುರ್ಥಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Varamahalakshmi Vrata',
@@ -948,7 +948,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ವರಮಹಾಲಕ್ಷ್ಮಿ ವ್ರತ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Durga Puja / Ghatasthapana',
@@ -968,7 +968,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಘಟಸ್ಥಾಪನೆ (ನವರಾತ್ರಿ ಉದ್ಘಾಟನೆ)' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Maha Shivratri Puja',
@@ -988,7 +988,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra', 'Tamil Nadu'],
     localNames: { kannada: 'ಮಹಾ ಶಿವರಾತ್ರಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Krishna Janmashtami Puja',
@@ -1008,7 +1008,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Swarna Gowri Vrata',
@@ -1028,7 +1028,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಸ್ವರ್ಣ ಗೌರಿ ವ್ರತ (ಗೌರಿ ಹಬ್ಬ)' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Ugadi Puja (Kannada New Year)',
@@ -1048,7 +1048,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'New Home'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh'],
     localNames: { kannada: 'ಯುಗಾದಿ ಹಬ್ಬದ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Raksha Bandhan Puja',
@@ -1068,7 +1068,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ರಕ್ಷಾಬಂಧನ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Karwa Chauth Vrat Udyapan',
@@ -1088,7 +1088,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಕರ್ವಾ ಚೌತ್ ವ್ರತ ಉದ್ಯಾಪನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Chhath Puja Surya Arghya',
@@ -1108,7 +1108,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Child Birth'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಛತ್ ಪೂಜೆ ಸೂರ್ಯ ಅರ್ಘ್ಯ' },
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Holi Dahan Puja',
@@ -1128,7 +1128,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಹೋಲಿಕಾ ದಹನ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Makar Sankranti Surya Tarpan',
@@ -1148,7 +1148,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra', 'Tamil Nadu'],
     localNames: { kannada: 'ಮಕರ ಸಂಕ್ರಾಂತಿ ಸೂರ್ಯ ತರ್ಪಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Hanuman Jayanti Sundarkand Path',
@@ -1168,7 +1168,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಹನುಮದ್ ಜಯಂತಿ ಸುಂದರಕಾಂಡ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Laksha Deepotsava',
@@ -1188,7 +1188,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಲಕ್ಷ ದೀಪೋತ್ಸವ ಸೇವೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 7. Shiva Pujas (9) ──
@@ -1210,7 +1210,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ರುದ್ರಾಭಿಷೇಕ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Laghu Rudra Puja',
@@ -1230,7 +1230,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಲಘು ರುದ್ರ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1609137144814-7e8c148e11a1?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Maha Rudra Puja',
@@ -1250,7 +1250,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಮಹಾ ರುದ್ರ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shiva Sahasranama Archana',
@@ -1270,7 +1270,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶಿವ ಸಹಸ್ರನಾಮ ಅರ್ಚನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Somvar Vrat Udyapan',
@@ -1290,7 +1290,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಸೋಮವಾರ ವ್ರತ ಉದ್ಯಾಪನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Pradosh Vrat Puja',
@@ -1310,7 +1310,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಪ್ರದೋಷ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Kedarnath Gauri Shankar Archana',
@@ -1330,7 +1330,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಗೌರಿ ಶಂಕರ ಅರ್ಚನೆ ಸೇವೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Bilvapatra Archana',
@@ -1350,7 +1350,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಬಿಲ್ವಪತ್ರೆ ಅರ್ಚನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Karthika Somavara Abhisheka',
@@ -1370,7 +1370,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಕಾರ್ತಿಕ ಸೋಮವಾರ ಶಿವ ಅಭಿಷೇಕ' },
-    imageUrl: 'https://images.unsplash.com/photo-1608976479361-9c60e5999238?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 8. Vishnu Pujas (9) ──
@@ -1392,7 +1392,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ವಿಷ್ಣು ಸಹಸ್ರನಾಮ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shaligram Puja',
@@ -1412,7 +1412,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಶಾಲಿಗ್ರಾಮ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Purushottam Maas Puja',
@@ -1432,7 +1432,7 @@ const ritualsData = [
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಪುರುಷೋತ್ತಮ ಮಾಸ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Anant Chaturdashi Puja',
@@ -1452,7 +1452,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಅನಂತ ಚತುರ್ದಶಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Rama Raksha Stotra Path',
@@ -1472,7 +1472,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ರಾಮ ರಕ್ಷಾ ಸ್ತೋತ್ರ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Gita Path Puja',
@@ -1492,7 +1492,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಭಗವದ್ಗೀತಾ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Venkateshwara Swamy Puja',
@@ -1512,7 +1512,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ವೆಂಕಟೇಶ್ವರ ಸ್ವಾಮಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Gajendra Moksha Path',
@@ -1532,7 +1532,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಗಜೇಂದ್ರ ಮೋಕ್ಷ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Srinivasa Kalyana',
@@ -1552,7 +1552,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Wealth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ಶ್ರೀನಿವಾಸ ಕಲ್ಯಾಣ ಮಹೋತ್ಸವ' },
-    imageUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 9. Devi Pujas (9) ──
@@ -1574,7 +1574,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಶ್ರೀ ಚಂಡೀ ಪಾರಾಯಣ' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Saraswati Puja for Knowledge',
@@ -1594,7 +1594,7 @@ const ritualsData = [
     occasionTags: ['Education'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಸರಸ್ವತಿ ಪೂಜೆ (ಜ್ಞಾನಾರ್ಜನೆ)' },
-    imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Varalakshmi Vrat Puja',
@@ -1614,7 +1614,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth', 'Marriage'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ವರಲಕ್ಷ್ಮಿ ವ್ರತ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Lalita Sahasranama Archana',
@@ -1634,7 +1634,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಲಲಿತಾ ಸಹಸ್ರನಾಮ ಅರ್ಚನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Gayatri Mantra Jaap',
@@ -1654,7 +1654,7 @@ const ritualsData = [
     occasionTags: ['Education', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಗಾಯತ್ರೀ ಮಂತ್ರ ಜಪ ಸೇವೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Kali Puja for Negativity Removal',
@@ -1674,7 +1674,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ಕಾಳಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1561361060-61a19f2a24f0?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Santoshi Maa Vrat Udyapan',
@@ -1694,7 +1694,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಸಂತೋಷಿ ಮಾತಾ ವ್ರತ ಉದ್ಯಾಪನೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1607190074257-dd4b7af0309f?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Radha Krishna Yugal Puja',
@@ -1714,7 +1714,7 @@ const ritualsData = [
     occasionTags: ['Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Maharashtra'],
     localNames: { kannada: 'ರಾಧಾ ಕೃಷ್ಣ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Durga Homa',
@@ -1734,7 +1734,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಶ್ರೀ ದುರ್ಗಾ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 10. Homa & Havan Rituals (12) ──
@@ -1756,7 +1756,7 @@ const ritualsData = [
     occasionTags: ['New Home', 'Business Opening', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ಗಣಪತಿ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Chandi Homa',
@@ -1776,7 +1776,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Career Growth', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ಚಂಡೀ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Ayushya Homa',
@@ -1796,7 +1796,7 @@ const ritualsData = [
     occasionTags: ['Child Birth', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ಆಯುಷ್ಯ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Sudarshana Homa',
@@ -1816,7 +1816,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Career Growth', 'Business Opening'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ಸುದರ್ಶನ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Mrityunjaya Homa',
@@ -1836,7 +1836,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶ್ರೀ ಮೃತ್ಯುಂಜಯ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Saraswati Homa',
@@ -1856,7 +1856,7 @@ const ritualsData = [
     occasionTags: ['Education'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ಸರಸ್ವತಿ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Lakshmi Narayana Homa',
@@ -1876,7 +1876,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth', 'Marriage'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಶ್ರೀ ಲಕ್ಷ್ಮೀ ನಾರಾಯಣ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Rudra Homa',
@@ -1896,7 +1896,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶ್ರೀ ರುದ್ರ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Karika Dahan Havan',
@@ -1916,7 +1916,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ದಾರಿದ್ರ್ಯ ದಹನ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Satyanarayana Homa',
@@ -1936,7 +1936,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ಶ್ರೀ ಸತ್ಯನಾರಾಯಣ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Navadhanya Homa',
@@ -1956,7 +1956,7 @@ const ritualsData = [
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka'],
     localNames: { kannada: 'ನವಧಾನ್ಯ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shatru Samhara Homa',
@@ -1976,7 +1976,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Career Growth'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶತ್ರು ಸಂಹಾರ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
 
   // ── 11. Special Vedic Ceremonies (8) ──
@@ -1998,7 +1998,7 @@ const ritualsData = [
     occasionTags: ['Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಪಿತೃ ದೋಷ ನಿವಾರಣಾ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Narayan Bali Puja',
@@ -2018,7 +2018,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ನಾರಾಯಣ ಬಲಿ ಪೂಜೆ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shasti Poorthi (60th Birthday)',
@@ -2038,7 +2038,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Marriage', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಷಷ್ಟಿಪೂರ್ತಿ ಮಹೋತ್ಸವ (ಅರವತ್ತನೇ ವರ್ಷದ ಶಾಂತಿ)' },
-    imageUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Sathabhishekam (80th Birthday)',
@@ -2058,7 +2058,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಶತಾಭಿಷೇಕ ಮಹೋತ್ಸವ' },
-    imageUrl: 'https://images.unsplash.com/photo-1542044896530-05d85be9b11a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Bheema Ratha Shanthi (70th Birthday)',
@@ -2078,7 +2078,7 @@ const ritualsData = [
     occasionTags: ['Health', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu'],
     localNames: { kannada: 'ಭೀಮರಥ ಶಾಂತಿ ಮಹೋತ್ಸವ' },
-    imageUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shat Chandi Yajna',
@@ -2098,7 +2098,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Wealth', 'Protection'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಶತ ಚಂಡೀ ಮಹಾ ಯಾಗ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Atirudra Maha Yajna',
@@ -2118,7 +2118,7 @@ const ritualsData = [
     occasionTags: ['Protection', 'Prosperity'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Andhra Pradesh'],
     localNames: { kannada: 'ಅತಿರುದ್ರ ಮಹಾ ಯಾಗ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   },
   {
     pujaName: 'Shanti Karan Yajna',
@@ -2138,7 +2138,7 @@ const ritualsData = [
     occasionTags: ['Prosperity', 'Health'],
     supportedRegions: ['Karnataka', 'Tamil Nadu', 'Maharashtra'],
     localNames: { kannada: 'ಶಾಂತಿ ಕರಣ ಹೋಮ' },
-    imageUrl: 'https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&q=80&w=600'
+    imageUrl: ''
   }
 ];
 
