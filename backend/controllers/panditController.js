@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Pandit = require('../models/Pandit');
 const Ritual = require('../models/Ritual');
+const User = require('../models/User');
 const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 const { validationResult } = require('express-validator');
 
@@ -26,8 +27,10 @@ const createOrUpdateProfile = async (req, res, next) => {
 
     if (bio !== undefined)               pandit.bio = bio;
     if (city !== undefined)              pandit.location.city = city;
-    if (region !== undefined)            pandit.location.region = region;
-    if (state !== undefined)             pandit.location.state = state;
+    if (region !== undefined) {
+      pandit.location.region = region;
+      pandit.location.state = region;
+    }
     if (yearsOfExperience !== undefined) pandit.yearsOfExperience = Number(yearsOfExperience);
 
     if (languagesSpoken) {
@@ -57,6 +60,14 @@ const createOrUpdateProfile = async (req, res, next) => {
 
     await pandit.save();
 
+    // Sync location back to User model
+    const user = await User.findById(req.user._id);
+    if (user) {
+      if (city !== undefined) user.city = city;
+      if (region !== undefined) user.region = region;
+      await user.save();
+    }
+    
     const populated = await Pandit.findById(pandit._id)
       .populate('userId', 'name email phone')
       .populate('supportedRituals', 'pujaName description duration priceRange');
@@ -72,10 +83,37 @@ const createOrUpdateProfile = async (req, res, next) => {
 // @access Public
 const getAllPandits = async (req, res, next) => {
   try {
-    const { city, region, ritualId, language, minExp, maxExp, page = 1, limit = 12 } = req.query;
+    const { search, city, region, ritualId, language, minExp, maxExp, page = 1, limit = 12 } = req.query;
 
     // ── API-level enforcement: only verified + active pandits shown publicly ──
     const filter = { verificationStatus: 'verified', isActive: true };
+
+    if (search) {
+      const trimmedSearch = search.trim();
+      
+      // 1. Find matching User IDs by name
+      const users = await User.find({ name: { $regex: trimmedSearch, $options: 'i' } }).select('_id');
+      const userIds = users.map(u => u._id);
+
+      // 2. Find matching Ritual IDs
+      const rituals = await Ritual.find({
+        $or: [
+          { pujaName: { $regex: trimmedSearch, $options: 'i' } },
+          { category: { $regex: trimmedSearch, $options: 'i' } },
+          { slug: { $regex: trimmedSearch, $options: 'i' } }
+        ]
+      }).select('_id');
+      const ritualIds = rituals.map(r => r._id);
+
+      // 3. Construct $or query on Pandit
+      filter.$or = [
+        { userId: { $in: userIds } },
+        { 'location.city': { $regex: trimmedSearch, $options: 'i' } },
+        { 'location.region': { $regex: trimmedSearch, $options: 'i' } },
+        { languagesSpoken: { $regex: trimmedSearch, $options: 'i' } },
+        { supportedRituals: { $in: ritualIds } }
+      ];
+    }
 
     if (city)     filter['location.city']   = { $regex: city,     $options: 'i' };
     if (region)   filter['location.region'] = { $regex: region,   $options: 'i' };

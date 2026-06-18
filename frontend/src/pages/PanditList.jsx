@@ -17,6 +17,7 @@ const PanditList = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const [filters, setFilters] = useState({
+    search:   searchParams.get('search')   || '',
     city:     searchParams.get('city')     || '',
     region:   searchParams.get('region')   || '',
     ritualId: searchParams.get('ritual')   || '',
@@ -79,7 +80,7 @@ const PanditList = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ city: '', region: '', ritualId: '', language: '', minExp: '' });
+    setFilters({ search: '', city: '', region: '', ritualId: '', language: '', minExp: '' });
     setSearchParams({});
     setPage(1);
   };
@@ -101,11 +102,11 @@ const PanditList = () => {
             <div className="flex-1 relative">
               <HiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
               <input
-                id="pandit-city-search"
+                id="pandit-search"
                 type="text"
-                value={filters.city}
-                onChange={(e) => handleFilterChange('city', e.target.value)}
-                placeholder="Search by city..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                placeholder="Search by name, city, language, or puja..."
                 className="input-field pl-11"
               />
             </div>
@@ -131,7 +132,17 @@ const PanditList = () => {
                 {/* Region */}
                 <div className="form-group">
                   <label className="label">Region/State</label>
-                  <input id="filter-region" type="text" value={filters.region} onChange={(e) => handleFilterChange('region', e.target.value)} placeholder="Karnataka..." className="input-field" />
+                  <select
+                    id="filter-region"
+                    value={filters.region}
+                    onChange={(e) => handleFilterChange('region', e.target.value)}
+                    className="input-field"
+                  >
+                    <option value="">All Regions/States</option>
+                    {['Delhi', 'Gujarat', 'Haryana', 'Karnataka', 'Kerala', 'Maharashtra', 'Rajasthan', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'West Bengal'].map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Ritual */}

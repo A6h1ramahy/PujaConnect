@@ -83,7 +83,7 @@ const seedPandits = async () => {
         role: 'pandit',
         phone: `98450${String(i).padStart(5, '0')}`,
         city: cityInfo.city,
-        region: cityInfo.region
+        region: cityInfo.state
       });
 
       // Specialization selection
@@ -171,7 +171,7 @@ const seedPandits = async () => {
         bio: generateBio(displayName, experience, cityInfo.city, specialty.name),
         location: {
           city: cityInfo.city,
-          region: cityInfo.region,
+          region: cityInfo.state,
           state: cityInfo.state
         },
         yearsOfExperience: experience,

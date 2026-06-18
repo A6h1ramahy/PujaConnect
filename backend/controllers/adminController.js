@@ -45,6 +45,18 @@ const verifyPandit = async (req, res, next) => {
     const pandit = await Pandit.findById(req.params.id);
     if (!pandit) return res.status(404).json({ message: 'Pandit not found' });
 
+    if (!pandit.location?.city || !pandit.location?.region) {
+      return res.status(400).json({ message: 'Pandit profile must have a valid City and Region/State before verification' });
+    }
+
+    const VALID_STATES = [
+      'Karnataka', 'Maharashtra', 'Delhi', 'Haryana', 'Tamil Nadu', 
+      'Telangana', 'Kerala', 'West Bengal', 'Gujarat', 'Rajasthan', 'Uttar Pradesh'
+    ];
+    if (!VALID_STATES.some(s => s.toLowerCase() === pandit.location.region.toLowerCase())) {
+      return res.status(400).json({ message: `Pandit profile location has an invalid Region/State. Must be one of: ${VALID_STATES.join(', ')}` });
+    }
+
     pandit.verificationStatus = 'verified';
     pandit.verificationNote = req.body.note || 'Profile approved by admin';
     await pandit.save();

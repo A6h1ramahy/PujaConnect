@@ -21,11 +21,45 @@ const updateProfile = async (req, res, next) => {
     const { name, phone, city, region, password } = req.body;
 
     const user = await User.findById(req.user._id).select('+password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.role === 'pandit') {
+      if (city !== undefined && !city.trim()) {
+        return res.status(400).json({ message: 'City is required for Pandits' });
+      }
+      if (region !== undefined) {
+        if (!region.trim()) {
+          return res.status(400).json({ message: 'Region (State) is required for Pandits' });
+        }
+        const VALID_STATES = [
+          'Karnataka', 'Maharashtra', 'Delhi', 'Haryana', 'Tamil Nadu', 
+          'Telangana', 'Kerala', 'West Bengal', 'Gujarat', 'Rajasthan', 'Uttar Pradesh'
+        ];
+        const matchedState = VALID_STATES.find(s => s.toLowerCase() === region.trim().toLowerCase());
+        if (!matchedState) {
+          return res.status(400).json({ message: `Invalid Region. Must be one of: ${VALID_STATES.join(', ')}` });
+        }
+        req.body.region = matchedState;
+      }
+
+      const checkCity = city !== undefined ? city : user.city;
+      const checkRegion = region !== undefined ? req.body.region : user.region;
+      if (checkCity && checkRegion) {
+        const { CITIES } = require('../seed/panditsData');
+        const standardCity = CITIES.find(c => c.city.toLowerCase() === checkCity.trim().toLowerCase());
+        if (standardCity && standardCity.state.toLowerCase() !== checkRegion.trim().toLowerCase()) {
+          return res.status(400).json({ message: `Inconsistent location: ${checkCity} is located in ${standardCity.state}, not ${checkRegion}` });
+        }
+        if (standardCity && city !== undefined) {
+          req.body.city = standardCity.city;
+        }
+      }
+    }
 
     if (name)   user.name   = name;
     if (phone)  user.phone  = phone;
-    if (city)   user.city   = city;
-    if (region) user.region = region;
+    if (city !== undefined)   user.city   = req.body.city || city;
+    if (region !== undefined) user.region = req.body.region || region;
     if (password) {
       if (password.length < 6) {
         return res.status(400).json({ message: 'Password must be at least 6 characters' });
@@ -34,6 +68,19 @@ const updateProfile = async (req, res, next) => {
     }
 
     await user.save();
+
+    if (user.role === 'pandit') {
+      const Pandit = require('../models/Pandit');
+      const pandit = await Pandit.findOne({ userId: user._id });
+      if (pandit) {
+        if (city !== undefined)   pandit.location.city   = user.city;
+        if (region !== undefined) {
+          pandit.location.region = user.region;
+          pandit.location.state  = user.region;
+        }
+        await pandit.save();
+      }
+    }
 
     res.json({
       message: 'Profile updated successfully',

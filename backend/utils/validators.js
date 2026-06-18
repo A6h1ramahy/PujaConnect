@@ -49,12 +49,46 @@ const panditProfileRules = [
     .isInt({ min: 0, max: 60 }).withMessage('Years of experience must be between 0 and 60'),
 
   body('city')
-    .optional()
-    .isLength({ max: 100 }).withMessage('City name too long'),
+    .notEmpty().withMessage('City is required')
+    .isLength({ max: 100 }).withMessage('City name too long')
+    .custom((val, { req }) => {
+      const { CITIES } = require('../seed/panditsData');
+      const matchCity = CITIES.find(c => c.city.toLowerCase() === val.trim().toLowerCase());
+      if (matchCity) {
+        req.body.city = matchCity.city;
+      } else {
+        req.body.city = val.trim().replace(/\b\w/g, c => c.toUpperCase());
+      }
+      return true;
+    }),
 
   body('region')
-    .optional()
-    .isLength({ max: 100 }).withMessage('Region name too long'),
+    .notEmpty().withMessage('Region (State) is required')
+    .isLength({ max: 100 }).withMessage('Region name too long')
+    .custom((val, { req }) => {
+      const { CITIES } = require('../seed/panditsData');
+      const city = req.body.city || '';
+      
+      const VALID_STATES = [
+        'Karnataka', 'Maharashtra', 'Delhi', 'Haryana', 'Tamil Nadu', 
+        'Telangana', 'Kerala', 'West Bengal', 'Gujarat', 'Rajasthan', 'Uttar Pradesh'
+      ];
+      
+      const matchState = VALID_STATES.find(s => s.toLowerCase() === val.trim().toLowerCase());
+      if (!matchState) {
+        throw new Error(`Invalid Region. Must be one of: ${VALID_STATES.join(', ')}`);
+      }
+      
+      req.body.region = matchState;
+      
+      if (city) {
+        const standardCity = CITIES.find(c => c.city.toLowerCase() === city.trim().toLowerCase());
+        if (standardCity && standardCity.state.toLowerCase() !== val.trim().toLowerCase()) {
+          throw new Error(`Inconsistent location: ${city} is located in ${standardCity.state}, not ${matchState}`);
+        }
+      }
+      return true;
+    }),
 ];
 
 // ── Booking ───────────────────────────────────────────────────
