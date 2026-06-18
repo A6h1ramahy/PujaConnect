@@ -203,10 +203,10 @@ const Home = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-300 ${
                   activeTab === tab.id
-                    ? 'bg-saffron-gradient text-white shadow-glow-saffron scale-105'
-                    : 'bg-stone-100 dark:bg-stone-850 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-800'
+                    ? 'bg-saffron-gradient text-white border-saffron-500 shadow-glow-saffron scale-105'
+                    : 'bg-saffron-50/60 dark:bg-saffron-950 text-saffron-800 dark:text-gold-200 border-saffron-100 dark:border-saffron-900/40 hover:bg-saffron-100/80 dark:hover:bg-saffron-900/25 dark:hover:border-saffron-500/40 dark:hover:text-gold-100 dark:hover:shadow-glow-gold'
                 }`}
               >
                 <span>{tab.icon}</span>
