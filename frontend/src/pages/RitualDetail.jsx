@@ -5,6 +5,7 @@ import { MdOutlineTempleHindu, MdCurrencyRupee } from 'react-icons/md';
 import { getRitualBySlug, getPandits } from '../api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
+import PanditAvatar from '../components/common/PanditAvatar';
 
 const getCategoryColor = (category) => {
   switch (category) {
@@ -275,41 +276,64 @@ const RitualDetail = () => {
                   No verified Pandits are currently listed supporting this specific ritual. Please check back later.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {pandits.slice(0, 4).map((pandit) => (
-                    <div 
-                      key={pandit._id}
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300"
-                    >
-                      <img 
-                        src={pandit.photo || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150'} 
-                        alt={pandit.userId?.name}
-                        className="w-14 h-14 rounded-full object-cover shrink-0 border border-stone-150 dark:border-stone-800"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm truncate">
-                          {pandit.userId?.name}
-                        </h4>
-                        <p className="text-xs text-stone-500 dark:text-stone-400">
-                          🎓 {pandit.yearsOfExperience} yrs Exp. | {pandit.location?.city || ''}
-                        </p>
-                        <div className="flex gap-1.5 items-center mt-1.5">
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/30">
-                            Verified
-                          </span>
-                          <span className="text-[10px] text-stone-400 dark:text-stone-500">
-                            🗣️ {pandit.languagesSpoken?.slice(0, 2).join(', ')}
-                          </span>
-                        </div>
-                      </div>
-                      <Link 
-                        to={`/pandits/${pandit._id}?ritual=${encodeURIComponent(ritual.slug)}`}
-                        className="btn-secondary btn-sm py-1.5 px-3.5 text-xs font-bold"
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {pandits.slice(0, 4).map((pandit) => (
+                      <div 
+                        key={pandit._id}
+                        className="flex items-center gap-4 p-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300"
                       >
-                        View
-                      </Link>
+                        <PanditAvatar 
+                          photo={pandit.photo}
+                          name={pandit.userId?.name}
+                          size={56}
+                          className="rounded-2xl"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm truncate">
+                            {pandit.userId?.name}
+                          </h4>
+                          <p className="text-xs text-stone-500 dark:text-stone-400">
+                            🎓 {pandit.yearsOfExperience} yrs Exp. | {pandit.location?.city || ''}
+                          </p>
+                          <div className="flex gap-1.5 items-center mt-1.5">
+                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/30">
+                              Verified
+                            </span>
+                            <span className="text-[10px] text-stone-400 dark:text-stone-500">
+                              🗣️ {pandit.languagesSpoken?.slice(0, 2).join(', ')}
+                            </span>
+                          </div>
+                        </div>
+                        <Link 
+                          to={`/pandits/${pandit._id}?ritual=${encodeURIComponent(ritual.slug)}`}
+                          className="btn-secondary btn-sm py-1.5 px-3.5 text-xs font-bold"
+                        >
+                          View
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-2 p-4 rounded-2xl bg-saffron-50 dark:bg-saffron-950/20 border border-saffron-100 dark:border-saffron-900/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-fade-in">
+                    <div className="text-left">
+                      <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm">
+                        Looking for more options?
+                      </h4>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        {pandits.length > 4 
+                          ? `Only a preview of ${Math.min(4, pandits.length)} matching Pandits is shown here. Click 'Find & Book Pandits' to explore all available options.`
+                          : 'Find more matching Pandits by location, language, experience, or price range.'
+                        }
+                      </p>
                     </div>
-                  ))}
+                    <Link 
+                      to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
+                      className="btn-primary btn-sm py-2 px-4 whitespace-nowrap text-xs font-bold shrink-0 self-start sm:self-auto flex items-center gap-1 shadow-glow-saffron"
+                    >
+                      Find & Book Pandits 🕉️
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
