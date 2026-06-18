@@ -2,8 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HiLocationMarker, HiCheckCircle, HiClock } from 'react-icons/hi';
 import PanditAvatar from '../common/PanditAvatar';
+import { useAuth } from '../../context/AuthContext';
 
 const PanditCard = ({ pandit }) => {
+  const { user } = useAuth();
   const { _id, photo, bio, location, yearsOfExperience, supportedRituals, languagesSpoken, userId, pricing } = pandit;
   const name   = userId?.name || 'Pandit';
   const city   = location?.city || userId?.city || '';
@@ -33,28 +35,30 @@ const PanditCard = ({ pandit }) => {
             <h3 className="font-display font-semibold text-stone-900 dark:text-stone-100 group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors truncate">
               {name}
             </h3>
-            {(city || region) && (
+            {user && (city || region) && (
               <p className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                 <HiLocationMarker className="shrink-0 text-saffron-500" />
                 <span className="truncate">{[city, region].filter(Boolean).join(', ')}</span>
               </p>
             )}
-            <div className="flex items-center gap-3 mt-2">
-              <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-                <HiClock className="text-gold-500" />
-                {yearsOfExperience} yrs exp.
-              </span>
-              {minPrice && (
-                <span className="text-xs font-semibold text-saffron-600 dark:text-saffron-400">
-                  From ₹{minPrice.toLocaleString('en-IN')}
+            {user && (
+              <div className="flex items-center gap-3 mt-2">
+                <span className="flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
+                  <HiClock className="text-gold-500" />
+                  {yearsOfExperience} yrs exp.
                 </span>
-              )}
-            </div>
+                {minPrice && (
+                  <span className="text-xs font-semibold text-saffron-600 dark:text-saffron-400">
+                    From ₹{minPrice.toLocaleString('en-IN')}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Bio */}
-        {bio && (
+        {user && bio && (
           <p className="mt-3 text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed">
             {bio}
           </p>
@@ -80,7 +84,7 @@ const PanditCard = ({ pandit }) => {
         )}
 
         {/* Languages */}
-        {languagesSpoken?.length > 0 && (
+        {user && languagesSpoken?.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {languagesSpoken.slice(0, 3).map((lang) => (
               <span key={lang} className="px-2 py-0.5 rounded-md text-xs text-stone-500 dark:text-stone-400 bg-stone-100 dark:bg-stone-800">
@@ -93,7 +97,7 @@ const PanditCard = ({ pandit }) => {
         {/* CTA */}
         <div className="mt-4 pt-3 border-t border-light-border dark:border-dark-border">
           <span className="text-sm font-semibold text-saffron-600 dark:text-saffron-400 group-hover:underline">
-            View Profile & Book →
+            {user ? 'View Profile & Book →' : 'View Profile →'}
           </span>
         </div>
       </div>

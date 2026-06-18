@@ -20,10 +20,16 @@ const PanditProfile = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [panditRes, availRes] = await Promise.all([
-          getPanditById(id),
-          getPanditAvailability(id, { from: new Date().toISOString() }),
-        ]);
+        let panditRes;
+        let availRes = { data: { slots: [] } };
+        if (user) {
+          [panditRes, availRes] = await Promise.all([
+            getPanditById(id),
+            getPanditAvailability(id, { from: new Date().toISOString() }),
+          ]);
+        } else {
+          panditRes = await getPanditById(id);
+        }
         setPandit(panditRes.data.pandit);
         setAvailability(availRes.data.slots || []);
       } catch (err) {
@@ -33,7 +39,7 @@ const PanditProfile = () => {
       }
     };
     fetchData();
-  }, [id]);
+  }, [id, user]);
 
   if (loading) return <LoadingSpinner size="lg" text="Loading Pandit profile..." />;
   if (!pandit) return (
@@ -74,20 +80,22 @@ const PanditProfile = () => {
 
               <h1 className="text-2xl font-display font-bold text-stone-900 dark:text-stone-100 mb-1">{name}</h1>
 
-              {(location?.city || location?.region) && (
+              {user && (location?.city || location?.region) && (
                 <p className="flex items-center justify-center gap-1 text-sm text-stone-500 dark:text-stone-400 mb-3">
                   <HiLocationMarker className="text-saffron-500" />
                   {[location.city, location.region, location.state].filter(Boolean).join(', ')}
                 </p>
               )}
 
-              <div className="flex items-center justify-center gap-2 text-sm text-stone-500 dark:text-stone-400 mb-4">
-                <HiClock className="text-gold-500" />
-                {yearsOfExperience} years of experience
-              </div>
+              {user && (
+                <div className="flex items-center justify-center gap-2 text-sm text-stone-500 dark:text-stone-400 mb-4">
+                  <HiClock className="text-gold-500" />
+                  {yearsOfExperience} years of experience
+                </div>
+              )}
 
               {/* Languages */}
-              {languagesSpoken?.length > 0 && (
+              {user && languagesSpoken?.length > 0 && (
                 <div className="flex flex-wrap justify-center gap-2 mb-4">
                   {languagesSpoken.map((lang) => (
                     <span key={lang} className="px-3 py-1 rounded-lg text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
@@ -107,12 +115,20 @@ const PanditProfile = () => {
                   <HiCalendar /> Book This Pandit
                 </Link>
               ) : !user ? (
-                <Link to={`/login`} id="login-to-book" className="btn-primary w-full">Login to Book</Link>
+                <div className="mt-6 p-5 border border-dashed border-light-border dark:border-dark-border rounded-2xl bg-light-surface dark:bg-dark-surface/40 text-center animate-fade-in">
+                  <p className="text-xs font-medium text-stone-600 dark:text-stone-300 mb-4 leading-relaxed">
+                    Login to view complete Pandit details and book services.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <Link to="/login" className="btn-primary btn-sm w-full py-2.5">Login</Link>
+                    <Link to="/register" className="btn-secondary btn-sm w-full py-2.5">Create Account</Link>
+                  </div>
+                </div>
               ) : null}
             </div>
 
             {/* Pricing card */}
-            {supportedRituals?.length > 0 && (
+            {user && supportedRituals?.length > 0 && (
               <div className="card p-5">
                 <h3 className="font-semibold text-stone-900 dark:text-stone-100 mb-3">Pricing</h3>
                 <div className="space-y-2">
@@ -154,23 +170,42 @@ const PanditProfile = () => {
 
             {/* About */}
             {activeTab === 'about' && (
-              <div className="card p-6 animate-fade-in">
+              <div className="card p-6 animate-fade-in relative overflow-hidden">
                 <h2 className="font-display font-semibold text-xl mb-3 text-stone-900 dark:text-stone-100">About</h2>
-                {bio ? (
-                  <p className="text-stone-600 dark:text-stone-300 leading-relaxed">{bio}</p>
-                ) : (
-                  <p className="text-stone-400 italic">No bio provided yet.</p>
-                )}
-                <div className="mt-5 grid grid-cols-2 gap-4">
-                  <div className="p-3 rounded-xl bg-light-surface dark:bg-dark-surface text-center">
-                    <p className="text-2xl font-display font-bold text-gradient">{yearsOfExperience}+</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">Years Experience</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-light-surface dark:bg-dark-surface text-center">
-                    <p className="text-2xl font-display font-bold text-gradient">{supportedRituals?.length || 0}</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">Rituals Supported</p>
+                <div className={!user ? "blur-[5px] select-none pointer-events-none opacity-40" : ""}>
+                  {bio ? (
+                    <p className="text-stone-600 dark:text-stone-300 leading-relaxed">{bio}</p>
+                  ) : (
+                    <p className="text-stone-400 italic">No bio provided yet.</p>
+                  )}
+                  <div className="mt-5 grid grid-cols-2 gap-4">
+                    <div className="p-3 rounded-xl bg-light-surface dark:bg-dark-surface text-center">
+                      <p className="text-2xl font-display font-bold text-gradient">{yearsOfExperience || 0}+</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">Years Experience</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-light-surface dark:bg-dark-surface text-center">
+                      <p className="text-2xl font-display font-bold text-gradient">{supportedRituals?.length || 0}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400">Rituals Supported</p>
+                    </div>
                   </div>
                 </div>
+
+                {!user && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-white/10 dark:bg-black/10 backdrop-blur-[1px] text-center">
+                    <div className="max-w-xs bg-white dark:bg-stone-900 p-5 rounded-2xl shadow-lg border border-light-border dark:border-dark-border">
+                      <p className="text-sm font-semibold text-stone-800 dark:text-stone-200 mb-3">
+                        Unlock bio & profile details
+                      </p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">
+                        Please login or register to view this Pandit's full experience details.
+                      </p>
+                      <div className="flex gap-2 justify-center">
+                        <Link to="/login" className="btn-primary btn-xs px-4 py-1.5 text-xs font-semibold">Login</Link>
+                        <Link to="/register" className="btn-secondary btn-xs px-4 py-1.5 text-xs font-semibold">Register</Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -195,11 +230,13 @@ const PanditProfile = () => {
                             </div>
                           )}
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-lg font-bold text-saffron-600 dark:text-saffron-400">
-                            ₹{ritual.priceRange?.min?.toLocaleString('en-IN')}+
-                          </p>
-                        </div>
+                        {user && (
+                          <div className="text-right shrink-0">
+                            <p className="text-lg font-bold text-saffron-600 dark:text-saffron-400">
+                              ₹{ritual.priceRange?.min?.toLocaleString('en-IN')}+
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))
@@ -212,47 +249,65 @@ const PanditProfile = () => {
             {/* Availability */}
             {activeTab === 'availability' && (
               <div className="animate-fade-in">
-                {availability.length > 0 ? (
-                  <div className="space-y-3">
-                    {availability.map((slot) => (
-                      <div key={slot._id} className="card p-4">
-                        <div className="flex items-center justify-between flex-wrap gap-3">
-                          <div className="flex items-center gap-2">
-                            <HiCalendar className="text-saffron-500" />
-                            <span className="font-semibold text-stone-900 dark:text-stone-100">
-                              {format(new Date(slot.date), 'EEEE, MMMM dd yyyy')}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {slot.timeSlots.map((ts) => (
-                              <span
-                                key={ts._id}
-                                className={`px-3 py-1 rounded-lg text-xs font-medium ${
-                                  ts.isBooked
-                                    ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 line-through'
-                                    : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800'
-                                }`}
-                              >
-                                {ts.time} {ts.isBooked ? '(Booked)' : ''}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                {!user ? (
+                  <div className="card p-8 text-center bg-stone-50 dark:bg-stone-900/30 border border-dashed border-light-border dark:border-dark-border rounded-2xl">
+                    <HiCalendar className="text-4xl text-saffron-500 mx-auto mb-3" />
+                    <h4 className="font-display font-semibold text-stone-900 dark:text-stone-100 mb-2">
+                      Availability Calendar Locked
+                    </h4>
+                    <p className="text-stone-500 dark:text-stone-400 text-sm max-w-md mx-auto mb-5">
+                      Availability calendar is locked for visitors. Please login to view open slots and book.
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <Link to="/login" className="btn-primary btn-sm px-6">Login</Link>
+                      <Link to="/register" className="btn-secondary btn-sm px-6">Register</Link>
+                    </div>
                   </div>
                 ) : (
-                  <div className="card p-8 text-center">
-                    <HiCalendar className="text-4xl text-stone-300 dark:text-stone-600 mx-auto mb-2" />
-                    <p className="text-stone-500 dark:text-stone-400">No availability listed yet.</p>
-                    <p className="text-sm text-stone-400 mt-1">Contact the Pandit directly to arrange a time.</p>
-                  </div>
-                )}
+                  <>
+                    {availability.length > 0 ? (
+                      <div className="space-y-3">
+                        {availability.map((slot) => (
+                          <div key={slot._id} className="card p-4">
+                            <div className="flex items-center justify-between flex-wrap gap-3">
+                              <div className="flex items-center gap-2">
+                                <HiCalendar className="text-saffron-500" />
+                                <span className="font-semibold text-stone-900 dark:text-stone-100">
+                                  {format(new Date(slot.date), 'EEEE, MMMM dd yyyy')}
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {slot.timeSlots.map((ts) => (
+                                  <span
+                                    key={ts._id}
+                                    className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                                      ts.isBooked
+                                        ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 line-through'
+                                        : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800'
+                                    }`}
+                                  >
+                                    {ts.time} {ts.isBooked ? '(Booked)' : ''}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="card p-8 text-center">
+                        <HiCalendar className="text-4xl text-stone-300 dark:text-stone-600 mx-auto mb-2" />
+                        <p className="text-stone-500 dark:text-stone-400">No availability listed yet.</p>
+                        <p className="text-sm text-stone-400 mt-1">Contact the Pandit directly to arrange a time.</p>
+                      </div>
+                    )}
 
-                {user?.role === 'user' && (
-                  <Link to={`/book/${id}`} id="book-now-availability-tab" className="btn-primary mt-4 inline-flex">
-                    <HiCalendar /> Book Now
-                  </Link>
+                    {user?.role === 'user' && (
+                      <Link to={`/book/${id}`} id="book-now-availability-tab" className="btn-primary mt-4 inline-flex">
+                        <HiCalendar /> Book Now
+                      </Link>
+                    )}
+                  </>
                 )}
               </div>
             )}

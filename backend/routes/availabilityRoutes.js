@@ -9,7 +9,7 @@ const { requireRole } = require('../middleware/roleMiddleware');
 const router = express.Router();
 
 router.get('/me', protect, requireRole('pandit'), getMyAvailability);
-router.get('/pandit/:panditId', getPanditAvailability);
+router.get('/pandit/:panditId', protect, getPanditAvailability);
 router.post('/', protect, requireRole('pandit'), setAvailability);
 router.put('/:id', protect, requireRole('pandit'), updateAvailability);
 router.delete('/:id', protect, requireRole('pandit'), deleteAvailability);

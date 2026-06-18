@@ -95,7 +95,26 @@ const getAllPandits = async (req, res, next) => {
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    res.json({ pandits, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
+    let sanitizedPandits = pandits;
+    if (!req.user) {
+      sanitizedPandits = pandits.map(p => {
+        const plain = p.toObject();
+        if (plain.userId) {
+          plain.userId = {
+            _id: plain.userId._id,
+            name: plain.userId.name,
+          };
+        }
+        delete plain.bio;
+        delete plain.yearsOfExperience;
+        delete plain.languagesSpoken;
+        delete plain.pricing;
+        delete plain.location;
+        return plain;
+      });
+    }
+
+    res.json({ pandits: sanitizedPandits, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
   } catch (error) {
     next(error);
   }
@@ -119,7 +138,24 @@ const getPanditById = async (req, res, next) => {
       return res.status(403).json({ message: 'This Pandit profile is not yet verified' });
     }
 
-    res.json({ pandit });
+    let responsePandit = pandit;
+    if (!req.user) {
+      const plain = pandit.toObject();
+      if (plain.userId) {
+        plain.userId = {
+          _id: plain.userId._id,
+          name: plain.userId.name,
+        };
+      }
+      delete plain.bio;
+      delete plain.yearsOfExperience;
+      delete plain.languagesSpoken;
+      delete plain.pricing;
+      delete plain.location;
+      responsePandit = plain;
+    }
+
+    res.json({ pandit: responsePandit });
   } catch (error) {
     next(error);
   }

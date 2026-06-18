@@ -4,6 +4,7 @@ import { HiClock, HiLocationMarker, HiArrowLeft, HiCheckCircle, HiHome, HiStar, 
 import { MdOutlineTempleHindu, MdCurrencyRupee } from 'react-icons/md';
 import { getRitualBySlug, getPandits } from '../api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useAuth } from '../context/AuthContext';
 
 const getCategoryColor = (category) => {
   switch (category) {
@@ -35,6 +36,7 @@ const getCategoryColor = (category) => {
 const RitualDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [ritual, setRitual] = useState(null);
   const [pandits, setPandits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,14 +50,18 @@ const RitualDetail = () => {
         if (data.ritual) {
           setRitual(data.ritual);
           
-          // Fetch pandits supporting this ritual
-          setLoadingPandits(true);
-          try {
-            const panditsRes = await getPandits({ ritualId: data.ritual._id });
-            setPandits(panditsRes.data.pandits || []);
-          } catch (err) {
-            console.error('Failed to load pandits:', err);
-          } finally {
+          if (user) {
+            // Fetch pandits supporting this ritual
+            setLoadingPandits(true);
+            try {
+              const panditsRes = await getPandits({ ritualId: data.ritual._id });
+              setPandits(panditsRes.data.pandits || []);
+            } catch (err) {
+              console.error('Failed to load pandits:', err);
+            } finally {
+              setLoadingPandits(false);
+            }
+          } else {
             setLoadingPandits(false);
           }
         }
@@ -68,7 +74,7 @@ const RitualDetail = () => {
       }
     };
     fetchDetails();
-  }, [slug, navigate]);
+  }, [slug, navigate, user]);
 
   if (loading) {
     return (
@@ -248,7 +254,21 @@ const RitualDetail = () => {
                 Available Pandits for this Ritual
               </h3>
               
-              {loadingPandits ? (
+              {!user ? (
+                <div className="card p-8 text-center bg-stone-50 dark:bg-stone-900/30 border border-dashed border-light-border dark:border-dark-border rounded-2xl animate-fade-in">
+                  <HiCheckCircle className="text-4xl text-saffron-500 mx-auto mb-3" />
+                  <h4 className="font-display font-semibold text-stone-900 dark:text-stone-100 mb-2">
+                    Verified Pandits Available
+                  </h4>
+                  <p className="text-stone-500 dark:text-stone-400 text-sm max-w-md mx-auto mb-5 leading-relaxed">
+                    Login to view verified Pandits who provide this ritual and check their pricing & availability.
+                  </p>
+                  <div className="flex gap-3 justify-center">
+                    <Link to="/login" className="btn-primary btn-sm px-6 py-2">Login</Link>
+                    <Link to="/register" className="btn-secondary btn-sm px-6 py-2">Register</Link>
+                  </div>
+                </div>
+              ) : loadingPandits ? (
                 <LoadingSpinner />
               ) : pandits.length === 0 ? (
                 <div className="p-6 text-center border border-dashed border-light-border dark:border-dark-border rounded-2xl text-stone-400">
@@ -271,14 +291,14 @@ const RitualDetail = () => {
                           {pandit.userId?.name}
                         </h4>
                         <p className="text-xs text-stone-500 dark:text-stone-400">
-                          🎓 {pandit.yearsOfExperience} yrs Exp. | {pandit.location.city}
+                          🎓 {pandit.yearsOfExperience} yrs Exp. | {pandit.location?.city || ''}
                         </p>
                         <div className="flex gap-1.5 items-center mt-1.5">
                           <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/30">
                             Verified
                           </span>
                           <span className="text-[10px] text-stone-400 dark:text-stone-500">
-                            🗣️ {pandit.languagesSpoken.slice(0, 2).join(', ')}
+                            🗣️ {pandit.languagesSpoken?.slice(0, 2).join(', ')}
                           </span>
                         </div>
                       </div>
