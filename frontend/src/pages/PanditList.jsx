@@ -35,8 +35,25 @@ const PanditList = () => {
   const fetchRituals = async () => {
     try {
       const { data } = await getRituals();
-      setRituals(data.rituals || []);
-    } catch {}
+      const loadedRituals = data.rituals || [];
+      setRituals(loadedRituals);
+
+      // Resolve ritual slug or name to ritualId if present
+      const queryRitual = searchParams.get('ritual') || '';
+      if (queryRitual) {
+        const matched = loadedRituals.find(
+          (r) =>
+            r._id === queryRitual ||
+            r.slug === queryRitual ||
+            r.pujaName.toLowerCase() === queryRitual.toLowerCase()
+        );
+        if (matched) {
+          setFilters((prev) => ({ ...prev, ritualId: matched._id }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load rituals:', err);
+    }
   };
 
   const fetchPandits = async () => {

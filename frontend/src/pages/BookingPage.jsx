@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { HiCalendar, HiClock, HiLocationMarker, HiArrowLeft, HiArrowRight, HiCheckCircle } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import toast from 'react-hot-toast';
@@ -13,6 +13,8 @@ const STEPS = ['Ritual', 'Date & Time', 'Location', 'Confirm'];
 const BookingPage = () => {
   const { panditId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ritualParam = searchParams.get('ritual') || searchParams.get('ritualId') || '';
   const [pandit, setPandit] = useState(null);
   const [rituals, setRituals] = useState([]);
   const [availability, setAvailability] = useState([]);
@@ -35,9 +37,23 @@ const BookingPage = () => {
         ]);
         setPandit(panditRes.data.pandit);
         const panditRitualIds = panditRes.data.pandit.supportedRituals?.map((r) => r._id) || [];
-        const filtered = (ritualsRes.data.rituals || []).filter((r) => panditRitualIds.includes(r._id));
+        const loadedRituals = ritualsRes.data.rituals || [];
+        const filtered = loadedRituals.filter((r) => panditRitualIds.includes(r._id));
         setRituals(filtered);
         setAvailability(availRes.data.slots || []);
+
+        // Pre-fill ritual if passed in query param
+        if (ritualParam) {
+          const matched = filtered.find(
+            (r) =>
+              r._id === ritualParam ||
+              r.slug === ritualParam ||
+              r.pujaName.toLowerCase() === ritualParam.toLowerCase()
+          );
+          if (matched) {
+            setForm((f) => ({ ...f, ritualId: matched._id }));
+          }
+        }
       } catch (err) {
         toast.error('Failed to load booking data');
       } finally {
@@ -45,7 +61,7 @@ const BookingPage = () => {
       }
     };
     fetchData();
-  }, [panditId]);
+  }, [panditId, ritualParam]);
 
   const availableDates = availability.filter((s) => s.status === 'available');
   const selectedDateSlots = availableDates.find((s) => s.date?.slice(0, 10) === form.date || new Date(s.date).toISOString().slice(0, 10) === form.date);

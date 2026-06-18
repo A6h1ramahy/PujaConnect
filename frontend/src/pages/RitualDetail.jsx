@@ -175,7 +175,7 @@ const RitualDetail = () => {
               </div>
 
               <Link 
-                to={`/pandits?ritual=${encodeURIComponent(ritual.pujaName)}`}
+                to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
                 className="w-full flex items-center justify-center gap-2 btn-primary py-3.5 shadow-glow-saffron text-sm"
               >
                 Find & Book Pandits 🕉️
@@ -303,7 +303,7 @@ const RitualDetail = () => {
                         </div>
                       </div>
                       <Link 
-                        to={`/pandits/${pandit._id}`}
+                        to={`/pandits/${pandit._id}?ritual=${encodeURIComponent(ritual.slug)}`}
                         className="btn-secondary btn-sm py-1.5 px-3.5 text-xs font-bold"
                       >
                         View

@@ -1,4 +1,6 @@
+const mongoose = require('mongoose');
 const Pandit = require('../models/Pandit');
+const Ritual = require('../models/Ritual');
 const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 const { validationResult } = require('express-validator');
 
@@ -77,7 +79,23 @@ const getAllPandits = async (req, res, next) => {
 
     if (city)     filter['location.city']   = { $regex: city,     $options: 'i' };
     if (region)   filter['location.region'] = { $regex: region,   $options: 'i' };
-    if (ritualId) filter.supportedRituals   = ritualId;
+    if (ritualId) {
+      if (mongoose.Types.ObjectId.isValid(ritualId)) {
+        filter.supportedRituals = ritualId;
+      } else {
+        const ritual = await Ritual.findOne({
+          $or: [
+            { slug: ritualId },
+            { pujaName: { $regex: new RegExp(`^${ritualId}$`, 'i') } }
+          ]
+        });
+        if (ritual) {
+          filter.supportedRituals = ritual._id;
+        } else {
+          filter.supportedRituals = new mongoose.Types.ObjectId();
+        }
+      }
+    }
     if (language) filter.languagesSpoken    = { $regex: language,  $options: 'i' };
     if (minExp || maxExp) {
       filter.yearsOfExperience = {};

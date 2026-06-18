@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Pandit = require('../models/Pandit');
 const Availability = require('../models/Availability');
+const Ritual = require('../models/Ritual');
 const { validationResult } = require('express-validator');
 
 // ── Helper: push to statusHistory ──────────────────────────────
@@ -25,6 +27,23 @@ const createBooking = async (req, res, next) => {
     if (!pandit) return res.status(404).json({ message: 'Pandit not found' });
     if (pandit.verificationStatus !== 'verified') {
       return res.status(400).json({ message: 'This Pandit is not yet verified' });
+    }
+
+    // Verify ritual exists and is active
+    if (!mongoose.Types.ObjectId.isValid(ritualId)) {
+      return res.status(400).json({ message: 'Invalid Ritual ID' });
+    }
+    const ritual = await Ritual.findById(ritualId);
+    if (!ritual || !ritual.isActive) {
+      return res.status(404).json({ message: 'Ritual not found or inactive' });
+    }
+
+    // Verify Pandit supports that ritual
+    const supportsRitual = pandit.supportedRituals.some(
+      (rId) => rId.toString() === ritualId.toString()
+    );
+    if (!supportsRitual) {
+      return res.status(400).json({ message: 'This Pandit does not support the selected ritual' });
     }
 
     const bookingDate = new Date(date);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { HiLocationMarker, HiClock, HiCheckCircle, HiCalendar, HiArrowLeft } from 'react-icons/hi';
 import { getPanditById, getPanditAvailability } from '../api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -11,6 +11,8 @@ const PanditProfile = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ritualParam = searchParams.get('ritual') || searchParams.get('ritualId') || '';
   const [pandit, setPandit] = useState(null);
   const [availability, setAvailability] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ const PanditProfile = () => {
               {/* CTA */}
               {user?.role === 'user' ? (
                 <Link
-                  to={`/book/${id}`}
+                  to={`/book/${id}${ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : ''}`}
                   id="book-pandit-btn"
                   className="btn-primary w-full"
                 >
@@ -303,7 +305,11 @@ const PanditProfile = () => {
                     )}
 
                     {user?.role === 'user' && (
-                      <Link to={`/book/${id}`} id="book-now-availability-tab" className="btn-primary mt-4 inline-flex">
+                      <Link 
+                        to={`/book/${id}${ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : ''}`} 
+                        id="book-now-availability-tab" 
+                        className="btn-primary mt-4 inline-flex"
+                      >
                         <HiCalendar /> Book Now
                       </Link>
                     )}
