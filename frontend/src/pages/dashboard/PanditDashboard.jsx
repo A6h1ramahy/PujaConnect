@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle } from 'react-icons/hi';
+import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -35,6 +35,8 @@ const PanditDashboard = () => {
   const [photoPreview, setPhotoPreview] = useState('');
   const [availForm, setAvailForm] = useState({ date: '', timeSlots: [] });
   const [saving, setSaving] = useState(false);
+  const [isSupportedRitualsOpen, setIsSupportedRitualsOpen] = useState(false);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   useEffect(() => {
     fetchAll();
@@ -392,54 +394,91 @@ const PanditDashboard = () => {
                       </div>
 
                       {/* Supported rituals */}
-                      <div className="form-group">
-                        <label className="label">Supported Rituals</label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                          {rituals.map((ritual) => (
-                            <button
-                              key={ritual._id}
-                              type="button"
-                              id={`ritual-toggle-${ritual._id}`}
-                              onClick={() => toggleRitual(ritual._id)}
-                              className={`p-2.5 rounded-xl text-xs font-medium text-left border-2 transition-all ${
-                                profileForm.supportedRituals.includes(ritual._id)
-                                  ? 'border-saffron-500 bg-saffron-50 dark:bg-saffron-900/20 text-saffron-700 dark:text-saffron-400'
-                                  : 'border-light-border dark:border-dark-border text-stone-600 dark:text-stone-300 hover:border-saffron-300'
-                              }`}
-                            >
-                              {ritual.pujaName}
-                            </button>
-                          ))}
-                        </div>
+                      <div className="border border-light-border dark:border-dark-border rounded-2xl overflow-hidden transition-all duration-300">
+                        <button
+                          type="button"
+                          onClick={() => setIsSupportedRitualsOpen(!isSupportedRitualsOpen)}
+                          className="w-full flex items-center justify-between p-4 bg-stone-50 hover:bg-stone-100 dark:bg-stone-900/30 dark:hover:bg-stone-900/50 transition-colors cursor-pointer select-none"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">Supported Rituals</span>
+                            <span className="px-2 py-0.5 rounded-full bg-saffron-100 dark:bg-saffron-900/30 text-saffron-700 dark:text-saffron-400 text-[10px] font-bold">
+                              {profileForm.supportedRituals.length} selected
+                            </span>
+                          </div>
+                          {isSupportedRitualsOpen ? (
+                            <HiChevronDown className="text-stone-500 dark:text-stone-400 text-lg transition-transform duration-200 rotate-180" />
+                          ) : (
+                            <HiChevronRight className="text-stone-500 dark:text-stone-400 text-lg transition-transform duration-200" />
+                          )}
+                        </button>
+                        
+                        {isSupportedRitualsOpen && (
+                          <div className="p-4 bg-white dark:bg-dark-card border-t border-light-border dark:border-dark-border space-y-3 animate-fade-in">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                              {rituals.map((ritual) => (
+                                <button
+                                  key={ritual._id}
+                                  type="button"
+                                  id={`ritual-toggle-${ritual._id}`}
+                                  onClick={() => toggleRitual(ritual._id)}
+                                  className={`p-2.5 rounded-xl text-xs font-medium text-left border-2 transition-all ${
+                                    profileForm.supportedRituals.includes(ritual._id)
+                                      ? 'border-saffron-500 bg-saffron-50 dark:bg-saffron-900/20 text-saffron-700 dark:text-saffron-400'
+                                      : 'border-light-border dark:border-dark-border text-stone-600 dark:text-stone-300 hover:border-saffron-300'
+                                  }`}
+                                >
+                                  {ritual.pujaName}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Pricing */}
                       {profileForm.supportedRituals.length > 0 && (
-                        <div className="form-group">
-                          <label className="label">Pricing per Ritual (₹)</label>
-                          <div className="space-y-2">
-                            {profileForm.supportedRituals.map((ritualId) => {
-                              const ritual = rituals.find((r) => r._id === ritualId);
-                              return ritual ? (
-                                <div key={ritualId} className="flex items-center gap-3">
-                                  <span className="text-sm text-stone-600 dark:text-stone-300 w-40 shrink-0">{ritual.pujaName}</span>
-                                  <input
-                                    type="number"
-                                    id={`price-${ritualId}`}
-                                    min="0"
-                                    value={profileForm.pricing[ritualId] || ''}
-                                    onChange={(e) => setProfileForm((prev) => ({ ...prev, pricing: { ...prev.pricing, [ritualId]: e.target.value } }))}
-                                    placeholder={`₹${ritual.priceRange?.min || 0}+`}
-                                    className="input-field max-w-xs"
-                                  />
-                                </div>
-                              ) : null;
-                            })}
-                          </div>
+                        <div className="border border-light-border dark:border-dark-border rounded-2xl overflow-hidden transition-all duration-300">
+                          <button
+                            type="button"
+                            onClick={() => setIsPricingOpen(!isPricingOpen)}
+                            className="w-full flex items-center justify-between p-4 bg-stone-50 hover:bg-stone-100 dark:bg-stone-900/30 dark:hover:bg-stone-900/50 transition-colors cursor-pointer select-none"
+                          >
+                            <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">Pricing per Ritual (₹)</span>
+                            {isPricingOpen ? (
+                              <HiChevronDown className="text-stone-500 dark:text-stone-400 text-lg transition-transform duration-200 rotate-180" />
+                            ) : (
+                              <HiChevronRight className="text-stone-500 dark:text-stone-400 text-lg transition-transform duration-200" />
+                            )}
+                          </button>
+
+                          {isPricingOpen && (
+                            <div className="p-4 bg-white dark:bg-dark-card border-t border-light-border dark:border-dark-border space-y-3 animate-fade-in">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {profileForm.supportedRituals.map((ritualId) => {
+                                  const ritual = rituals.find((r) => r._id === ritualId);
+                                  return ritual ? (
+                                    <div key={ritualId} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-stone-50 dark:bg-stone-900/10 border border-light-border dark:border-dark-border/40">
+                                      <span className="text-xs font-semibold text-stone-700 dark:text-stone-300 truncate max-w-[150px] sm:max-w-none">{ritual.pujaName}</span>
+                                      <input
+                                        type="number"
+                                        id={`price-${ritualId}`}
+                                        min="0"
+                                        value={profileForm.pricing[ritualId] || ''}
+                                        onChange={(e) => setProfileForm((prev) => ({ ...prev, pricing: { ...prev.pricing, [ritualId]: e.target.value } }))}
+                                        placeholder={`₹${ritual.priceRange?.min || 0}+`}
+                                        className="input-field max-w-[120px] text-xs py-1 px-2.5 h-9"
+                                      />
+                                    </div>
+                                  ) : null;
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
 
-                      <button type="submit" id="save-pandit-profile" disabled={saving} className="btn-primary">
+                      <button type="submit" id="save-pandit-profile" disabled={saving} className="btn-primary w-full sm:w-auto mt-2">
                         {saving ? 'Saving...' : 'Save Profile'}
                       </button>
                     </form>
