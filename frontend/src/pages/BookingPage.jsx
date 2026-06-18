@@ -122,7 +122,14 @@ const BookingPage = () => {
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg animate-fade-in py-8">
       <div className="page-container max-w-3xl">
         {/* Back */}
-        <button id="back-from-booking" onClick={() => navigate(`/pandits/${panditId}`)} className="btn-ghost btn-sm mb-6">
+        <button 
+          id="back-from-booking" 
+          onClick={() => {
+            const query = ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : '';
+            navigate(`/pandits/${panditId}${query}`, { replace: true });
+          }} 
+          className="btn-ghost btn-sm mb-6"
+        >
           <HiArrowLeft /> Back to Profile
         </button>
 

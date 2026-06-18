@@ -69,7 +69,7 @@ const RitualDetail = () => {
       } catch (err) {
         console.error('Failed to load ritual detail:', err);
         // Redirect to list if error or not found
-        navigate('/rituals');
+        navigate('/rituals', { replace: true });
       } finally {
         setLoading(false);
       }
