@@ -47,12 +47,33 @@ const panditSchema = new mongoose.Schema(
     },
     verificationStatus: {
       type: String,
-      enum: ['pending', 'verified', 'rejected'],
+      enum: ['pending', 'verified', 'rejected', 'suspended'],
       default: 'pending',
     },
     verificationNote: {
       type: String,
     },
+    adminActionHistory: [
+      {
+        actionType: {
+          type: String,
+          enum: ['approved', 'rejected', 'suspended', 'unsuspended', 'restored'],
+          required: true,
+        },
+        adminId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        actionDate: {
+          type: Date,
+          default: Date.now,
+        },
+        reason: {
+          type: String,
+        },
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,

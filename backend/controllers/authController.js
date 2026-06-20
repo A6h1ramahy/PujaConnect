@@ -81,6 +81,9 @@ const login = async (req, res, next) => {
       return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
     }
 
+    user.lastLogin = new Date();
+    await user.save();
+
     const token = generateToken(user._id, user.role);
 
     res.json({
