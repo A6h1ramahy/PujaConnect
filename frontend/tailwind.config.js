@@ -56,6 +56,10 @@ export default {
           border:  '#F0D9C0',
           muted:   '#A0856A',
         },
+        stone: {
+          250: '#dedcd9',
+          850: '#22201e',
+        },
       },
       fontFamily: {
         sans:    ['Source Serif 4', 'Georgia', 'Times New Roman', 'serif'],
