@@ -71,7 +71,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="divider mt-8 mb-6" />
+        <div className="h-px bg-gradient-to-r from-transparent via-light-border dark:via-dark-border to-transparent mt-8 mb-6" />
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-400 dark:text-stone-500 text-center sm:text-left">
           <p>© {new Date().getFullYear()} PujaConnect. All rights reserved.</p>
