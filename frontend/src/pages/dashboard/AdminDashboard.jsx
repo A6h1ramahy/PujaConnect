@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash, HiEye, HiUpload } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
@@ -141,6 +142,7 @@ const AdminDashboard = () => {
   };
 
   const handleVerify = async (id) => {
+    if (!window.confirm('Are you sure you want to verify and approve this Pandit?')) return;
     try {
       await verifyPandit(id);
       toast.success('Pandit verified!');
@@ -150,9 +152,11 @@ const AdminDashboard = () => {
   };
 
   const handleReject = async (id) => {
-    const reason = window.prompt('Reason for rejection:') || 'Profile rejected';
+    const reason = window.prompt('Reason for rejection:');
+    if (reason === null) return;
+    if (!window.confirm(`Are you sure you want to reject this Pandit profile? Reason: "${reason || 'Profile rejected'}"`)) return;
     try {
-      await rejectPanditAdmin(id, reason);
+      await rejectPanditAdmin(id, reason || 'Profile rejected');
       toast.success('Pandit rejected');
       setPendingPandits((prev) => prev.filter((p) => p._id !== id));
     } catch { toast.error('Failed to reject'); }
@@ -441,6 +445,7 @@ const AdminDashboard = () => {
                         <option value="pending">Pending Only</option>
                         <option value="verified">Verified Only</option>
                         <option value="rejected">Rejected Only</option>
+                        <option value="suspended">Suspended Only</option>
                       </select>
                     </div>
                   </div>
@@ -485,16 +490,9 @@ const AdminDashboard = () => {
                           
                           <div className="flex items-center gap-3 shrink-0">
                             <StatusBadge status={p.verificationStatus} />
-                            {p.verificationStatus === 'pending' && (
-                              <div className="flex gap-2">
-                                <button onClick={() => handleVerify(p._id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors">
-                                  Verify
-                                </button>
-                                <button onClick={() => handleReject(p._id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 text-xs font-semibold transition-colors">
-                                  Reject
-                                </button>
-                              </div>
-                            )}
+                            <Link to={`/admin/pandits/${p._id}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold transition-colors">
+                              Manage Profile
+                            </Link>
                           </div>
                         </div>
                       ))}

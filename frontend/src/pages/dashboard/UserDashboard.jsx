@@ -123,24 +123,45 @@ const UserDashboard = () => {
                     </ScrollReveal>
                   ) : (
                     <StaggerContainer className="space-y-3">
-                      {bookings.map((b) => (
-                        <StaggerItem key={b._id}>
-                          <div id={`booking-${b._id}`} className="card-hover p-5 flex flex-col sm:flex-row sm:items-center gap-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
-                            <div className="flex-1">
-                              <p className="font-semibold text-stone-900 dark:text-stone-100">
-                                {b.ritual?.pujaName || 'Puja Ceremony'}
-                              </p>
-                              <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
-                                Pandit: {b.pandit?.userId?.name || '—'}
-                              </p>
-                              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                                {b.date ? format(new Date(b.date), 'MMM dd, yyyy') : ''} · {b.time}
-                              </p>
+                      {bookings.map((b) => {
+                        const isCancelledByAdmin = b.status === 'cancelled' && b.statusHistory?.some(h => h.note === 'Cancelled by Administration');
+                        return (
+                          <StaggerItem key={b._id}>
+                            <div id={`booking-${b._id}`} className="card-hover p-5 flex flex-col gap-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex-1">
+                                  <p className="font-semibold text-stone-900 dark:text-stone-100">
+                                    {b.ritual?.pujaName || 'Puja Ceremony'}
+                                  </p>
+                                  <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
+                                    Pandit: {b.pandit?.userId?.name || '—'}
+                                  </p>
+                                  <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
+                                    {b.date ? format(new Date(b.date), 'MMM dd, yyyy') : ''} · {b.time}
+                                  </p>
+                                </div>
+                                <StatusBadge status={b.status} />
+                              </div>
+
+                              {isCancelledByAdmin && (
+                                <div className="p-3.5 rounded-xl bg-crimson-500/10 border border-crimson-500/20 text-crimson-700 dark:text-crimson-450 text-xs space-y-2 animate-fade-in">
+                                  <p className="font-medium">
+                                    Your booking has been cancelled because the assigned Pandit is currently unavailable. Please choose another verified Pandit.
+                                  </p>
+                                  <div>
+                                    <Link
+                                      to={`/pandits?ritual=${b.ritual?._id || ''}&city=${encodeURIComponent(b.location?.city || b.pandit?.location?.city || '')}`}
+                                      className="inline-flex items-center gap-1 font-semibold text-saffron-600 dark:text-saffron-400 hover:underline"
+                                    >
+                                      Find Replacement Pandit →
+                                    </Link>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            <StatusBadge status={b.status} />
-                          </div>
-                        </StaggerItem>
-                      ))}
+                          </StaggerItem>
+                        );
+                      })}
                     </StaggerContainer>
                   )}
                 </div>

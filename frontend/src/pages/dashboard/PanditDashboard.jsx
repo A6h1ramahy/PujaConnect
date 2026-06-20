@@ -207,6 +207,20 @@ const PanditDashboard = () => {
         </div>
 
         <div className="page-container py-8">
+          {pandit?.verificationStatus === 'suspended' && (
+            <div id="pandit-suspension-alert" className="p-4 mb-6 rounded-2xl bg-crimson-500/10 border border-crimson-500/30 text-crimson-600 dark:text-crimson-400 text-sm font-semibold flex flex-col gap-1 animate-fade-in">
+              <p>⚠️ Your account has been temporarily suspended by administration.</p>
+              {pandit.verificationNote && (
+                <p className="text-xs font-normal text-stone-500 dark:text-stone-400 mt-1">
+                  Reason: {pandit.verificationNote}
+                </p>
+              )}
+              <p className="text-xs font-normal text-stone-500 dark:text-stone-400 mt-1">
+                You will not appear in public searches, receive new booking requests, or be able to accept any bookings until your account status is restored. Please contact the administrator.
+              </p>
+            </div>
+          )}
+
           {/* Stats */}
           <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
