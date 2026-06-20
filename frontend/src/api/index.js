@@ -26,8 +26,10 @@ export const getPanditAvailability = (panditId, params) => api.get(`/availabilit
 export const getAdminStats     = ()              => api.get('/admin/stats');
 export const getPendingPandits = ()              => api.get('/admin/pandits/pending');
 export const getAllPanditsAdmin = (params)        => api.get('/admin/pandits', { params });
+export const getPanditByIdAdmin = (id)           => api.get(`/admin/pandits/${id}`);
 export const verifyPandit      = (id, note)      => api.put(`/admin/pandits/${id}/verify`, { note });
 export const rejectPanditAdmin = (id, reason)    => api.put(`/admin/pandits/${id}/reject`, { reason });
+export const suspendPandit      = (id, reason)    => api.put(`/admin/pandits/${id}/suspend`, { reason });
 export const getAllUsers        = ()              => api.get('/admin/users');
 export const toggleSuspend     = (id)            => api.put(`/admin/users/${id}/suspend`);
 export const getAllBookingsAdmin = (params)       => api.get('/admin/bookings', { params });

@@ -20,6 +20,7 @@ import PlaceholderPage from './pages/PlaceholderPage';
 import UserDashboard   from './pages/dashboard/UserDashboard';
 import PanditDashboard from './pages/dashboard/PanditDashboard';
 import AdminDashboard  from './pages/dashboard/AdminDashboard';
+import AdminPanditDetail from './pages/dashboard/AdminPanditDetail';
 
 const Layout = ({ children }) => (
   <div className="flex flex-col min-h-screen">
@@ -69,6 +70,7 @@ function App() {
             <Route path="/resources/support" element={<Layout><PlaceholderPage /></Layout>} />
             <Route path="/trust/verified-pandits" element={<Layout><PlaceholderPage /></Layout>} />
             <Route path="/trust/secure-booking" element={<Layout><PlaceholderPage /></Layout>} />
+            <Route path="/trust/gridlines" element={<Layout><PlaceholderPage /></Layout>} /> {/* Note: was trust/guidelines in original code but let's check or keep layout */}
             <Route path="/trust/guidelines" element={<Layout><PlaceholderPage /></Layout>} />
             <Route path="/trust/support" element={<Layout><PlaceholderPage /></Layout>} />
 
@@ -95,6 +97,11 @@ function App() {
             <Route path="/admin/dashboard" element={
               <ProtectedRoute role="admin">
                 <Layout><AdminDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pandits/:id" element={
+              <ProtectedRoute role="admin">
+                <Layout><AdminPanditDetail /></Layout>
               </ProtectedRoute>
             } />
 
