@@ -8,7 +8,10 @@ const Ritual = require('../models/Ritual');
 // @access Admin
 const getPendingPandits = async (req, res, next) => {
   try {
-    const pandits = await Pandit.find({ verificationStatus: 'pending' })
+    const panditUsers = await User.find({ role: 'pandit' }).select('_id');
+    const panditUserIds = panditUsers.map(u => u._id);
+
+    const pandits = await Pandit.find({ verificationStatus: 'pending', userId: { $in: panditUserIds } })
       .populate('userId', 'name email phone createdAt')
       .populate('supportedRituals', 'pujaName')
       .sort({ createdAt: -1 });
@@ -25,7 +28,11 @@ const getPendingPandits = async (req, res, next) => {
 const getAllPanditsAdmin = async (req, res, next) => {
   try {
     const { status } = req.query;
-    const filter = status ? { verificationStatus: status } : {};
+    
+    const panditUsers = await User.find({ role: 'pandit' }).select('_id');
+    const panditUserIds = panditUsers.map(u => u._id);
+
+    const filter = status ? { verificationStatus: status, userId: { $in: panditUserIds } } : { userId: { $in: panditUserIds } };
     const pandits = await Pandit.find(filter)
       .populate('userId', 'name email phone createdAt')
       .populate('supportedRituals', 'pujaName')
@@ -90,6 +97,9 @@ const rejectPandit = async (req, res, next) => {
 // @access Admin
 const getStats = async (req, res, next) => {
   try {
+    const panditUsers = await User.find({ role: 'pandit' }).select('_id');
+    const panditUserIds = panditUsers.map(u => u._id);
+
     const [
       totalUsers,
       totalPandits,
@@ -100,16 +110,18 @@ const getStats = async (req, res, next) => {
       acceptedBookings,
       rejectedBookings,
       totalRituals,
+      totalAdmins,
     ] = await Promise.all([
       User.countDocuments({ role: 'user' }),
-      Pandit.countDocuments(),
-      Pandit.countDocuments({ verificationStatus: 'verified' }),
-      Pandit.countDocuments({ verificationStatus: 'pending' }),
+      User.countDocuments({ role: 'pandit' }),
+      Pandit.countDocuments({ verificationStatus: 'verified', userId: { $in: panditUserIds } }),
+      Pandit.countDocuments({ verificationStatus: 'pending', userId: { $in: panditUserIds } }),
       Booking.countDocuments(),
       Booking.countDocuments({ status: 'pending' }),
       Booking.countDocuments({ status: 'accepted' }),
       Booking.countDocuments({ status: 'rejected' }),
       Ritual.countDocuments({ isActive: true }),
+      User.countDocuments({ role: 'admin' }),
     ]);
 
     res.json({
@@ -117,6 +129,7 @@ const getStats = async (req, res, next) => {
       pandits:  { total: totalPandits, verified: verifiedPandits, pending: pendingPandits },
       bookings: { total: totalBookings, pending: pendingBookings, accepted: acceptedBookings, rejected: rejectedBookings },
       rituals:  { total: totalRituals },
+      admins:   { total: totalAdmins },
     });
   } catch (error) {
     next(error);

@@ -104,8 +104,27 @@ const updateProfile = async (req, res, next) => {
 // @access Admin
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({ role: { $ne: 'admin' } }).sort({ createdAt: -1 });
-    res.json({ users, total: users.length });
+    const users = await User.find({ role: 'user' }).sort({ createdAt: -1 });
+    
+    // Aggregate booking counts for each user
+    const userIds = users.map(u => u._id);
+    const bookingStats = await Booking.aggregate([
+      { $match: { user: { $in: userIds } } },
+      { $group: { _id: '$user', count: { $sum: 1 } } }
+    ]);
+
+    const bookingCountMap = {};
+    bookingStats.forEach(stat => {
+      bookingCountMap[stat._id.toString()] = stat.count;
+    });
+
+    const usersWithStats = users.map(user => {
+      const userObj = user.toObject();
+      userObj.bookingCount = bookingCountMap[user._id.toString()] || 0;
+      return userObj;
+    });
+
+    res.json({ users: usersWithStats, total: usersWithStats.length });
   } catch (error) {
     next(error);
   }

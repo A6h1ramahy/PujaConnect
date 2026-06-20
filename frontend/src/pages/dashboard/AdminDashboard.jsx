@@ -48,6 +48,34 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [rituals, setRituals] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Search and filter states
+  const [userSearch, setUserSearch] = useState('');
+  const [panditSearch, setPanditSearch] = useState('');
+  const [panditStatusFilter, setPanditStatusFilter] = useState('all');
+
+  // Filtered lists
+  const filteredUsers = users.filter((u) => {
+    const term = userSearch.toLowerCase();
+    return (
+      u.name.toLowerCase().includes(term) ||
+      u.email.toLowerCase().includes(term) ||
+      (u.phone && u.phone.toLowerCase().includes(term))
+    );
+  });
+
+  const filteredPandits = allPandits.filter((p) => {
+    const term = panditSearch.toLowerCase();
+    const nameMatch = p.userId?.name?.toLowerCase().includes(term) || false;
+    const emailMatch = p.userId?.email?.toLowerCase().includes(term) || false;
+    const cityMatch = p.location?.city?.toLowerCase().includes(term) || false;
+    const ritualMatch = p.supportedRituals?.some((r) => r.pujaName.toLowerCase().includes(term)) || false;
+    const searchMatch = nameMatch || emailMatch || cityMatch || ritualMatch;
+    
+    if (panditStatusFilter === 'all') return searchMatch;
+    return searchMatch && p.verificationStatus === panditStatusFilter;
+  });
+
   const [ritualForm, setRitualForm] = useState({
     pujaName: '',
     slug: '',
@@ -330,14 +358,14 @@ const AdminDashboard = () => {
                   {/* Stats grid */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     {[
-                      { label: 'Registered Users',   value: stats.users.total,          color: 'text-blue-600 dark:text-blue-400' },
+                      { label: 'Total Users',        value: stats.users.total,          color: 'text-blue-600 dark:text-blue-400' },
+                      { label: 'Total Pandits',      value: stats.pandits.total,        color: 'text-purple-600 dark:text-purple-400' },
                       { label: 'Verified Pandits',   value: stats.pandits.verified,     color: 'text-emerald-600 dark:text-emerald-400' },
+                      { label: 'Total Admins',       value: stats.admins?.total || 0,   color: 'text-rose-600 dark:text-rose-400' },
                       { label: 'Total Bookings',     value: stats.bookings.total,       color: 'text-saffron-600 dark:text-saffron-400' },
-                      { label: 'Pending Pandits',    value: stats.pandits.pending,      color: 'text-amber-600 dark:text-amber-400' },
                       { label: 'Active Rituals',     value: stats.rituals.total,        color: 'text-violet-600 dark:text-violet-400' },
+                      { label: 'Pending Pandits',    value: stats.pandits.pending,      color: 'text-amber-600 dark:text-amber-400' },
                       { label: 'Pending Bookings',   value: stats.bookings.pending,     color: 'text-amber-600 dark:text-amber-400' },
-                      { label: 'Accepted Bookings',  value: stats.bookings.accepted,    color: 'text-emerald-600 dark:text-emerald-400' },
-                      { label: 'Rejected Bookings',  value: stats.bookings.rejected,    color: 'text-crimson-600 dark:text-crimson-400' },
                     ].map((s) => (
                       <div key={s.label} className="stat-card">
                         <p className={`text-3xl font-display font-bold ${s.color}`}>{s.value}</p>
@@ -384,61 +412,147 @@ const AdminDashboard = () => {
               {/* Pandits */}
               {activeTab === 'pandits' && (
                 <div className="animate-fade-in">
-                  <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">All Pandits</h2>
-                  <div className="space-y-2">
-                    {allPandits.map((p) => (
-                      <div key={p._id} className="card p-4 flex items-center gap-3 flex-wrap">
-                        <PanditAvatar photo={p.photo} name={p.userId?.name} size={32} className="rounded-lg" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-stone-900 dark:text-stone-100 text-sm truncate">{p.userId?.name}</p>
-                          <p className="text-xs text-stone-400 truncate">{p.userId?.email} · {p.location?.city}</p>
-                        </div>
-                        <StatusBadge status={p.verificationStatus} />
-                        {p.verificationStatus === 'pending' && (
-                          <div className="flex gap-2">
-                            <button onClick={() => handleVerify(p._id)} className="btn-sm px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600">Verify</button>
-                            <button onClick={() => handleReject(p._id)} className="btn-sm px-3 py-1.5 rounded-lg border border-crimson-500 text-crimson-600 dark:text-crimson-400 text-xs font-semibold">Reject</button>
-                          </div>
-                        )}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100">Service Providers / Pandits ({allPandits.length})</h2>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                      <div className="relative w-full sm:w-64">
+                        <input
+                          type="text"
+                          placeholder="Search pandits by name, email, city, ritual..."
+                          value={panditSearch}
+                          onChange={(e) => setPanditSearch(e.target.value)}
+                          className="input-field py-2 pl-9 pr-4 text-sm rounded-xl w-full"
+                        />
+                        <MdOutlineTempleHindu className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
                       </div>
-                    ))}
+                      <select
+                        value={panditStatusFilter}
+                        onChange={(e) => setPanditStatusFilter(e.target.value)}
+                        className="input-field py-2 px-3 text-sm rounded-xl w-full sm:w-40"
+                      >
+                        <option value="all">All Verification</option>
+                        <option value="pending">Pending Only</option>
+                        <option value="verified">Verified Only</option>
+                        <option value="rejected">Rejected Only</option>
+                      </select>
+                    </div>
                   </div>
+
+                  {filteredPandits.length === 0 ? (
+                    <div className="card p-8 text-center text-stone-400">No pandits found matching the search criteria.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {filteredPandits.map((p) => (
+                        <div key={p._id} className="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-all duration-205">
+                          <div className="flex items-start gap-4 flex-1 min-w-0">
+                            <PanditAvatar photo={p.photo} name={p.userId?.name} size={44} className="rounded-xl shrink-0" />
+                            <div className="min-w-0">
+                              <p className="font-semibold text-stone-900 dark:text-stone-100 text-sm">{p.userId?.name || 'N/A'}</p>
+                              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                                ✉️ {p.userId?.email || 'N/A'} {p.userId?.phone && ` · 📞 ${p.userId?.phone}`} {p.location?.city && ` · 📍 ${p.location.city}, ${p.location.state || p.location.region || ''}`}
+                              </p>
+                              <div className="flex flex-wrap gap-2 items-center mt-2.5">
+                                <span className="text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-2.5 py-0.5 rounded-lg border border-stone-200/40 dark:border-stone-700/45">
+                                  🎓 {p.yearsOfExperience || 0} Yrs Exp
+                                </span>
+                                {p.languagesSpoken && p.languagesSpoken.length > 0 && (
+                                  <span className="text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-2.5 py-0.5 rounded-lg border border-stone-200/40 dark:border-stone-700/45">
+                                    🗣️ {p.languagesSpoken.join(', ')}
+                                  </span>
+                                )}
+                                <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-lg border ${p.isActive ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-450 border-emerald-100 dark:border-emerald-900/30' : 'bg-stone-50 dark:bg-stone-950/20 text-stone-400 border-stone-200/40'}`}>
+                                  {p.isActive ? '● Available' : '○ Unavailable'}
+                                </span>
+                              </div>
+                              {p.supportedRituals && p.supportedRituals.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2.5">
+                                  {p.supportedRituals.map((r) => (
+                                    <span key={r._id} className="text-[10px] font-medium bg-saffron-50 dark:bg-saffron-950/20 text-saffron-700 dark:text-saffron-450 border border-saffron-100/45 dark:border-saffron-900/30 px-2 py-0.5 rounded-md">
+                                      {r.pujaName}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 shrink-0">
+                            <StatusBadge status={p.verificationStatus} />
+                            {p.verificationStatus === 'pending' && (
+                              <div className="flex gap-2">
+                                <button onClick={() => handleVerify(p._id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors">
+                                  Verify
+                                </button>
+                                <button onClick={() => handleReject(p._id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 text-xs font-semibold transition-colors">
+                                  Reject
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Users */}
               {activeTab === 'users' && (
                 <div className="animate-fade-in">
-                  <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">All Users ({users.length})</h2>
-                  <div className="space-y-2">
-                    {users.map((u) => (
-                      <div key={u._id} id={`admin-user-${u._id}`} className="card p-4 flex items-center gap-3 flex-wrap">
-                        <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center shrink-0">
-                          <HiUsers className="text-stone-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-stone-900 dark:text-stone-100 text-sm">{u.name}</p>
-                          <p className="text-xs text-stone-400">{u.email} · {u.role} · {u.city || 'N/A'}</p>
-                        </div>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${u.role === 'pandit' ? 'bg-saffron-100 dark:bg-saffron-900/30 text-saffron-700 dark:text-saffron-400' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>
-                          {u.role}
-                        </span>
-                        {u.isSuspended && <span className="badge-rejected">Suspended</span>}
-                        <button
-                          id={`toggle-suspend-${u._id}`}
-                          onClick={() => handleSuspend(u._id)}
-                          className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                            u.isSuspended
-                              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
-                              : 'border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20'
-                          }`}
-                        >
-                          <HiBan className="text-sm" />
-                          {u.isSuspended ? 'Unsuspend' : 'Suspend'}
-                        </button>
-                      </div>
-                    ))}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100">Devotees / Customers ({users.length})</h2>
+                    <div className="relative w-full sm:w-72">
+                      <input
+                        type="text"
+                        placeholder="Search users by name, email, phone..."
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                        className="input-field py-2 pl-9 pr-4 text-sm rounded-xl w-full"
+                      />
+                      <HiUsers className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
+                    </div>
                   </div>
+
+                  {filteredUsers.length === 0 ? (
+                    <div className="card p-8 text-center text-stone-400">No devotees found matching the search criteria.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {filteredUsers.map((u) => (
+                        <div key={u._id} id={`admin-user-${u._id}`} className="card p-5 flex items-center justify-between gap-4 flex-wrap hover:border-stone-300 dark:hover:border-stone-700 transition-all duration-200">
+                          <div className="flex items-center gap-4 flex-1 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/50">
+                              <HiUsers className="text-blue-500 dark:text-blue-400 text-lg" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-stone-900 dark:text-stone-100 text-sm">{u.name}</p>
+                              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                                ✉️ {u.email} {u.phone && ` · 📞 ${u.phone}`} {u.city && ` · 📍 ${u.city}`}
+                              </p>
+                              <p className="text-[11px] text-stone-450 dark:text-stone-400 mt-1.5 font-medium">
+                                Registered: {u.createdAt ? format(new Date(u.createdAt), 'dd MMM yyyy') : 'N/A'} · 📊 {u.bookingCount || 0} Bookings
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-3 shrink-0">
+                            {u.isSuspended && <span className="badge-rejected">Suspended</span>}
+                            <button
+                              id={`toggle-suspend-${u._id}`}
+                              onClick={() => handleSuspend(u._id)}
+                              className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+                                u.isSuspended
+                                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                                  : 'border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20'
+                              }`}
+                            >
+                              <HiBan className="text-sm" />
+                              {u.isSuspended ? 'Unsuspend' : 'Suspend'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
