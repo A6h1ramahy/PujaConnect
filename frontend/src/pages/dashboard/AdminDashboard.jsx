@@ -11,6 +11,8 @@ import {
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PanditAvatar from '../../components/common/PanditAvatar';
+import PageTransition from '../../components/common/PageTransition';
+import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
 
 const getCategoryColor = (category) => {
   switch (category) {
@@ -317,62 +319,67 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg animate-fade-in">
-      {/* Header */}
-      <div className="bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border py-8">
-        <div className="page-container">
-          <h1 className="section-title mb-1">Admin Dashboard</h1>
-          <p className="text-stone-500 dark:text-stone-400">PujaConnect administration panel</p>
+    <PageTransition>
+      <div className="min-h-screen bg-light-bg dark:bg-dark-bg transition-colors duration-300">
+        {/* Header */}
+        <div className="bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border py-8 transition-colors duration-300">
+          <div className="page-container">
+            <h1 className="section-title mb-1 text-gradient">Admin Dashboard</h1>
+            <p className="text-stone-500 dark:text-stone-400">PujaConnect administration panel</p>
+          </div>
         </div>
-      </div>
 
-      <div className="page-container py-8">
-        {loading ? <LoadingSpinner size="lg" /> : (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* Sidebar */}
-            <div className="lg:col-span-1 space-y-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  id={`admin-tab-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-saffron-gradient text-white shadow-glow-saffron'
-                      : 'text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
-                  }`}
-                >
-                  <tab.icon className="text-base" /> {tab.label}
-                  {tab.id === 'overview' && pendingPandits.length > 0 && (
-                    <span className="ml-auto bg-crimson-500 text-white text-xs rounded-full px-1.5 py-0.5">{pendingPandits.length}</span>
-                  )}
-                </button>
-              ))}
-            </div>
+        <div className="page-container py-8">
+          {loading ? <LoadingSpinner size="lg" /> : (
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+              {/* Sidebar */}
+              <ScrollReveal className="lg:col-span-1">
+                <div className="space-y-2">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      id={`admin-tab-${tab.id}`}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${
+                        activeTab === tab.id
+                          ? 'bg-saffron-gradient text-white shadow-glow-saffron'
+                          : 'text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
+                      }`}
+                    >
+                      <tab.icon className="text-base" /> {tab.label}
+                      {tab.id === 'overview' && pendingPandits.length > 0 && (
+                        <span className="ml-auto bg-crimson-500 text-white text-xs rounded-full px-1.5 py-0.5">{pendingPandits.length}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </ScrollReveal>
 
-            {/* Main */}
-            <div className="lg:col-span-4">
-              {/* Overview */}
-              {activeTab === 'overview' && stats && (
-                <div className="animate-fade-in">
-                  {/* Stats grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    {[
-                      { label: 'Total Users',        value: stats.users.total,          color: 'text-blue-600 dark:text-blue-400' },
-                      { label: 'Total Pandits',      value: stats.pandits.total,        color: 'text-purple-600 dark:text-purple-400' },
-                      { label: 'Verified Pandits',   value: stats.pandits.verified,     color: 'text-emerald-600 dark:text-emerald-400' },
-                      { label: 'Total Admins',       value: stats.admins?.total || 0,   color: 'text-rose-600 dark:text-rose-400' },
-                      { label: 'Total Bookings',     value: stats.bookings.total,       color: 'text-saffron-600 dark:text-saffron-400' },
-                      { label: 'Active Rituals',     value: stats.rituals.total,        color: 'text-violet-600 dark:text-violet-400' },
-                      { label: 'Pending Pandits',    value: stats.pandits.pending,      color: 'text-amber-600 dark:text-amber-400' },
-                      { label: 'Pending Bookings',   value: stats.bookings.pending,     color: 'text-amber-600 dark:text-amber-400' },
-                    ].map((s) => (
-                      <div key={s.label} className="stat-card">
-                        <p className={`text-3xl font-display font-bold ${s.color}`}>{s.value}</p>
-                        <p className="text-xs text-stone-500 dark:text-stone-400">{s.label}</p>
-                      </div>
-                    ))}
-                  </div>
+              {/* Main */}
+              <div className="lg:col-span-4">
+                {/* Overview */}
+                {activeTab === 'overview' && stats && (
+                  <div className="animate-fade-in">
+                    {/* Stats grid */}
+                    <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                      {[
+                        { label: 'Total Users',        value: stats.users.total,          color: 'text-blue-600 dark:text-blue-400' },
+                        { label: 'Total Pandits',      value: stats.pandits.total,        color: 'text-purple-600 dark:text-purple-400' },
+                        { label: 'Verified Pandits',   value: stats.pandits.verified,     color: 'text-emerald-600 dark:text-emerald-400' },
+                        { label: 'Total Admins',       value: stats.admins?.total || 0,   color: 'text-rose-600 dark:text-rose-400' },
+                        { label: 'Total Bookings',     value: stats.bookings.total,       color: 'text-saffron-600 dark:text-saffron-400' },
+                        { label: 'Active Rituals',     value: stats.rituals.total,        color: 'text-violet-600 dark:text-violet-400' },
+                        { label: 'Pending Pandits',    value: stats.pandits.pending,      color: 'text-amber-600 dark:text-amber-400' },
+                        { label: 'Pending Bookings',   value: stats.bookings.pending,     color: 'text-amber-600 dark:text-amber-400' },
+                      ].map((s) => (
+                        <StaggerItem key={s.label}>
+                          <div className="stat-card">
+                            <p className={`text-3xl font-display font-bold ${s.color}`}>{s.value}</p>
+                            <p className="text-xs text-stone-500 dark:text-stone-400">{s.label}</p>
+                          </div>
+                        </StaggerItem>
+                      ))}
+                    </StaggerContainer>
 
                   {/* Pending verifications */}
                   <div>
@@ -945,6 +952,7 @@ const AdminDashboard = () => {
         </div>
       )}
     </div>
+  </PageTransition>
   );
 };
 

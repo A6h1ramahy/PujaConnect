@@ -12,6 +12,8 @@ import {
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PanditAvatar from '../../components/common/PanditAvatar';
+import PageTransition from '../../components/common/PageTransition';
+import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
 
 const TIME_SLOTS = [
   '06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM',
@@ -189,61 +191,66 @@ const PanditDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg animate-fade-in">
-      {/* Header */}
-      <div className="bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border py-8">
-        <div className="page-container flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="section-title mb-1">Pandit Dashboard</h1>
-            <p className="text-stone-500 dark:text-stone-400">
-              Welcome, {user?.name} · Status:{' '}
-              <StatusBadge status={pandit?.verificationStatus || 'pending'} />
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="page-container py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: 'Pending Requests', value: pending.length,  color: 'text-amber-600 dark:text-amber-400' },
-            { label: 'Upcoming Bookings', value: upcoming.length, color: 'text-emerald-600 dark:text-emerald-400' },
-            { label: 'Total Bookings',   value: bookings.length, color: 'text-saffron-600 dark:text-saffron-400' },
-            { label: 'Avail. Dates',     value: availability.length, color: 'text-blue-600 dark:text-blue-400' },
-          ].map((s) => (
-            <div key={s.label} className="stat-card">
-              <p className={`text-3xl font-display font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-sm text-stone-500 dark:text-stone-400">{s.label}</p>
+    <PageTransition>
+      <div className="min-h-screen bg-light-bg dark:bg-dark-bg transition-colors duration-300">
+        {/* Header */}
+        <div className="bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border py-8 transition-colors duration-300">
+          <div className="page-container flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="section-title mb-1 text-gradient">Pandit Dashboard</h1>
+              <p className="text-stone-500 dark:text-stone-400">
+                Welcome, {user?.name} · Status:{' '}
+                <StatusBadge status={pandit?.verificationStatus || 'pending'} />
+              </p>
             </div>
-          ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-2">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                id={`pandit-tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-saffron-gradient text-white shadow-glow-saffron'
-                    : 'text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
-                }`}
-              >
-                <tab.icon className="text-base" /> {tab.label}
-                {tab.id === 'bookings' && pending.length > 0 && (
-                  <span className="ml-auto bg-crimson-500 text-white text-xs rounded-full px-1.5 py-0.5">{pending.length}</span>
-                )}
-              </button>
+        <div className="page-container py-8">
+          {/* Stats */}
+          <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { label: 'Pending Requests', value: pending.length,  color: 'text-amber-600 dark:text-amber-400' },
+              { label: 'Upcoming Bookings', value: upcoming.length, color: 'text-emerald-600 dark:text-emerald-400' },
+              { label: 'Total Bookings',   value: bookings.length, color: 'text-saffron-600 dark:text-saffron-400' },
+              { label: 'Avail. Dates',     value: availability.length, color: 'text-blue-600 dark:text-blue-400' },
+            ].map((s) => (
+              <StaggerItem key={s.label}>
+                <div className="stat-card">
+                  <p className={`text-3xl font-display font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-sm text-stone-500 dark:text-stone-400">{s.label}</p>
+                </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
 
-          {/* Main */}
-          <div className="lg:col-span-3">
-            {loading ? <LoadingSpinner /> : (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <ScrollReveal className="lg:col-span-1">
+              <div className="space-y-2">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    id={`pandit-tab-${tab.id}`}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${
+                      activeTab === tab.id
+                        ? 'bg-saffron-gradient text-white shadow-glow-saffron'
+                        : 'text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
+                    }`}
+                  >
+                    <tab.icon className="text-base" /> {tab.label}
+                    {tab.id === 'bookings' && pending.length > 0 && (
+                      <span className="ml-auto bg-crimson-500 text-white text-xs rounded-full px-1.5 py-0.5">{pending.length}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </ScrollReveal>
+
+            {/* Main */}
+            <div className="lg:col-span-3">
+              {loading ? <LoadingSpinner /> : (
               <>
                 {/* Bookings */}
                 {activeTab === 'bookings' && (
@@ -569,6 +576,7 @@ const PanditDashboard = () => {
         </div>
       </div>
     </div>
+  </PageTransition>
   );
 };
 
