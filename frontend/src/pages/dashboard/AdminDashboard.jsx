@@ -541,18 +541,12 @@ const AdminDashboard = () => {
                           
                           <div className="flex items-center gap-3 shrink-0">
                             {u.isSuspended && <span className="badge-rejected">Suspended</span>}
-                            <button
-                              id={`toggle-suspend-${u._id}`}
-                              onClick={() => handleSuspend(u._id)}
-                              className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                                u.isSuspended
-                                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
-                                  : 'border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20'
-                              }`}
+                            <Link
+                              to={`/admin/users/${u._id}`}
+                              className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border border-saffron-500 text-saffron-600 dark:text-saffron-400 hover:bg-saffron-55 dark:hover:bg-saffron-950/20 hover:bg-saffron-50 transition-colors"
                             >
-                              <HiBan className="text-sm" />
-                              {u.isSuspended ? 'Unsuspend' : 'Suspend'}
-                            </button>
+                              Manage Profile
+                            </Link>
                           </div>
                         </div>
                       ))}
