@@ -21,6 +21,7 @@ import UserDashboard   from './pages/dashboard/UserDashboard';
 import PanditDashboard from './pages/dashboard/PanditDashboard';
 import AdminDashboard  from './pages/dashboard/AdminDashboard';
 import AdminPanditDetail from './pages/dashboard/AdminPanditDetail';
+import AdminUserDetail from './pages/dashboard/AdminUserDetail';
 
 const Layout = ({ children }) => (
   <div className="flex flex-col min-h-screen">
@@ -102,6 +103,11 @@ function App() {
             <Route path="/admin/pandits/:id" element={
               <ProtectedRoute role="admin">
                 <Layout><AdminPanditDetail /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users/:id" element={
+              <ProtectedRoute role="admin">
+                <Layout><AdminUserDetail /></Layout>
               </ProtectedRoute>
             } />
 

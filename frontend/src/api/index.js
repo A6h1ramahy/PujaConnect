@@ -31,6 +31,9 @@ export const verifyPandit      = (id, note)      => api.put(`/admin/pandits/${id
 export const rejectPanditAdmin = (id, reason)    => api.put(`/admin/pandits/${id}/reject`, { reason });
 export const suspendPandit      = (id, reason)    => api.put(`/admin/pandits/${id}/suspend`, { reason });
 export const getAllUsers        = ()              => api.get('/admin/users');
+export const getUserByIdAdmin   = (id)            => api.get(`/admin/users/${id}`);
+export const suspendUser        = (id, reason)    => api.put(`/admin/users/${id}/suspend`, { reason });
+export const reactivateUser     = (id, reason)    => api.put(`/admin/users/${id}/reactivate`, { reason });
 export const toggleSuspend     = (id)            => api.put(`/admin/users/${id}/suspend`);
 export const getAllBookingsAdmin = (params)       => api.get('/admin/bookings', { params });
 
