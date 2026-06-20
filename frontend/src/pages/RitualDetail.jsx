@@ -6,6 +6,8 @@ import { getRitualBySlug, getPandits } from '../api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 import PanditAvatar from '../components/common/PanditAvatar';
+import PageTransition from '../components/common/PageTransition';
+import { ScrollReveal, StaggerContainer, StaggerItem } from '../components/common/ScrollReveal';
 
 const getCategoryColor = (category) => {
   switch (category) {
@@ -79,9 +81,11 @@ const RitualDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-light-bg dark:bg-dark-bg">
-        <LoadingSpinner size="lg" />
-      </div>
+      <PageTransition>
+        <div className="min-h-[70vh] flex items-center justify-center bg-light-bg dark:bg-dark-bg transition-colors duration-300">
+          <LoadingSpinner size="lg" />
+        </div>
+      </PageTransition>
     );
   }
 
@@ -90,7 +94,8 @@ const RitualDetail = () => {
   const defaultPlaceholder = '/default-om.png';
 
   return (
-    <div className="min-h-screen bg-light-bg dark:bg-dark-bg pb-20 animate-fade-in">
+    <PageTransition>
+      <div className="min-h-screen bg-light-bg dark:bg-dark-bg pb-20 transition-colors duration-300">
       <div className="page-container py-8">
         
         {/* Back Link */}
@@ -109,79 +114,83 @@ const RitualDetail = () => {
           <div className="lg:col-span-5 flex flex-col gap-6">
             
             {/* Main Visual */}
-            <div className="relative rounded-3xl overflow-hidden aspect-video lg:aspect-square shadow-card-light dark:shadow-card-dark border border-light-border dark:border-dark-border">
-              <img 
-                src={ritual.imageUrl || defaultPlaceholder} 
-                alt={ritual.pujaName}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent pointer-events-none" />
-              
-              {/* Floating Badges */}
-              <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                <span className={`text-[10px] font-bold px-3 py-1 rounded-full border shadow-sm ${getCategoryColor(ritual.category)}`}>
-                  {ritual.category}
-                </span>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-white">
-                <div className="flex gap-2">
-                  {ritual.popular && (
-                    <span className="flex items-center gap-1 bg-amber-500 text-white text-[9px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-lg shadow-sm">
-                      <HiFire /> Popular
-                    </span>
-                  )}
-                  {ritual.featured && (
-                    <span className="flex items-center gap-1 bg-saffron-500 text-white text-[9px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-lg shadow-sm">
-                      <HiSparkles /> Featured
+            <ScrollReveal>
+              <div className="relative rounded-3xl overflow-hidden aspect-video lg:aspect-square shadow-card-light dark:shadow-card-dark border border-light-border dark:border-dark-border group">
+                <img 
+                  src={ritual.imageUrl || defaultPlaceholder} 
+                  alt={ritual.pujaName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent pointer-events-none" />
+                
+                {/* Floating Badges */}
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                  <span className={`text-[10px] font-bold px-3 py-1 rounded-full border shadow-sm ${getCategoryColor(ritual.category)}`}>
+                    {ritual.category}
+                  </span>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center text-white">
+                  <div className="flex gap-2">
+                    {ritual.popular && (
+                      <span className="flex items-center gap-1 bg-amber-500 text-white text-[9px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-lg shadow-sm">
+                        <HiFire /> Popular
+                      </span>
+                    )}
+                    {ritual.featured && (
+                      <span className="flex items-center gap-1 bg-saffron-500 text-white text-[9px] font-extrabold tracking-wider uppercase px-2 py-0.5 rounded-lg shadow-sm">
+                        <HiSparkles /> Featured
+                      </span>
+                    )}
+                  </div>
+                  {ritual.bookingCount > 0 && (
+                    <span className="text-xs font-semibold bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-lg">
+                      📊 {ritual.bookingCount} Bookings
                     </span>
                   )}
                 </div>
-                {ritual.bookingCount > 0 && (
-                  <span className="text-xs font-semibold bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-lg">
-                    📊 {ritual.bookingCount} Bookings
-                  </span>
-                )}
               </div>
-            </div>
+            </ScrollReveal>
 
             {/* Pricing & Booking Card */}
-            <div className="card p-6 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border shadow-card-light dark:shadow-card-dark">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">Service Cost Estimate</span>
-              <h2 className="text-3xl font-display font-bold text-stone-900 dark:text-stone-100 flex items-center mt-1 mb-4">
-                <span className="text-saffron-600 dark:text-saffron-400">₹</span>
-                {ritual.priceRange.min.toLocaleString('en-IN')} – {ritual.priceRange.max.toLocaleString('en-IN')}
-              </h2>
+            <ScrollReveal>
+              <div className="card-hover p-6 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border shadow-card-light dark:shadow-card-dark">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500">Service Cost Estimate</span>
+                <h2 className="text-3xl font-display font-bold text-stone-900 dark:text-stone-100 flex items-center mt-1 mb-4">
+                  <span className="text-saffron-600 dark:text-saffron-400">₹</span>
+                  {ritual.priceRange.min.toLocaleString('en-IN')} – {ritual.priceRange.max.toLocaleString('en-IN')}
+                </h2>
 
-              <div className="flex flex-col gap-3.5 border-t border-b border-light-border dark:border-dark-border py-4 mb-5">
-                <div className="flex justify-between items-center text-sm text-stone-600 dark:text-stone-400">
-                  <span className="flex items-center gap-2 font-medium"><HiClock className="text-stone-400 text-base" /> Duration</span>
-                  <span className="font-bold text-stone-900 dark:text-stone-200">{ritual.duration} ({ritual.durationMinutes} mins)</span>
-                </div>
-                <div className="flex justify-between items-center text-sm text-stone-600 dark:text-stone-400">
-                  <span className="flex items-center gap-2 font-medium"><HiLocationMarker className="text-stone-400 text-base" /> Location Support</span>
-                  <span className="font-bold text-stone-900 dark:text-stone-200">{ritual.locationType}</span>
-                </div>
-                {ritual.estimatedMaterialCost > 0 && (
+                <div className="flex flex-col gap-3.5 border-t border-b border-light-border dark:border-dark-border py-4 mb-5">
                   <div className="flex justify-between items-center text-sm text-stone-600 dark:text-stone-400">
-                    <span className="flex items-center gap-2 font-medium"><MdCurrencyRupee className="text-stone-400 text-base" /> Est. Material Cost</span>
-                    <span className="font-bold text-stone-900 dark:text-stone-200">₹{ritual.estimatedMaterialCost.toLocaleString('en-IN')}</span>
+                    <span className="flex items-center gap-2 font-medium"><HiClock className="text-stone-400 text-base" /> Duration</span>
+                    <span className="font-bold text-stone-900 dark:text-stone-200">{ritual.duration} ({ritual.durationMinutes} mins)</span>
                   </div>
-                )}
-                {ritual.supportedRegions?.length > 0 && (
                   <div className="flex justify-between items-center text-sm text-stone-600 dark:text-stone-400">
-                    <span className="flex items-center gap-2 font-medium">🗺️ Regions</span>
-                    <span className="font-bold text-stone-900 dark:text-stone-200">{ritual.supportedRegions.join(', ')}</span>
+                    <span className="flex items-center gap-2 font-medium"><HiLocationMarker className="text-stone-400 text-base" /> Location Support</span>
+                    <span className="font-bold text-stone-900 dark:text-stone-200">{ritual.locationType}</span>
                   </div>
-                )}
+                  {ritual.estimatedMaterialCost > 0 && (
+                    <div className="flex justify-between items-center text-sm text-stone-600 dark:text-stone-400">
+                      <span className="flex items-center gap-2 font-medium"><MdCurrencyRupee className="text-stone-400 text-base" /> Est. Material Cost</span>
+                      <span className="font-bold text-stone-900 dark:text-stone-200">₹{ritual.estimatedMaterialCost.toLocaleString('en-IN')}</span>
+                    </div>
+                  )}
+                  {ritual.supportedRegions?.length > 0 && (
+                    <div className="flex justify-between items-center text-sm text-stone-600 dark:text-stone-400">
+                      <span className="flex items-center gap-2 font-medium">🗺️ Regions</span>
+                      <span className="font-bold text-stone-900 dark:text-stone-200">{ritual.supportedRegions.join(', ')}</span>
+                    </div>
+                  )}
+                </div>
+
+                <Link 
+                  to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
+                  className="w-full flex items-center justify-center gap-2 btn-primary py-3.5 shadow-glow-saffron text-sm"
+                >
+                  Find & Book Pandits 🕉️
+                </Link>
               </div>
-
-              <Link 
-                to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
-                className="w-full flex items-center justify-center gap-2 btn-primary py-3.5 shadow-glow-saffron text-sm"
-              >
-                Find & Book Pandits 🕉️
-              </Link>
-            </div>
+            </ScrollReveal>
 
           </div>
 
@@ -189,64 +198,72 @@ const RitualDetail = () => {
           <div className="lg:col-span-7 flex flex-col gap-8">
             
             {/* Header info */}
-            <div>
-              <h1 className="section-title text-4xl leading-tight mb-3 text-gradient">
-                {ritual.pujaName}
-              </h1>
-              <p className="text-stone-700 dark:text-stone-300 font-semibold text-base leading-relaxed border-l-4 border-saffron-500 pl-4">
-                {ritual.shortDescription}
-              </p>
-            </div>
+            <ScrollReveal>
+              <div>
+                <h1 className="section-title text-4xl leading-tight mb-3 text-gradient">
+                  {ritual.pujaName}
+                </h1>
+                <p className="text-stone-700 dark:text-stone-300 font-semibold text-base leading-relaxed border-l-4 border-saffron-500 pl-4">
+                  {ritual.shortDescription}
+                </p>
+              </div>
+            </ScrollReveal>
 
             {/* Detailed Description */}
-            <div className="flex flex-col gap-3">
-              <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 text-lg border-b border-light-border dark:border-dark-border pb-2">
-                About the Ritual
-              </h3>
-              <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed whitespace-pre-line">
-                {ritual.description}
-              </p>
-            </div>
+            <ScrollReveal>
+              <div className="flex flex-col gap-3">
+                <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 text-lg border-b border-light-border dark:border-dark-border pb-2">
+                  About the Ritual
+                </h3>
+                <p className="text-stone-600 dark:text-stone-400 text-sm leading-relaxed whitespace-pre-line">
+                  {ritual.description}
+                </p>
+              </div>
+            </ScrollReveal>
 
             {/* Required Materials */}
             {ritual.requiredMaterials?.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 text-lg border-b border-light-border dark:border-dark-border pb-2">
-                  Required Materials (Puja Samagri)
-                </h3>
-                <p className="text-xs text-stone-500 dark:text-stone-500 mb-1">
-                  * These items are traditionally required for the ritual. Material cost is estimated separately.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {ritual.requiredMaterials.map((material) => (
-                    <span 
-                      key={material} 
-                      className="px-3 py-1.5 rounded-xl text-xs bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30"
-                    >
-                      {material}
-                    </span>
-                  ))}
+              <ScrollReveal>
+                <div className="flex flex-col gap-3">
+                  <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 text-lg border-b border-light-border dark:border-dark-border pb-2">
+                    Required Materials (Puja Samagri)
+                  </h3>
+                  <p className="text-xs text-stone-500 dark:text-stone-500 mb-1">
+                    * These items are traditionally required for the ritual. Material cost is estimated separately.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {ritual.requiredMaterials.map((material) => (
+                      <span 
+                        key={material} 
+                        className="px-3 py-1.5 rounded-xl text-xs bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30"
+                      >
+                        {material}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </ScrollReveal>
             )}
 
             {/* Occasions list */}
             {ritual.occasionTags?.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 text-sm border-b border-light-border dark:border-dark-border pb-2 uppercase tracking-wide">
-                  Recommended Occasions
-                </h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {ritual.occasionTags.map((tag) => (
-                    <span 
-                      key={tag} 
-                      className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#2D0B12] text-[#FBBF24] border border-[#F59E0B]/40 hover:bg-[#3d121c] hover:border-[#FBBF24]/60 hover:shadow-[0_0_8px_rgba(251,191,36,0.3)] transition-all duration-300"
-                    >
-                      🏷️ {tag}
-                    </span>
-                  ))}
+              <ScrollReveal>
+                <div className="flex flex-col gap-3">
+                  <h3 className="font-display font-bold text-stone-900 dark:text-stone-100 text-sm border-b border-light-border dark:border-dark-border pb-2 uppercase tracking-wide">
+                    Recommended Occasions
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ritual.occasionTags.map((tag) => (
+                      <span 
+                        key={tag} 
+                        className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#2D0B12] text-[#FBBF24] border border-[#F59E0B]/40 hover:bg-[#3d121c] hover:border-[#FBBF24]/60 hover:shadow-[0_0_8px_rgba(251,191,36,0.3)] transition-all duration-300"
+                      >
+                        🏷️ {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </ScrollReveal>
             )}
 
             {/* Available Pandits section */}
@@ -256,19 +273,21 @@ const RitualDetail = () => {
               </h3>
               
               {!user ? (
-                <div className="card p-8 text-center bg-stone-50 dark:bg-stone-900/30 border border-dashed border-light-border dark:border-dark-border rounded-2xl animate-fade-in">
-                  <HiCheckCircle className="text-4xl text-saffron-500 mx-auto mb-3" />
-                  <h4 className="font-display font-semibold text-stone-900 dark:text-stone-100 mb-2">
-                    Verified Pandits Available
-                  </h4>
-                  <p className="text-stone-500 dark:text-stone-400 text-sm max-w-md mx-auto mb-5 leading-relaxed">
-                    Login to view verified Pandits who provide this ritual and check their pricing & availability.
-                  </p>
-                  <div className="flex gap-3 justify-center">
-                    <Link to="/login" className="btn-primary btn-sm px-6 py-2">Login</Link>
-                    <Link to="/register" className="btn-secondary btn-sm px-6 py-2">Register</Link>
+                <ScrollReveal>
+                  <div className="card-hover p-8 text-center bg-stone-50 dark:bg-stone-900/30 border border-dashed border-light-border dark:border-dark-border rounded-2xl">
+                    <HiCheckCircle className="text-4xl text-saffron-500 mx-auto mb-3" />
+                    <h4 className="font-display font-semibold text-stone-900 dark:text-stone-100 mb-2">
+                      Verified Pandits Available
+                    </h4>
+                    <p className="text-stone-500 dark:text-stone-400 text-sm max-w-md mx-auto mb-5 leading-relaxed">
+                      Login to view verified Pandits who provide this ritual and check their pricing & availability.
+                    </p>
+                    <div className="flex gap-3 justify-center">
+                      <Link to="/login" className="btn-primary btn-sm px-6 py-2">Login</Link>
+                      <Link to="/register" className="btn-secondary btn-sm px-6 py-2">Register</Link>
+                    </div>
                   </div>
-                </div>
+                </ScrollReveal>
               ) : loadingPandits ? (
                 <LoadingSpinner />
               ) : pandits.length === 0 ? (
@@ -276,64 +295,67 @@ const RitualDetail = () => {
                   No verified Pandits are currently listed supporting this specific ritual. Please check back later.
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-4 animate-fade-in">
+                  <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {pandits.slice(0, 4).map((pandit) => (
-                      <div 
-                        key={pandit._id}
-                        className="flex items-center gap-4 p-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300"
-                      >
-                        <PanditAvatar 
-                          photo={pandit.photo}
-                          name={pandit.userId?.name}
-                          size={56}
-                          className="rounded-2xl"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm truncate">
-                            {pandit.userId?.name}
-                          </h4>
-                          <p className="text-xs text-stone-500 dark:text-stone-400">
-                            🎓 {pandit.yearsOfExperience} yrs Exp. | {pandit.location?.city || ''}
-                          </p>
-                          <div className="flex gap-1.5 items-center mt-1.5">
-                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/30">
-                              Verified
-                            </span>
-                            <span className="text-[10px] text-stone-400 dark:text-stone-500">
-                              🗣️ {pandit.languagesSpoken?.slice(0, 2).join(', ')}
-                            </span>
-                          </div>
-                        </div>
-                        <Link 
-                          to={`/pandits/${pandit._id}?ritual=${encodeURIComponent(ritual.slug)}`}
-                          className="btn-secondary btn-sm py-1.5 px-3.5 text-xs font-bold"
+                      <StaggerItem key={pandit._id}>
+                        <div 
+                          className="flex items-center gap-4 p-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-card-light dark:hover:shadow-card-dark transition-all duration-300"
                         >
-                          View
-                        </Link>
-                      </div>
+                          <PanditAvatar 
+                            photo={pandit.photo}
+                            name={pandit.userId?.name}
+                            size={56}
+                            className="rounded-2xl"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm truncate">
+                              {pandit.userId?.name}
+                            </h4>
+                            <p className="text-xs text-stone-500 dark:text-stone-400">
+                              🎓 {pandit.yearsOfExperience} yrs Exp. | {pandit.location?.city || ''}
+                            </p>
+                            <div className="flex gap-1.5 items-center mt-1.5">
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/30">
+                                Verified
+                              </span>
+                              <span className="text-[10px] text-stone-400 dark:text-stone-500">
+                                🗣️ {pandit.languagesSpoken?.slice(0, 2).join(', ')}
+                              </span>
+                            </div>
+                          </div>
+                          <Link 
+                            to={`/pandits/${pandit._id}?ritual=${encodeURIComponent(ritual.slug)}`}
+                            className="btn-secondary btn-sm py-1.5 px-3.5 text-xs font-bold"
+                          >
+                            View
+                          </Link>
+                        </div>
+                      </StaggerItem>
                     ))}
-                  </div>
+                  </StaggerContainer>
 
-                  <div className="mt-2 p-4 rounded-2xl bg-saffron-50 dark:bg-saffron-950/20 border border-saffron-100 dark:border-saffron-900/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-fade-in">
-                    <div className="text-left">
-                      <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm">
-                        Looking for more options?
-                      </h4>
-                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                        {pandits.length > 4 
-                          ? `Only a preview of ${Math.min(4, pandits.length)} matching Pandits is shown here. Click 'Find & Book Pandits' to explore all available options.`
-                          : 'Find more matching Pandits by location, language, experience, or price range.'
-                        }
-                      </p>
+                  <ScrollReveal>
+                    <div className="mt-2 p-4 rounded-2xl bg-saffron-50 dark:bg-saffron-950/20 border border-saffron-100 dark:border-saffron-900/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="text-left">
+                        <h4 className="font-semibold text-stone-900 dark:text-stone-100 text-sm">
+                          Looking for more options?
+                        </h4>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                          {pandits.length > 4 
+                            ? `Only a preview of ${Math.min(4, pandits.length)} matching Pandits is shown here. Click 'Find & Book Pandits' to explore all available options.`
+                            : 'Find more matching Pandits by location, language, experience, or price range.'
+                          }
+                        </p>
+                      </div>
+                      <Link 
+                        to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
+                        className="btn-primary btn-sm py-2 px-4 whitespace-nowrap text-xs font-bold shrink-0 self-start sm:self-auto flex items-center gap-1 shadow-glow-saffron"
+                      >
+                        Find & Book Pandits 🕉️
+                      </Link>
                     </div>
-                    <Link 
-                      to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
-                      className="btn-primary btn-sm py-2 px-4 whitespace-nowrap text-xs font-bold shrink-0 self-start sm:self-auto flex items-center gap-1 shadow-glow-saffron"
-                    >
-                      Find & Book Pandits 🕉️
-                    </Link>
-                  </div>
+                  </ScrollReveal>
                 </div>
               )}
             </div>
@@ -344,6 +366,7 @@ const RitualDetail = () => {
 
       </div>
     </div>
+  </PageTransition>
   );
 };
 
