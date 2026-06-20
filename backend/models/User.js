@@ -47,6 +47,14 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
+    adminActionHistory: [
+      {
+        actionType: { type: String, enum: ['suspended', 'reactivated'] },
+        adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        actionDate: { type: Date, default: Date.now },
+        reason: { type: String }
+      }
+    ],
   },
   { timestamps: true }
 );

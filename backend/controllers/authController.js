@@ -78,7 +78,7 @@ const login = async (req, res, next) => {
     }
 
     if (user.isSuspended) {
-      return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
+      return res.status(403).json({ message: 'Your account has been temporarily suspended. Please contact the administrator for assistance.' });
     }
 
     user.lastLogin = new Date();
