@@ -151,4 +151,169 @@ const toggleSuspend = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getAllUsers, toggleSuspend };
+// @desc  Get user by ID (admin detail view)
+// @route GET /api/admin/users/:id
+// @access Admin
+const getUserByIdAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .populate({
+        path: 'adminActionHistory.adminId',
+        select: 'name email'
+      });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Fetch bookings to aggregate stats and metrics
+    const bookings = await Booking.find({ user: user._id })
+      .populate('ritual', 'pujaName slug category')
+      .populate({ path: 'pandit', populate: { path: 'userId', select: 'name email phone' } })
+      .sort({ date: -1 });
+
+    const stats = {
+      total: bookings.length,
+      completed: bookings.filter(b => b.status === 'completed').length,
+      pending: bookings.filter(b => b.status === 'pending').length,
+      cancelled: bookings.filter(b => b.status === 'cancelled').length,
+      accepted: bookings.filter(b => b.status === 'accepted').length,
+      rejected: bookings.filter(b => b.status === 'rejected').length
+    };
+
+    // Calculate informational stats
+    let lastBookingDate = null;
+    const ritualCounts = {};
+    const cityCounts = {};
+    const categoryCounts = {};
+
+    if (bookings.length > 0) {
+      lastBookingDate = bookings[0].date;
+      bookings.forEach(b => {
+        const ritualName = b.ritual?.pujaName || 'Unknown Puja';
+        ritualCounts[ritualName] = (ritualCounts[ritualName] || 0) + 1;
+
+        const city = b.location?.city || b.pandit?.location?.city || 'Unknown City';
+        cityCounts[city] = (cityCounts[city] || 0) + 1;
+
+        const category = b.ritual?.category || 'General';
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+      });
+    }
+
+    const getTopItems = (countsMap) => {
+      return Object.entries(countsMap)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+    };
+
+    const userActivity = {
+      lastBookingDate,
+      mostBookedRituals: getTopItems(ritualCounts),
+      frequentlySelectedCities: getTopItems(cityCounts),
+      favoriteCategories: getTopItems(categoryCounts)
+    };
+
+    res.json({ user, stats, userActivity, bookings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc  Suspend a user (admin only)
+// @route PUT /api/admin/users/:id/suspend-action
+// @access Admin
+const suspendUser = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.role === 'admin') return res.status(400).json({ message: 'Cannot suspend admin accounts' });
+
+    user.isSuspended = true;
+
+    if (!user.adminActionHistory) {
+      user.adminActionHistory = [];
+    }
+
+    user.adminActionHistory.push({
+      actionType: 'suspended',
+      adminId: req.user._id,
+      actionDate: new Date(),
+      reason: reason || 'Suspended by admin'
+    });
+
+    await user.save();
+
+    // Cancel all future bookings (date >= start of today, status in ['pending', 'accepted'])
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const bookingsToCancel = await Booking.find({
+      user: user._id,
+      status: { $in: ['pending', 'accepted'] },
+      date: { $gte: startOfToday }
+    });
+
+    for (let booking of bookingsToCancel) {
+      booking.status = 'cancelled';
+      booking.statusHistory.push({
+        status: 'cancelled',
+        changedAt: new Date(),
+        changedBy: req.user._id,
+        note: 'Cancelled by Administration'
+      });
+      await booking.save();
+
+      // Free up the availability slot if it exists
+      if (booking.availabilitySlotId) {
+        const Availability = require('../models/Availability');
+        const availability = await Availability.findById(booking.availabilitySlotId);
+        if (availability) {
+          const slot = availability.timeSlots.find(
+            (s) => s.bookingId?.toString() === booking._id.toString()
+          );
+          if (slot) {
+            slot.isBooked  = false;
+            slot.bookingId = null;
+            await availability.save();
+          }
+        }
+      }
+    }
+
+    res.json({ message: 'User suspended successfully and future bookings cancelled', user, cancelledBookingsCount: bookingsToCancel.length });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc  Reactivate a user (admin only)
+// @route PUT /api/admin/users/:id/reactivate
+// @access Admin
+const reactivateUser = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.isSuspended = false;
+
+    if (!user.adminActionHistory) {
+      user.adminActionHistory = [];
+    }
+
+    user.adminActionHistory.push({
+      actionType: 'reactivated',
+      adminId: req.user._id,
+      actionDate: new Date(),
+      reason: reason || 'Reactivated by admin'
+    });
+
+    await user.save();
+
+    res.json({ message: 'User reactivated successfully', user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getProfile, updateProfile, getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser };
