@@ -42,19 +42,19 @@
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-saffron-500 to-gold-600 hover:from-saffron-600 hover:to-gold-700 shadow-glow-saffron hover:shadow-lg transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-saffron-500 to-gold-600 hover:from-saffron-600 hover:to-gold-700 shadow-glow-saffron hover:shadow-lg active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold border-2 border-saffron-500 text-saffron-600 dark:text-saffron-400 hover:bg-saffron-50 dark:hover:bg-saffron-900/20 transition-all duration-200 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold border-2 border-saffron-500 text-saffron-600 dark:text-saffron-400 hover:bg-saffron-50 dark:hover:bg-saffron-900/20 active:scale-95 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 hover:shadow-sm;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-crimson-600 hover:bg-crimson-700 transition-all duration-200 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-crimson-600 hover:bg-crimson-700 transition-all duration-300 active:scale-95 hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .btn-sm {
@@ -63,16 +63,16 @@
 
   /* Cards */
   .card {
-    @apply bg-light-card dark:bg-dark-card rounded-2xl shadow-card-light dark:shadow-card-dark border border-light-border dark:border-dark-border transition-colors duration-300;
+    @apply bg-light-card dark:bg-dark-card rounded-2xl shadow-card-light dark:shadow-card-dark border border-light-border dark:border-dark-border transition-all duration-300;
   }
 
   .card-hover {
-    @apply card hover:shadow-glow-saffron hover:-translate-y-1 transition-all duration-300 cursor-pointer;
+    @apply card hover:shadow-glow-saffron dark:hover:shadow-glow-gold hover:-translate-y-1.5 hover:scale-[1.01] hover:border-saffron-400/50 dark:hover:border-gold-500/40 transition-all duration-300 cursor-pointer;
   }
 
   /* Form */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-xl bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-saffron-500 focus:border-transparent transition-all duration-300;
   }
 
   .label {
@@ -85,15 +85,15 @@
 
   /* Badges */
   .badge-verified {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/30 hover:scale-105 transition-transform;
   }
 
   .badge-pending {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200/50 dark:border-amber-800/30 hover:scale-105 transition-transform;
   }
 
   .badge-rejected {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-crimson-100 dark:bg-crimson-900/30 text-crimson-700 dark:text-crimson-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-crimson-100 dark:bg-crimson-900/30 text-crimson-700 dark:text-crimson-400 border border-crimson-200/50 dark:border-crimson-800/30 hover:scale-105 transition-transform;
   }
 
   .badge-accepted {
@@ -101,11 +101,11 @@
   }
 
   .badge-cancelled {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-100 dark:bg-stone-850 text-stone-500 dark:text-stone-400 border border-stone-200/50 dark:border-stone-800/30 hover:scale-105 transition-transform;
   }
 
   .badge-completed {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/30 hover:scale-105 transition-transform;
   }
 
   /* Section */
@@ -129,7 +129,7 @@
 
   /* Stat card */
   .stat-card {
-    @apply card p-6 flex flex-col gap-2;
+    @apply card p-6 flex flex-col gap-2 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300;
   }
 }
 
@@ -140,10 +140,81 @@
   }
 
   .glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
-  .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-  .animate-slide-up { animation: slideUp 0.4s ease-out; }
+  .animate-fade-in { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+  .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+  
+  /* Premium animations */
+  .animate-mandala-slow {
+    animation: mandalaRotate 120s linear infinite;
+  }
+  
+  .animate-flame-flicker {
+    animation: flameFlicker 2s ease-in-out infinite alternate;
+  }
+}
+
+/* ── Custom Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mandalaRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flameFlicker {
+  0% { transform: scale(1) rotate(-1deg); filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.5)); }
+  50% { transform: scale(1.08) rotate(2deg); filter: drop-shadow(0 4px 8px rgba(249, 115, 22, 0.7)); }
+  100% { transform: scale(0.96) rotate(-0.5deg); filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.5)); }
+}
+
+/* Skeleton Loading Shimmer */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(240, 217, 192, 0.25) 25%,
+    rgba(240, 217, 192, 0.5) 37%,
+    rgba(240, 217, 192, 0.25) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer-anim 1.6s ease-in-out infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(61, 31, 45, 0.25) 25%,
+    rgba(61, 31, 45, 0.5) 37%,
+    rgba(61, 31, 45, 0.25) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer-anim 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer-anim {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Accessibility Settings - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+  }
 }
