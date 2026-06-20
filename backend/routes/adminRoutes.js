@@ -1,7 +1,7 @@
 const express = require('express');
 const { getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPandit, getStats, suspendPandit, getPanditByIdAdmin } = require('../controllers/adminController');
 const { getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser } = require('../controllers/userController');
-const { getAllBookings } = require('../controllers/bookingController');
+const { getAllBookings, getBookingByIdAdmin } = require('../controllers/bookingController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/roleMiddleware');
 
@@ -22,5 +22,6 @@ router.get('/users/:id', getUserByIdAdmin);
 router.put('/users/:id/suspend', suspendUser);
 router.put('/users/:id/reactivate', reactivateUser);
 router.get('/bookings', getAllBookings);
+router.get('/bookings/:id', getBookingByIdAdmin);
 
 module.exports = router;

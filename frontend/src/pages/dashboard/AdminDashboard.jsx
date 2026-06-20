@@ -571,6 +571,12 @@ const AdminDashboard = () => {
                           </p>
                         </div>
                         <StatusBadge status={b.status} />
+                        <Link
+                          to={`/admin/bookings/${b._id}`}
+                          className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors shrink-0"
+                        >
+                          View Details
+                        </Link>
                       </div>
                     ))}
                   </div>

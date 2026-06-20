@@ -36,6 +36,7 @@ export const suspendUser        = (id, reason)    => api.put(`/admin/users/${id}
 export const reactivateUser     = (id, reason)    => api.put(`/admin/users/${id}/reactivate`, { reason });
 export const toggleSuspend     = (id)            => api.put(`/admin/users/${id}/suspend`);
 export const getAllBookingsAdmin = (params)       => api.get('/admin/bookings', { params });
+export const getBookingByIdAdmin = (id)           => api.get(`/admin/bookings/${id}`);
 
 export const createRitual = (data) => api.post('/rituals', data);
 export const updateRitual = (id, data) => api.put(`/rituals/${id}`, data);

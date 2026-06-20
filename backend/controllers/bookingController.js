@@ -294,6 +294,28 @@ const getAllBookings = async (req, res, next) => {
   }
 };
 
+// @desc  Get single booking by ID (admin only – read only)
+// @route GET /api/admin/bookings/:id
+// @access Admin
+const getBookingByIdAdmin = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate('user', 'name email phone city region isSuspended createdAt lastLogin')
+      .populate({
+        path: 'pandit',
+        populate: { path: 'userId', select: 'name email phone' }
+      })
+      .populate('ritual', 'pujaName category duration durationMinutes priceRange locationType slug')
+      .populate('statusHistory.changedBy', 'name role');
+
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+    res.json({ booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createBooking,
   getMyBookings,
@@ -303,4 +325,5 @@ module.exports = {
   completeBooking,
   cancelBooking,
   getAllBookings,
+  getBookingByIdAdmin,
 };

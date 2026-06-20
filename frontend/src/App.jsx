@@ -21,6 +21,7 @@ import UserDashboard   from './pages/dashboard/UserDashboard';
 import PanditDashboard from './pages/dashboard/PanditDashboard';
 import AdminDashboard  from './pages/dashboard/AdminDashboard';
 import AdminPanditDetail from './pages/dashboard/AdminPanditDetail';
+import AdminBookingDetail from './pages/dashboard/AdminBookingDetail';
 import AdminUserDetail from './pages/dashboard/AdminUserDetail';
 
 const Layout = ({ children }) => (
@@ -108,6 +109,11 @@ function App() {
             <Route path="/admin/users/:id" element={
               <ProtectedRoute role="admin">
                 <Layout><AdminUserDetail /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/bookings/:id" element={
+              <ProtectedRoute role="admin">
+                <Layout><AdminBookingDetail /></Layout>
               </ProtectedRoute>
             } />
 
