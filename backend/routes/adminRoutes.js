@@ -1,6 +1,6 @@
 const express = require('express');
-const { getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPandit, getStats, suspendPandit, getPanditByIdAdmin } = require('../controllers/adminController');
-const { getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser } = require('../controllers/userController');
+const { getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPandit, getStats, suspendPandit, getPanditByIdAdmin, deletePanditAdmin } = require('../controllers/adminController');
+const { getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser, deleteUserAdmin } = require('../controllers/userController');
 const { getAllBookings, getBookingByIdAdmin } = require('../controllers/bookingController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/roleMiddleware');
@@ -17,10 +17,12 @@ router.get('/pandits/:id', getPanditByIdAdmin);
 router.put('/pandits/:id/verify', verifyPandit);
 router.put('/pandits/:id/reject', rejectPandit);
 router.put('/pandits/:id/suspend', suspendPandit);
+router.delete('/pandits/:id', deletePanditAdmin);
 router.get('/users', getAllUsers);
 router.get('/users/:id', getUserByIdAdmin);
 router.put('/users/:id/suspend', suspendUser);
 router.put('/users/:id/reactivate', reactivateUser);
+router.delete('/users/:id', deleteUserAdmin);
 router.get('/bookings', getAllBookings);
 router.get('/bookings/:id', getBookingByIdAdmin);
 

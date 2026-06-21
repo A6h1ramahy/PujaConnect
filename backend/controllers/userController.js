@@ -104,7 +104,22 @@ const updateProfile = async (req, res, next) => {
 // @access Admin
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({ role: 'user' }).sort({ createdAt: -1 });
+    const { status } = req.query;
+
+    const query = { role: 'user' };
+    if (status === 'deleted') {
+      query.isDeleted = true;
+    } else if (status === 'suspended') {
+      query.isSuspended = true;
+      query.isDeleted = { $ne: true };
+    } else if (status === 'active') {
+      query.isSuspended = false;
+      query.isDeleted = { $ne: true };
+    } else {
+      query.isDeleted = { $ne: true };
+    }
+
+    const users = await User.find(query).sort({ createdAt: -1 });
     
     // Aggregate booking counts for each user
     const userIds = users.map(u => u._id);
@@ -367,5 +382,227 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser, changePassword };
+// @desc  Delete a user (admin only)
+// @route DELETE /api/admin/users/:id
+// @access Admin
+const deleteUserAdmin = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.role === 'admin') return res.status(400).json({ message: 'Cannot delete admin accounts' });
+
+    const deletedAt = new Date();
+    const deletedBy = req.user._id;
+    const deletionReason = reason || 'Deleted by administrator';
+
+    user.isDeleted = true;
+    user.deletedAt = deletedAt;
+    user.deletedBy = deletedBy;
+    user.deletionReason = deletionReason;
+
+    if (!user.adminActionHistory) {
+      user.adminActionHistory = [];
+    }
+    user.adminActionHistory.push({
+      actionType: 'deleted',
+      adminId: deletedBy,
+      actionDate: deletedAt,
+      reason: deletionReason
+    });
+
+    await user.save();
+
+    // Cancel user's future bookings
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const bookingsToCancel = await Booking.find({
+      user: user._id,
+      status: { $in: ['pending', 'accepted'] },
+      date: { $gte: startOfToday }
+    });
+
+    for (let booking of bookingsToCancel) {
+      booking.status = 'cancelled';
+      booking.statusHistory.push({
+        status: 'cancelled',
+        changedAt: new Date(),
+        changedBy: deletedBy,
+        note: 'The user account associated with this booking is no longer available.'
+      });
+      await booking.save();
+
+      // Free up availability slot
+      if (booking.availabilitySlotId) {
+        const Availability = require('../models/Availability');
+        const availability = await Availability.findById(booking.availabilitySlotId);
+        if (availability) {
+          const slot = availability.timeSlots.find(
+            (s) => s.bookingId?.toString() === booking._id.toString()
+          );
+          if (slot) {
+            slot.isBooked = false;
+            slot.bookingId = null;
+            await availability.save();
+          }
+        }
+      }
+    }
+
+    // If pandit, delete pandit profile and cancel pandit bookings
+    if (user.role === 'pandit') {
+      const Pandit = require('../models/Pandit');
+      const pandit = await Pandit.findOne({ userId: user._id });
+      if (pandit) {
+        pandit.isDeleted = true;
+        pandit.deletedAt = deletedAt;
+        pandit.deletedBy = deletedBy;
+        pandit.deletionReason = deletionReason;
+
+        if (!pandit.adminActionHistory) {
+          pandit.adminActionHistory = [];
+        }
+        pandit.adminActionHistory.push({
+          actionType: 'deleted',
+          adminId: deletedBy,
+          actionDate: deletedAt,
+          reason: deletionReason
+        });
+        await pandit.save();
+
+        const Availability = require('../models/Availability');
+        await Availability.deleteMany({ pandit: pandit._id });
+
+        const panditBookingsToCancel = await Booking.find({
+          pandit: pandit._id,
+          status: { $in: ['pending', 'accepted'] },
+          date: { $gte: startOfToday }
+        });
+
+        for (let booking of panditBookingsToCancel) {
+          booking.status = 'cancelled';
+          booking.statusHistory.push({
+            status: 'cancelled',
+            changedAt: new Date(),
+            changedBy: deletedBy,
+            note: 'Your booking has been cancelled because the assigned Pandit account is no longer available. Please select another verified Pandit.'
+          });
+          await booking.save();
+        }
+      }
+    }
+
+    res.json({ message: 'User account deleted successfully', user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc  Self-delete account (user or pandit)
+// @route DELETE /api/users/delete-account
+// @access Private (User or Pandit)
+const deleteAccountSelf = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required to delete account' });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect password' });
+    }
+
+    const deletedAt = new Date();
+    const deletedBy = user._id;
+    const deletionReason = 'Self-deleted account';
+
+    user.isDeleted = true;
+    user.deletedAt = deletedAt;
+    user.deletedBy = deletedBy;
+    user.deletionReason = deletionReason;
+
+    await user.save();
+
+    // Cancel user's future bookings
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const bookingsToCancel = await Booking.find({
+      user: user._id,
+      status: { $in: ['pending', 'accepted'] },
+      date: { $gte: startOfToday }
+    });
+
+    for (let booking of bookingsToCancel) {
+      booking.status = 'cancelled';
+      booking.statusHistory.push({
+        status: 'cancelled',
+        changedAt: new Date(),
+        changedBy: deletedBy,
+        note: 'The user account associated with this booking is no longer available.'
+      });
+      await booking.save();
+
+      // Free up availability slot
+      if (booking.availabilitySlotId) {
+        const Availability = require('../models/Availability');
+        const availability = await Availability.findById(booking.availabilitySlotId);
+        if (availability) {
+          const slot = availability.timeSlots.find(
+            (s) => s.bookingId?.toString() === booking._id.toString()
+          );
+          if (slot) {
+            slot.isBooked = false;
+            slot.bookingId = null;
+            await availability.save();
+          }
+        }
+      }
+    }
+
+    // If pandit, delete pandit profile and cancel pandit bookings
+    if (user.role === 'pandit') {
+      const Pandit = require('../models/Pandit');
+      const pandit = await Pandit.findOne({ userId: user._id });
+      if (pandit) {
+        pandit.isDeleted = true;
+        pandit.deletedAt = deletedAt;
+        pandit.deletedBy = deletedBy;
+        pandit.deletionReason = deletionReason;
+        await pandit.save();
+
+        const Availability = require('../models/Availability');
+        await Availability.deleteMany({ pandit: pandit._id });
+
+        const panditBookingsToCancel = await Booking.find({
+          pandit: pandit._id,
+          status: { $in: ['pending', 'accepted'] },
+          date: { $gte: startOfToday }
+        });
+
+        for (let booking of panditBookingsToCancel) {
+          booking.status = 'cancelled';
+          booking.statusHistory.push({
+            status: 'cancelled',
+            changedAt: new Date(),
+            changedBy: deletedBy,
+            note: 'Your booking has been cancelled because the assigned Pandit account is no longer available. Please select another verified Pandit.'
+          });
+          await booking.save();
+        }
+      }
+    }
+
+    res.json({ message: 'Your account has been deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getProfile, updateProfile, getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser, changePassword, deleteUserAdmin, deleteAccountSelf };
 
