@@ -33,13 +33,8 @@ const getAllPanditsAdmin = async (req, res, next) => {
     const panditUserIds = panditUsers.map(u => u._id);
 
     const filter = { userId: { $in: panditUserIds } };
-    if (status === 'deleted') {
-      filter.isDeleted = true;
-    } else if (status) {
+    if (status) {
       filter.verificationStatus = status;
-      filter.isDeleted = { $ne: true };
-    } else {
-      filter.isDeleted = { $ne: true };
     }
 
     const pandits = await Pandit.find(filter)
@@ -279,48 +274,10 @@ const getStats = async (req, res, next) => {
 // @access Admin
 const deletePanditAdmin = async (req, res, next) => {
   try {
-    const { reason } = req.body;
     const pandit = await Pandit.findById(req.params.id);
     if (!pandit) return res.status(404).json({ message: 'Pandit not found' });
 
-    const deletedAt = new Date();
     const deletedBy = req.user._id;
-    const deletionReason = reason || 'Deleted by administrator';
-
-    pandit.isDeleted = true;
-    pandit.deletedAt = deletedAt;
-    pandit.deletedBy = deletedBy;
-    pandit.deletionReason = deletionReason;
-
-    if (!pandit.adminActionHistory) {
-      pandit.adminActionHistory = [];
-    }
-    pandit.adminActionHistory.push({
-      actionType: 'deleted',
-      adminId: deletedBy,
-      actionDate: deletedAt,
-      reason: deletionReason
-    });
-    await pandit.save();
-
-    // Also mark the associated user account as deleted
-    const user = await User.findById(pandit.userId);
-    if (user) {
-      user.isDeleted = true;
-      user.deletedAt = deletedAt;
-      user.deletedBy = deletedBy;
-      user.deletionReason = deletionReason;
-      if (!user.adminActionHistory) {
-        user.adminActionHistory = [];
-      }
-      user.adminActionHistory.push({
-        actionType: 'deleted',
-        adminId: deletedBy,
-        actionDate: deletedAt,
-        reason: deletionReason
-      });
-      await user.save();
-    }
 
     // Cancel all future bookings
     const startOfToday = new Date();
@@ -338,7 +295,7 @@ const deletePanditAdmin = async (req, res, next) => {
         status: 'cancelled',
         changedAt: new Date(),
         changedBy: deletedBy,
-        note: 'Your booking has been cancelled because the assigned Pandit account is no longer available. Please select another verified Pandit.'
+        note: 'Cancelled: Pandit account deleted.'
       });
       await booking.save();
     }
@@ -347,7 +304,15 @@ const deletePanditAdmin = async (req, res, next) => {
     const Availability = require('../models/Availability');
     await Availability.deleteMany({ pandit: pandit._id });
 
-    res.json({ message: 'Pandit account deleted successfully', pandit });
+    // Delete associated User document
+    if (pandit.userId) {
+      await User.findByIdAndDelete(pandit.userId);
+    }
+
+    // Delete Pandit document
+    await Pandit.findByIdAndDelete(pandit._id);
+
+    res.json({ message: 'Pandit account deleted successfully' });
   } catch (error) {
     next(error);
   }
