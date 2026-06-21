@@ -15,21 +15,18 @@ const bookingSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     pandit: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Pandit',
+      required: true,
     },
     ritual: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Ritual',
+      required: true,
     },
-    userNameSnapshot:      { type: String },
-    userEmailSnapshot:     { type: String },
-    panditNameSnapshot:    { type: String },
-    panditPhoneSnapshot:   { type: String },
-    ritualNameSnapshot:    { type: String },
-    ritualCategorySnapshot: { type: String },
     date: {
       type: Date,
       required: [true, 'Date is required'],
