@@ -23,7 +23,7 @@ const createBooking = async (req, res, next) => {
     const { panditId, ritualId, date, time, locationType, address, city, region, notes } = req.body;
 
     // Verify pandit is verified and active
-    const pandit = await Pandit.findById(panditId);
+    const pandit = await Pandit.findById(panditId).populate('userId');
     if (!pandit) return res.status(404).json({ message: 'Pandit not found' });
     if (pandit.verificationStatus !== 'verified') {
       return res.status(400).json({ message: 'This Pandit is not yet verified' });
@@ -72,6 +72,12 @@ const createBooking = async (req, res, next) => {
       user:    req.user._id,
       pandit:  panditId,
       ritual:  ritualId,
+      userNameSnapshot:      req.user.name,
+      userEmailSnapshot:     req.user.email,
+      panditNameSnapshot:    pandit.userId ? pandit.userId.name : '',
+      panditPhoneSnapshot:   pandit.userId ? pandit.userId.phone : '',
+      ritualNameSnapshot:    ritual.pujaName,
+      ritualCategorySnapshot: ritual.category,
       date:    bookingDate,
       time,
       locationType: locationType || 'Home',
