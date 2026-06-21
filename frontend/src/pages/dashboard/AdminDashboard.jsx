@@ -403,7 +403,9 @@ const AdminDashboard = () => {
                               <div>
                                 <p className="font-semibold text-stone-900 dark:text-stone-100">{p.userId?.name}</p>
                                 <p className="text-xs text-stone-500 dark:text-stone-400">{p.userId?.email}</p>
-                                <p className="text-xs text-stone-400">{p.location?.city} · {p.yearsOfExperience} yrs exp.</p>
+                                <p className="text-xs text-stone-400 mt-0.5">
+                                  📍 {p.location?.city || 'N/A'}, {p.location?.state || p.location?.region || 'N/A'} · 📞 {p.userId?.phone || 'N/A'} · 🎓 {p.yearsOfExperience || 0} yrs exp.
+                                </p>
                               </div>
                             </div>
                             <div className="flex gap-2">
