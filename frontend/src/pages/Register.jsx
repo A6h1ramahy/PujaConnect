@@ -72,6 +72,28 @@ const Register = () => {
             </div>
 
             <form onSubmit={handleSubmit} id="register-form" className="space-y-4">
+              {/* Role Selection */}
+              <div className="form-group">
+                <label className="label">Register as...</label>
+                <div id="role-toggle" className="flex rounded-xl overflow-hidden border border-light-border dark:border-dark-border">
+                  {['user', 'pandit'].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      id={`role-${r}`}
+                      onClick={() => setForm({ ...form, role: r })}
+                      className={`flex-1 py-2.5 text-sm font-semibold transition-colors duration-200 ${
+                        form.role === r
+                          ? 'bg-saffron-gradient text-white'
+                          : 'text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
+                      }`}
+                    >
+                      {r === 'user' ? '🙏 Register as User' : '🛕 Register as Pandit'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3.5">
                 {/* Left Column */}
                 <div className="space-y-3.5">
@@ -134,28 +156,6 @@ const Register = () => {
 
                 {/* Right Column */}
                 <div className="space-y-3.5">
-                  {/* Role Selection */}
-                  <div className="form-group">
-                    <label className="label">Register as...</label>
-                    <div id="role-toggle" className="flex rounded-xl overflow-hidden border border-light-border dark:border-dark-border">
-                      {['user', 'pandit'].map((r) => (
-                        <button
-                          key={r}
-                          type="button"
-                          id={`role-${r}`}
-                          onClick={() => setForm({ ...form, role: r })}
-                          className={`flex-1 py-2 text-xs font-semibold transition-colors duration-200 ${
-                            form.role === r
-                              ? 'bg-saffron-gradient text-white'
-                              : 'text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
-                          }`}
-                        >
-                          {r === 'user' ? '🙏 User' : '🛕 Pandit'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* State / Region (only for Pandit) */}
                   {form.role === 'pandit' && (
                     <div className="form-group animate-fade-in">
