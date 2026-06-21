@@ -17,24 +17,19 @@ const {
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/pujaconnect';
 
-const TIME_SLOTS_POOL = [
-  '06:00 AM', '08:00 AM', '10:00 AM', '12:00 PM', '02:00 PM', '04:00 PM', '06:00 PM', '08:00 PM'
-];
-
-// Seed 500 Pandits
 const seedPandits = async () => {
   try {
     await mongoose.connect(MONGO_URI);
     console.log('✅ Connected to MongoDB');
 
-    // 1. Fetch existing rituals
+    // 1. Fetch active rituals
     const rituals = await Ritual.find({ isActive: true });
     if (rituals.length === 0) {
       throw new Error('No rituals found in the database. Please run npm run seed first to populate rituals.');
     }
     console.log(`ℹ️  Found ${rituals.length} active rituals to assign.`);
 
-    // 2. Clear existing Pandit data
+    // 2. Clear existing Pandit data & Availability
     console.log('🗑️  Clearing existing Pandit users, profiles, and availability...');
     
     // Clear all users with role 'pandit'
@@ -45,30 +40,36 @@ const seedPandits = async () => {
     const deletedPandits = await Pandit.deleteMany({});
     console.log(`🗑️  Deleted ${deletedPandits.deletedCount} existing Pandit profiles.`);
 
-    // Clear all availability slots
+    // Clear all availability slots (ensure completely empty as requested)
     const deletedAvailability = await Availability.deleteMany({});
     console.log(`🗑️  Deleted ${deletedAvailability.deletedCount} availability calendars.`);
 
     // 3. Setup stats tracking
     const stats = {
-      total: 500,
+      total: 515,
       verified: 0,
       pending: 0,
       rejected: 0,
       cities: new Set(),
       languages: new Set(),
-      ritualsAssigned: 0
+      ritualsAssigned: 0,
+      ritualCoverage: {} // ritualId -> count of verified pandits
     };
 
-    console.log('🌱 Generating 500 Pandit records. This might take a few moments...');
+    // Initialize ritual coverage counter
+    rituals.forEach(r => {
+      stats.ritualCoverage[r._id.toString()] = {
+        name: r.pujaName,
+        verifiedCount: 0
+      };
+    });
 
-    // We process pandits in batches to avoid overwhelming connections
-    const batchSize = 25;
+    console.log('🌱 Generating 515 Pandit records. This might take a few moments...');
+
     for (let i = 1; i <= stats.total; i++) {
-      // Formulate unique name
-      let firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
-      let lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
-      // Prevent duplicates by attaching index if necessary (or just let it be random)
+      // Pick unique-ish name
+      const firstName = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+      const lastName = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
       const displayName = `Pandit ${firstName} ${lastName}`;
 
       // Sequentially assign city for even distribution
@@ -86,52 +87,29 @@ const seedPandits = async () => {
         region: cityInfo.state
       });
 
-      // Specialization selection
-      const specialties = [
-        { name: 'Shiva & Homa Specialist', keywords: ['Shiva', 'Rudra', 'Mrityunjaya', 'Havan', 'Homa'] },
-        { name: 'Marriage & Family Specialist', keywords: ['Marriage', 'Wedding', 'Vivah', 'Family', 'Griha'] },
-        { name: 'Vedic & General Puja Specialist', keywords: ['Satyanarayan', 'Ganesh', 'Lakshmi', 'Vedic', 'Katha'] }
-      ];
-      const specialty = specialties[(i - 1) % specialties.length];
-
-      // Filter rituals for this specialty
-      let filteredRituals = rituals.filter(r => 
-        specialty.keywords.some(keyword => 
-          r.pujaName.toLowerCase().includes(keyword.toLowerCase()) || 
-          r.category.toLowerCase().includes(keyword.toLowerCase())
-        )
-      );
-      if (filteredRituals.length < 3) {
-        filteredRituals = rituals; // Fallback to all if specialty has too few
+      // Verification Status distribution: 450 verified, 50 pending, 15 rejected
+      let status = 'verified';
+      if (i > 450 && i <= 500) {
+        status = 'pending';
+      } else if (i > 500) {
+        status = 'rejected';
       }
 
-      // Pick 3-6 random rituals
-      const numRituals = Math.min(filteredRituals.length, 3 + Math.floor(Math.random() * 4));
-      const selectedRituals = [];
-      const tempRituals = [...filteredRituals];
-      for (let j = 0; j < numRituals; j++) {
-        const idx = Math.floor(Math.random() * tempRituals.length);
-        selectedRituals.push(tempRituals[idx]);
-        tempRituals.splice(idx, 1);
-      }
-      stats.ritualsAssigned += selectedRituals.length;
+      if (status === 'verified') stats.verified++;
+      else if (status === 'pending') stats.pending++;
+      else if (status === 'rejected') stats.rejected++;
 
-      // Build pricing map
-      const pricingMap = new Map();
-      selectedRituals.forEach(r => {
-        const min = r.priceRange.min || 1000;
-        const max = r.priceRange.max || 8000;
-        const price = Math.round((min + Math.random() * (max - min)) / 100) * 100;
-        pricingMap.set(r._id.toString(), price);
-      });
+      // Determine experience level randomly
+      const expPool = [2, 5, 8, 12, 20, 30];
+      const experience = expPool[Math.floor(Math.random() * expPool.length)];
 
-      // Determine regional language affinity
+      // Determine languages: 1 to 4 languages
       const selectedLanguages = [];
-      // Sanskrit (80% chance) and Hindi (65% chance)
+      // Always add Sanskrit (80% chance) and Hindi (70% chance)
       if (Math.random() < 0.8) selectedLanguages.push('Sanskrit');
-      if (Math.random() < 0.65) selectedLanguages.push('Hindi');
+      if (Math.random() < 0.7) selectedLanguages.push('Hindi');
 
-      // State specific regional languages
+      // Add regional state language
       if (cityInfo.state === 'Karnataka' && !selectedLanguages.includes('Kannada')) selectedLanguages.push('Kannada');
       if (cityInfo.state === 'Maharashtra' && !selectedLanguages.includes('Marathi')) selectedLanguages.push('Marathi');
       if (cityInfo.state === 'Tamil Nadu' && !selectedLanguages.includes('Tamil')) selectedLanguages.push('Tamil');
@@ -140,35 +118,81 @@ const seedPandits = async () => {
       if (cityInfo.state === 'West Bengal' && !selectedLanguages.includes('Bengali')) selectedLanguages.push('Bengali');
       if (cityInfo.state === 'Gujarat' && !selectedLanguages.includes('Gujarati')) selectedLanguages.push('Gujarati');
 
-      // Add a random fallback language if empty
-      if (selectedLanguages.length === 0) {
-        selectedLanguages.push(LANGUAGES[Math.floor(Math.random() * LANGUAGES.length)]);
+      // Add some random extra languages if empty or just to enrich
+      while (selectedLanguages.length < 1 || (selectedLanguages.length < 4 && Math.random() < 0.4)) {
+        const randomLang = LANGUAGES[Math.floor(Math.random() * LANGUAGES.length)];
+        if (!selectedLanguages.includes(randomLang)) {
+          selectedLanguages.push(randomLang);
+        }
       }
 
-      // Cap languages list and add to stats
-      const finalLanguages = selectedLanguages.slice(0, 4);
-      finalLanguages.forEach(l => stats.languages.add(l));
+      selectedLanguages.forEach(l => stats.languages.add(l));
 
-      // Experience level
-      const experience = EXPERIENCE_LEVELS[Math.floor(Math.random() * EXPERIENCE_LEVELS.length)];
+      // Supported Rituals: 3 to 10 rituals
+      const selectedRituals = [];
+      const numRituals = 3 + Math.floor(Math.random() * 8); // 3 to 10
 
-      // Verification Status distribution: 80% verified, 15% pending, 5% rejected
-      let status = 'verified';
-      if (i > 400 && i <= 475) {
-        status = 'pending';
-      } else if (i > 475) {
-        status = 'rejected';
+      if (status === 'verified') {
+        // Guarantee at least 10 verified Pandits per ritual:
+        // Use i % rituals.length to ensure every ritual is assigned as the primary ritual of approximately 450/N pandits.
+        const primaryRitualIndex = (i - 1) % rituals.length;
+        const primaryRitual = rituals[primaryRitualIndex];
+        selectedRituals.push(primaryRitual);
+        stats.ritualCoverage[primaryRitual._id.toString()].verifiedCount += 1;
+
+        // Fill the remaining (numRituals - 1) rituals
+        const tempRituals = rituals.filter(r => r._id.toString() !== primaryRitual._id.toString());
+        // Prioritize rituals with less coverage first to maintain perfect distribution
+        tempRituals.sort((a, b) => {
+          const countA = stats.ritualCoverage[a._id.toString()].verifiedCount;
+          const countB = stats.ritualCoverage[b._id.toString()].verifiedCount;
+          return countA - countB;
+        });
+
+        // Add additional rituals
+        for (let j = 0; j < numRituals - 1; j++) {
+          if (tempRituals[j]) {
+            selectedRituals.push(tempRituals[j]);
+            stats.ritualCoverage[tempRituals[j]._id.toString()].verifiedCount += 1;
+          }
+        }
+      } else {
+        // For pending and rejected pandits, randomize 3 to 10 rituals
+        const tempRituals = [...rituals];
+        for (let j = 0; j < numRituals; j++) {
+          const idx = Math.floor(Math.random() * tempRituals.length);
+          selectedRituals.push(tempRituals[idx]);
+          tempRituals.splice(idx, 1);
+        }
       }
 
-      if (status === 'verified') stats.verified++;
-      else if (status === 'pending') stats.pending++;
-      else if (status === 'rejected') stats.rejected++;
+      stats.ritualsAssigned += selectedRituals.length;
 
-      // Create Pandit Profile
-      const pandit = await Pandit.create({
+      // Build pricing map based on ritual priceRange
+      const pricingMap = new Map();
+      selectedRituals.forEach(r => {
+        const min = r.priceRange.min || 1000;
+        const max = r.priceRange.max || 8000;
+        // Generate realistic price between min and max, rounded to nearest 100
+        const price = Math.round((min + Math.random() * (max - min)) / 100) * 100;
+        pricingMap.set(r._id.toString(), price);
+      });
+
+      // Specialization name for Bio
+      const specialties = [
+        'Vedic Pujas & Havan',
+        'Marriage & Family Ceremonies',
+        'Shiva & Protection Homa',
+        'Griha Pravesh & Property Pujas',
+        'Child & Sanskar Ceremonies'
+      ];
+      const specialty = specialties[(i - 1) % specialties.length];
+
+      // Create Pandit Profile (photo strictly empty/null as required)
+      await Pandit.create({
         userId: user._id,
         photo: '',
-        bio: generateBio(displayName, experience, cityInfo.city, specialty.name),
+        bio: generateBio(displayName, experience, cityInfo.city, specialty),
         location: {
           city: cityInfo.city,
           region: cityInfo.state,
@@ -176,68 +200,41 @@ const seedPandits = async () => {
         },
         yearsOfExperience: experience,
         supportedRituals: selectedRituals.map(r => r._id),
-        languagesSpoken: finalLanguages,
+        languagesSpoken: selectedLanguages,
         pricing: pricingMap,
         verificationStatus: status,
-        verificationNote: status === 'rejected' ? 'Missing required certification document.' : '',
+        verificationNote: status === 'rejected' ? 'Document verification failed.' : '',
         isActive: true
       });
 
-      // Generate Availability schedules for the next 30 days
-      const availabilityDocs = [];
-      for (let day = 0; day < 30; day++) {
-        // 80% chance of being available on any given day
-        if (Math.random() < 0.8) {
-          const date = new Date();
-          date.setDate(date.getDate() + day);
-          date.setHours(0, 0, 0, 0); // Normalize to start of day
-
-          // Pick 3-6 random slots
-          const numSlots = 3 + Math.floor(Math.random() * 4);
-          const timeSlots = [];
-          const tempSlots = [...TIME_SLOTS_POOL];
-          for (let s = 0; s < numSlots; s++) {
-            const idx = Math.floor(Math.random() * tempSlots.length);
-            const timeStr = tempSlots[idx];
-            tempSlots.splice(idx, 1);
-
-            // 25% chance slot is booked
-            timeSlots.push({
-              time: timeStr,
-              isBooked: Math.random() < 0.25,
-              bookingId: null
-            });
-          }
-
-          availabilityDocs.push({
-            pandit: pandit._id,
-            date,
-            timeSlots,
-            status: 'available'
-          });
-        }
-      }
-
-      if (availabilityDocs.length > 0) {
-        await Availability.insertMany(availabilityDocs);
-      }
-
       if (i % 50 === 0) {
-        console.log(`👉 Created ${i}/500 Pandits...`);
+        console.log(`👉 Created ${i}/515 Pandits...`);
       }
     }
 
     // ── Seeding Report Printout ──
     console.log('\n🎉 Pandit Dataset Seeded Successfully!');
     console.log('─────────────────────────────────');
-    console.log(`Total Pandits Created: ${stats.total}`);
-    console.log(`Verified:              ${stats.verified}`);
-    console.log(`Pending:               ${stats.pending}`);
-    console.log(`Rejected:              ${stats.rejected}`);
+    console.log(`Total Pandits: ${stats.total}`);
+    console.log(`Verified: ${stats.verified}`);
+    console.log(`Pending: ${stats.pending}`);
+    console.log(`Rejected: ${stats.rejected}`);
     console.log('─────────────────────────────────');
-    console.log(`Cities Covered:        ${stats.cities.size} (${Array.from(stats.cities).join(', ')})`);
-    console.log(`Languages Covered:     ${stats.languages.size} (${Array.from(stats.languages).join(', ')})`);
-    console.log(`Rituals Assigned:      ${stats.ritualsAssigned}`);
+    console.log(`Cities Covered: ${stats.cities.size} (${Array.from(stats.cities).join(', ')})`);
+    console.log(`Languages Covered: ${stats.languages.size} (${Array.from(stats.languages).join(', ')})`);
+    console.log('─────────────────────────────────');
+    console.log('Ritual Coverage (Verified Pandits count per Ritual):');
+    
+    let minVerifiedCount = Infinity;
+    Object.values(stats.ritualCoverage).forEach(item => {
+      console.log(`- ${item.name}: ${item.verifiedCount}`);
+      if (item.verifiedCount < minVerifiedCount) {
+        minVerifiedCount = item.verifiedCount;
+      }
+    });
+
+    console.log('─────────────────────────────────');
+    console.log(`Minimum Pandits Per Ritual: ${minVerifiedCount}`);
     console.log('─────────────────────────────────\n');
 
     process.exit(0);
