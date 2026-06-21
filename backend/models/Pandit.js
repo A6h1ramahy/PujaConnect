@@ -57,7 +57,7 @@ const panditSchema = new mongoose.Schema(
       {
         actionType: {
           type: String,
-          enum: ['approved', 'rejected', 'suspended', 'unsuspended', 'restored'],
+          enum: ['approved', 'rejected', 'suspended', 'unsuspended', 'restored', 'deleted'],
           required: true,
         },
         adminId: {
@@ -77,6 +77,20 @@ const panditSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    deletionReason: {
+      type: String,
     },
   },
   { timestamps: true }

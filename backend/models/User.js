@@ -47,12 +47,26 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    deletionReason: {
+      type: String,
+    },
     lastLogin: {
       type: Date,
     },
     adminActionHistory: [
       {
-        actionType: { type: String, enum: ['suspended', 'reactivated'] },
+        actionType: { type: String, enum: ['suspended', 'reactivated', 'deleted'] },
         adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         actionDate: { type: Date, default: Date.now },
         reason: { type: String }
