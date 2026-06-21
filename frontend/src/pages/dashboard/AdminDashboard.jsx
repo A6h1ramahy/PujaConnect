@@ -7,7 +7,8 @@ import toast from 'react-hot-toast';
 import {
   getAdminStats, getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPanditAdmin,
   getAllUsers, toggleSuspend, getAllBookingsAdmin, getAllRitualsAdmin,
-  createRitual, updateRitual, deleteRitual, uploadRitualImage
+  createRitual, updateRitual, deleteRitual, uploadRitualImage,
+  deleteUserAdmin, deletePanditAdmin
 } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -55,6 +56,7 @@ const AdminDashboard = () => {
   
   // Search and filter states
   const [userSearch, setUserSearch] = useState('');
+  const [userStatusFilter, setUserStatusFilter] = useState('all');
   const [panditSearch, setPanditSearch] = useState('');
   const [panditStatusFilter, setPanditStatusFilter] = useState('all');
 
@@ -76,8 +78,7 @@ const AdminDashboard = () => {
     const ritualMatch = p.supportedRituals?.some((r) => r.pujaName.toLowerCase().includes(term)) || false;
     const searchMatch = nameMatch || emailMatch || cityMatch || ritualMatch;
     
-    if (panditStatusFilter === 'all') return searchMatch;
-    return searchMatch && p.verificationStatus === panditStatusFilter;
+    return searchMatch;
   });
 
   const [ritualForm, setRitualForm] = useState({
@@ -116,7 +117,7 @@ const AdminDashboard = () => {
     if (activeTab === 'users')    fetchUsers();
     if (activeTab === 'bookings') fetchBookings();
     if (activeTab === 'rituals')  fetchRituals();
-  }, [activeTab]);
+  }, [activeTab, panditStatusFilter, userStatusFilter]);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -130,10 +131,16 @@ const AdminDashboard = () => {
   };
 
   const fetchPandits = async () => {
-    try { const { data } = await getAllPanditsAdmin(); setAllPandits(data.pandits || []); } catch {}
+    try {
+      const { data } = await getAllPanditsAdmin({ status: panditStatusFilter === 'all' ? '' : panditStatusFilter });
+      setAllPandits(data.pandits || []);
+    } catch {}
   };
   const fetchUsers = async () => {
-    try { const { data } = await getAllUsers(); setUsers(data.users || []); } catch {}
+    try {
+      const { data } = await getAllUsers({ status: userStatusFilter === 'all' ? '' : userStatusFilter });
+      setUsers(data.users || []);
+    } catch {}
   };
   const fetchBookings = async () => {
     try { const { data } = await getAllBookingsAdmin(); setBookings(data.bookings || []); } catch {}
@@ -169,6 +176,38 @@ const AdminDashboard = () => {
       toast.success(data.message);
       setUsers((prev) => prev.map((u) => u._id === id ? data.user : u));
     } catch { toast.error('Failed to update user'); }
+  };
+
+  const handleDeleteUserClick = (id) => {
+    const reason = window.prompt('Provide a reason for user deletion (optional):') || 'Deleted by administrator';
+    if (reason === null) return;
+    if (window.confirm('Are you sure you want to delete this devotee account? This will cancel all their future bookings immediately. This action cannot be undone.')) {
+      deleteUserAdmin(id, reason)
+        .then(() => {
+          toast.success('User account deleted');
+          fetchUsers();
+          fetchAll(); // refresh stats
+        })
+        .catch((err) => {
+          toast.error(err?.response?.data?.message || 'Failed to delete user');
+        });
+    }
+  };
+
+  const handleDeletePanditClick = (id) => {
+    const reason = window.prompt('Provide a reason for Pandit deletion (optional):') || 'Deleted by administrator';
+    if (reason === null) return;
+    if (window.confirm('Are you sure you want to delete this Pandit account? This will cancel all their future bookings immediately. This action cannot be undone.')) {
+      deletePanditAdmin(id, reason)
+        .then(() => {
+          toast.success('Pandit account deleted');
+          fetchPandits();
+          fetchAll(); // refresh stats
+        })
+        .catch((err) => {
+          toast.error(err?.response?.data?.message || 'Failed to delete Pandit');
+        });
+    }
   };
 
   const handleImageUpload = async (e) => {
@@ -450,6 +489,7 @@ const AdminDashboard = () => {
                         <option value="verified">Verified Only</option>
                         <option value="rejected">Rejected Only</option>
                         <option value="suspended">Suspended Only</option>
+                        <option value="deleted">Deleted Only</option>
                       </select>
                     </div>
                   </div>
@@ -492,11 +532,20 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-3 shrink-0">
+                          <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
                             <StatusBadge status={p.verificationStatus} />
+                            {p.isDeleted && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-crimson-100 text-crimson-700 border border-crimson-200">Deleted</span>}
                             <Link to={`/admin/pandits/${p._id}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold transition-colors">
                               Manage Profile
                             </Link>
+                            {!p.isDeleted && (
+                              <button
+                                onClick={() => handleDeletePanditClick(p._id)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-colors"
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -509,16 +558,28 @@ const AdminDashboard = () => {
               {activeTab === 'users' && (
                 <div className="animate-fade-in">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100">Devotees / Customers ({users.length})</h2>
-                    <div className="relative w-full sm:w-72">
-                      <input
-                        type="text"
-                        placeholder="Search users by name, email, phone..."
-                        value={userSearch}
-                        onChange={(e) => setUserSearch(e.target.value)}
-                        className="input-field py-2 pl-9 pr-4 text-sm rounded-xl w-full"
-                      />
-                      <HiUsers className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
+                    <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 flex-1">Devotees / Customers ({users.length})</h2>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                      <div className="relative w-full sm:w-72">
+                        <input
+                          type="text"
+                          placeholder="Search users by name, email, phone..."
+                          value={userSearch}
+                          onChange={(e) => setUserSearch(e.target.value)}
+                          className="input-field py-2 pl-9 pr-4 text-sm rounded-xl w-full"
+                        />
+                        <HiUsers className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
+                      </div>
+                      <select
+                        value={userStatusFilter}
+                        onChange={(e) => setUserStatusFilter(e.target.value)}
+                        className="input-field py-2 px-3 text-sm rounded-xl w-full sm:w-40"
+                      >
+                        <option value="all">All Status</option>
+                        <option value="active">Active Only</option>
+                        <option value="suspended">Suspended Only</option>
+                        <option value="deleted">Deleted Only</option>
+                      </select>
                     </div>
                   </div>
 
@@ -543,14 +604,23 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-3 shrink-0">
+                          <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
                             {u.isSuspended && <span className="badge-rejected">Suspended</span>}
+                            {u.isDeleted && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-crimson-100 text-crimson-700 border border-crimson-200">Deleted</span>}
                             <Link
                               to={`/admin/users/${u._id}`}
                               className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border border-saffron-500 text-saffron-600 dark:text-saffron-400 hover:bg-saffron-55 dark:hover:bg-saffron-950/20 hover:bg-saffron-50 transition-colors"
                             >
                               Manage Profile
                             </Link>
+                            {!u.isDeleted && (
+                              <button
+                                onClick={() => handleDeleteUserClick(u._id)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-colors"
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { HiArrowLeft, HiMail, HiPhone, HiLocationMarker, HiCalendar, HiShieldCheck, HiX, HiBan, HiClock, HiSearch, HiCheckCircle } from 'react-icons/hi';
+import { HiArrowLeft, HiMail, HiPhone, HiLocationMarker, HiCalendar, HiShieldCheck, HiX, HiBan, HiClock, HiSearch, HiCheckCircle, HiTrash } from 'react-icons/hi';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
-import { getUserByIdAdmin, suspendUser, reactivateUser } from '../../api';
+import { getUserByIdAdmin, suspendUser, reactivateUser, deleteUserAdmin } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PageTransition from '../../components/common/PageTransition';
@@ -106,6 +106,24 @@ const AdminUserDetail = () => {
     );
   };
 
+  const handleDeleteAction = () => {
+    const reason = window.prompt('Provide a reason for account deletion (optional):') || 'Deleted by administrator';
+    if (reason === null) return;
+    openConfirmation(
+      'Delete User Account',
+      'WARNING: This will permanently delete this user account and cancel all future bookings immediately. This action cannot be undone. Do you wish to continue?',
+      async () => {
+        try {
+          const { data } = await deleteUserAdmin(id, reason);
+          toast.success(data.message || 'User account deleted successfully');
+          fetchDetails();
+        } catch (err) {
+          toast.error(err?.response?.data?.message || 'Failed to delete user');
+        }
+      }
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950">
@@ -188,13 +206,28 @@ const AdminUserDetail = () => {
                     <HiShieldCheck /> Reactivate / Restore Account
                   </button>
                 ) : (
+                  <>
+                    {!userData.isDeleted && (
+                      <button
+                        id="admin-suspend-btn"
+                        onClick={() => setShowSuspendModal(true)}
+                        className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white font-semibold transition-colors"
+                      >
+                        <HiBan /> Suspend User Account
+                      </button>
+                    )}
+                  </>
+                )}
+                {!userData.isDeleted ? (
                   <button
-                    id="admin-suspend-btn"
-                    onClick={() => setShowSuspendModal(true)}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white font-semibold transition-colors animate-pulse"
+                    id="admin-delete-user-btn"
+                    onClick={handleDeleteAction}
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-450 hover:bg-crimson-50 dark:hover:bg-crimson-950/20 font-semibold transition-colors"
                   >
-                    <HiBan /> Suspend User Account
+                    <HiTrash /> Delete Account
                   </button>
+                ) : (
+                  <span className="text-sm font-semibold text-crimson-600 text-center py-2">Account Deleted</span>
                 )}
               </div>
             </div>
