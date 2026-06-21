@@ -210,10 +210,8 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteUserClick = (id) => {
-    const reason = window.prompt('Provide a reason for user deletion (optional):') || 'Deleted by administrator';
-    if (reason === null) return;
-    if (window.confirm('Are you sure you want to delete this devotee account? This will cancel all their future bookings immediately. This action cannot be undone.')) {
-      deleteUserAdmin(id, reason)
+    if (window.confirm('This action permanently removes the account and all associated data. All bookings, records, and related information will be deleted permanently. This action cannot be undone. Continue?')) {
+      deleteUserAdmin(id)
         .then(() => {
           toast.success('User account deleted');
           fetchUsers();
@@ -226,10 +224,8 @@ const AdminDashboard = () => {
   };
 
   const handleDeletePanditClick = (id) => {
-    const reason = window.prompt('Provide a reason for Pandit deletion (optional):') || 'Deleted by administrator';
-    if (reason === null) return;
-    if (window.confirm('Are you sure you want to delete this Pandit account? This will cancel all their future bookings immediately. This action cannot be undone.')) {
-      deletePanditAdmin(id, reason)
+    if (window.confirm('This action permanently removes the account and all associated data. All bookings, records, and related information will be deleted permanently. This action cannot be undone. Continue?')) {
+      deletePanditAdmin(id)
         .then(() => {
           toast.success('Pandit account deleted');
           fetchPandits();
@@ -316,13 +312,10 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteAdminClick = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this administrator? This action cannot be undone.')) return;
-
-    const reason = window.prompt('Provide a reason for administrator deletion (optional):') || 'Deleted by administrator';
-    if (reason === null) return;
+    if (!window.confirm('This action permanently removes the account and all associated data. All bookings, records, and related information will be deleted permanently. This action cannot be undone. Continue?')) return;
 
     try {
-      await deleteAdmin(id, reason);
+      await deleteAdmin(id);
       toast.success('Admin account deleted');
       fetchAdmins();
       fetchAll();
