@@ -86,7 +86,7 @@ const getAllPandits = async (req, res, next) => {
     const { search, city, region, ritualId, language, minExp, maxExp, page = 1, limit = 12 } = req.query;
 
     // ── API-level enforcement: only verified + active pandits shown publicly ──
-    const filter = { verificationStatus: 'verified', isActive: true };
+    const filter = { verificationStatus: 'verified', isActive: true, isDeleted: { $ne: true } };
 
     if (search) {
       const trimmedSearch = search.trim();
@@ -194,7 +194,7 @@ const getPanditById = async (req, res, next) => {
       .populate('userId', 'name email phone city region')
       .populate('supportedRituals', 'pujaName description duration priceRange locationType requiredMaterials');
 
-    if (!pandit) {
+    if (!pandit || pandit.isDeleted) {
       return res.status(404).json({ message: 'Pandit not found' });
     }
 
