@@ -7,7 +7,7 @@ const SYSTEM_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@pujaconnect.com';
 // @access Admin Only
 const getAllAdmins = async (req, res, next) => {
   try {
-    const admins = await User.find({ role: 'admin', isDeleted: { $ne: true } })
+    const admins = await User.find({ role: 'admin' })
       .populate('createdBy', 'name email')
       .populate('lastModifiedBy', 'name email')
       .sort({ createdAt: -1 });
@@ -90,7 +90,7 @@ const createAdmin = async (req, res, next) => {
 // @access Admin Only
 const suspendAdmin = async (req, res, next) => {
   try {
-    const admin = await User.findOne({ _id: req.params.id, role: 'admin', isDeleted: { $ne: true } });
+    const admin = await User.findOne({ _id: req.params.id, role: 'admin' });
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found.' });
     }
@@ -105,8 +105,8 @@ const suspendAdmin = async (req, res, next) => {
       return res.status(400).json({ message: 'Cannot suspend the primary system administrator account.' });
     }
 
-    // Lockout prevention: count active, non-deleted admins
-    const activeCount = await User.countDocuments({ role: 'admin', isSuspended: false, isDeleted: { $ne: true } });
+    // Lockout prevention: count active admins
+    const activeCount = await User.countDocuments({ role: 'admin', isSuspended: false });
     if (!admin.isSuspended && activeCount <= 1) {
       return res.status(400).json({ message: 'Cannot suspend the last remaining active administrator.' });
     }
@@ -132,7 +132,7 @@ const suspendAdmin = async (req, res, next) => {
 // @access Admin Only
 const reactivateAdmin = async (req, res, next) => {
   try {
-    const admin = await User.findOne({ _id: req.params.id, role: 'admin', isDeleted: { $ne: true } });
+    const admin = await User.findOne({ _id: req.params.id, role: 'admin' });
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found.' });
     }
@@ -158,7 +158,7 @@ const reactivateAdmin = async (req, res, next) => {
 // @access Admin Only
 const deleteAdmin = async (req, res, next) => {
   try {
-    const admin = await User.findOne({ _id: req.params.id, role: 'admin', isDeleted: { $ne: true } });
+    const admin = await User.findOne({ _id: req.params.id, role: 'admin' });
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found.' });
     }
@@ -173,23 +173,13 @@ const deleteAdmin = async (req, res, next) => {
       return res.status(400).json({ message: 'Cannot delete the primary system administrator account.' });
     }
 
-    // Lockout prevention: count active, non-deleted admins
-    const activeCount = await User.countDocuments({ role: 'admin', isSuspended: false, isDeleted: { $ne: true } });
+    // Lockout prevention: count active admins
+    const activeCount = await User.countDocuments({ role: 'admin', isSuspended: false });
     if (!admin.isSuspended && activeCount <= 1) {
       return res.status(400).json({ message: 'Cannot delete the last remaining active administrator.' });
     }
 
-    admin.isDeleted = true;
-    admin.deletedAt = new Date();
-    admin.deletedBy = req.user._id;
-    admin.deletionReason = req.body.reason || 'Deleted by administrator';
-    admin.adminActionHistory.push({
-      actionType: 'deleted',
-      adminId: req.user._id,
-      reason: req.body.reason || 'Deleted by administrator'
-    });
-
-    await admin.save();
+    await User.findByIdAndDelete(admin._id);
 
     res.json({ message: 'Admin account deleted successfully' });
   } catch (error) {
