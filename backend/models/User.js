@@ -28,6 +28,20 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'pandit', 'admin'],
       default: 'user',
     },
+    username: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    lastModifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
     phone: {
       type: String,
       trim: true,
