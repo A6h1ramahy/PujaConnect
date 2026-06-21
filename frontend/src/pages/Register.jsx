@@ -57,7 +57,7 @@ const Register = () => {
           <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-gold-500/10 blur-3xl" />
         </div>
 
-        <div className="w-full max-w-lg md:max-w-2xl relative animate-slide-up">
+        <div className="w-full max-w-lg md:max-w-3xl relative animate-slide-up">
           <div className="card p-6 md:p-8">
             {/* Logo */}
             <div className="text-center mb-5">

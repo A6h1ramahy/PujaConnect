@@ -116,7 +116,7 @@ const AdminUserDetail = () => {
         try {
           const { data } = await deleteUserAdmin(id, reason);
           toast.success(data.message || 'User account deleted successfully');
-          fetchDetails();
+          navigate('/admin/dashboard');
         } catch (err) {
           toast.error(err?.response?.data?.message || 'Failed to delete user');
         }
@@ -206,29 +206,21 @@ const AdminUserDetail = () => {
                     <HiShieldCheck /> Reactivate / Restore Account
                   </button>
                 ) : (
-                  <>
-                    {!userData.isDeleted && (
-                      <button
-                        id="admin-suspend-btn"
-                        onClick={() => setShowSuspendModal(true)}
-                        className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white font-semibold transition-colors"
-                      >
-                        <HiBan /> Suspend User Account
-                      </button>
-                    )}
-                  </>
-                )}
-                {!userData.isDeleted ? (
                   <button
-                    id="admin-delete-user-btn"
-                    onClick={handleDeleteAction}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-450 hover:bg-crimson-50 dark:hover:bg-crimson-950/20 font-semibold transition-colors"
+                    id="admin-suspend-btn"
+                    onClick={() => setShowSuspendModal(true)}
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white font-semibold transition-colors"
                   >
-                    <HiTrash /> Delete Account
+                    <HiBan /> Suspend User Account
                   </button>
-                ) : (
-                  <span className="text-sm font-semibold text-crimson-600 text-center py-2">Account Deleted</span>
                 )}
+                <button
+                  id="admin-delete-user-btn"
+                  onClick={handleDeleteAction}
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-450 hover:bg-crimson-50 dark:hover:bg-crimson-950/20 font-semibold transition-colors"
+                >
+                  <HiTrash /> Delete Account
+                </button>
               </div>
             </div>
           </ScrollReveal>

@@ -126,7 +126,7 @@ const AdminPanditDetail = () => {
         try {
           const { data } = await deletePanditAdmin(id, reason);
           toast.success(data.message || 'Pandit account deleted successfully');
-          fetchDetails();
+          navigate('/admin/dashboard');
         } catch (err) {
           toast.error(err?.response?.data?.message || 'Failed to delete Pandit');
         }
@@ -183,60 +183,52 @@ const AdminPanditDetail = () => {
 
               {/* Actions Grid */}
               <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto">
-                {!pandit.isDeleted && (
+                {pandit.verificationStatus === 'pending' && (
                   <>
-                    {pandit.verificationStatus === 'pending' && (
-                      <>
-                        <button
-                          id="admin-verify-btn"
-                          onClick={handleVerifyAction}
-                          className="btn-primary w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl"
-                        >
-                          <HiShieldCheck /> Approve Pandit
-                        </button>
-                        <button
-                          id="admin-reject-btn"
-                          onClick={handleRejectAction}
-                          className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 font-semibold transition-colors"
-                        >
-                          <HiX /> Reject Profile
-                        </button>
-                      </>
-                    )}
-
-                    {(pandit.verificationStatus === 'rejected' || pandit.verificationStatus === 'suspended') && (
-                      <button
-                        id="admin-restore-btn"
-                        onClick={handleVerifyAction}
-                        className="btn-primary w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl"
-                      >
-                        <HiShieldCheck /> Approve Again / Restore Account
-                      </button>
-                    )}
-
-                    {pandit.verificationStatus === 'verified' && (
-                      <button
-                        id="admin-suspend-btn"
-                        onClick={() => setShowSuspendModal(true)}
-                        className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white font-semibold transition-colors"
-                      >
-                        <HiBan /> Suspend Pandit / Deactivate
-                      </button>
-                    )}
+                    <button
+                      id="admin-verify-btn"
+                      onClick={handleVerifyAction}
+                      className="btn-primary w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl"
+                    >
+                      <HiShieldCheck /> Approve Pandit
+                    </button>
+                    <button
+                      id="admin-reject-btn"
+                      onClick={handleRejectAction}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-450 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 font-semibold transition-colors"
+                    >
+                      <HiX /> Reject Profile
+                    </button>
                   </>
                 )}
 
-                {!pandit.isDeleted ? (
+                {(pandit.verificationStatus === 'rejected' || pandit.verificationStatus === 'suspended') && (
                   <button
-                    id="admin-delete-pandit-btn"
-                    onClick={handleDeleteAction}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-450 hover:bg-crimson-50 dark:hover:bg-crimson-950/20 font-semibold transition-colors"
+                    id="admin-restore-btn"
+                    onClick={handleVerifyAction}
+                    className="btn-primary w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl"
                   >
-                    <HiTrash /> Delete Account
+                    <HiShieldCheck /> Approve Again / Restore Account
                   </button>
-                ) : (
-                  <span className="text-sm font-semibold text-crimson-600 text-center py-2 animate-fade-in">Account Deleted</span>
                 )}
+
+                {pandit.verificationStatus === 'verified' && (
+                  <button
+                    id="admin-suspend-btn"
+                    onClick={() => setShowSuspendModal(true)}
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white font-semibold transition-colors"
+                  >
+                    <HiBan /> Suspend Pandit / Deactivate
+                  </button>
+                )}
+
+                <button
+                  id="admin-delete-pandit-btn"
+                  onClick={handleDeleteAction}
+                  className="w-full flex items-center justify-center gap-1.5 py-2.5 px-6 rounded-xl border border-crimson-500 text-crimson-600 dark:text-crimson-450 hover:bg-crimson-50 dark:hover:bg-crimson-950/20 font-semibold transition-colors"
+                >
+                  <HiTrash /> Delete Account
+                </button>
               </div>
             </div>
           </ScrollReveal>

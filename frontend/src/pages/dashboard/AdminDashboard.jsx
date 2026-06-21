@@ -604,7 +604,6 @@ const AdminDashboard = () => {
                         <option value="verified">Verified Only</option>
                         <option value="rejected">Rejected Only</option>
                         <option value="suspended">Suspended Only</option>
-                        <option value="deleted">Deleted Only</option>
                       </select>
                     </div>
                   </div>
@@ -649,18 +648,15 @@ const AdminDashboard = () => {
                           
                           <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
                             <StatusBadge status={p.verificationStatus} />
-                            {p.isDeleted && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-crimson-100 text-crimson-700 border border-crimson-200">Deleted</span>}
                             <Link to={`/admin/pandits/${p._id}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold transition-colors">
                               Manage Profile
                             </Link>
-                            {!p.isDeleted && (
-                              <button
-                                onClick={() => handleDeletePanditClick(p._id)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-colors"
-                              >
-                                Delete
-                              </button>
-                            )}
+                            <button
+                              onClick={() => handleDeletePanditClick(p._id)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-colors"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -693,7 +689,6 @@ const AdminDashboard = () => {
                         <option value="all">All Status</option>
                         <option value="active">Active Only</option>
                         <option value="suspended">Suspended Only</option>
-                        <option value="deleted">Deleted Only</option>
                       </select>
                     </div>
                   </div>
@@ -721,21 +716,18 @@ const AdminDashboard = () => {
                           
                           <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
                             {u.isSuspended && <span className="badge-rejected">Suspended</span>}
-                            {u.isDeleted && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-crimson-100 text-crimson-700 border border-crimson-200">Deleted</span>}
                             <Link
                               to={`/admin/users/${u._id}`}
                               className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border border-saffron-500 text-saffron-600 dark:text-saffron-400 hover:bg-saffron-55 dark:hover:bg-saffron-950/20 hover:bg-saffron-50 transition-colors"
                             >
                               Manage Profile
                             </Link>
-                            {!u.isDeleted && (
-                              <button
-                                onClick={() => handleDeleteUserClick(u._id)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-colors"
-                              >
-                                Delete
-                              </button>
-                            )}
+                            <button
+                              onClick={() => handleDeleteUserClick(u._id)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold transition-colors"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -1171,7 +1163,7 @@ const AdminDashboard = () => {
                             filteredAdmins.map((admin) => {
                               const isSelf = currentUser?._id === admin._id;
                               const isSystemAdmin = admin.email.toLowerCase() === 'admin@pujaconnect.com';
-                              const totalActiveAdmins = admins.filter(a => !a.isSuspended && !a.isDeleted).length;
+                              const totalActiveAdmins = admins.filter(a => !a.isSuspended).length;
                               const isLastActive = !admin.isSuspended && totalActiveAdmins <= 1;
 
                               return (
