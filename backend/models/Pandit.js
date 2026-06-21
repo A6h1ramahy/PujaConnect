@@ -78,20 +78,7 @@ const panditSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-    deletedAt: {
-      type: Date,
-    },
-    deletedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-    deletionReason: {
-      type: String,
-    },
+
   },
   { timestamps: true }
 );
