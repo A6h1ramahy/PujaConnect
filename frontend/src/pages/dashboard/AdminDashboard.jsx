@@ -8,7 +8,8 @@ import {
   getAdminStats, getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPanditAdmin,
   getAllUsers, toggleSuspend, getAllBookingsAdmin, getAllRitualsAdmin,
   createRitual, updateRitual, deleteRitual, uploadRitualImage,
-  deleteUserAdmin, deletePanditAdmin
+  deleteUserAdmin, deletePanditAdmin,
+  getAllAdmins, createAdmin, suspendAdmin, reactivateAdmin, deleteAdmin
 } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -16,6 +17,7 @@ import PanditAvatar from '../../components/common/PanditAvatar';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
 import ChangePasswordForm from '../../components/common/ChangePasswordForm';
+import { useAuth } from '../../context/AuthContext';
 
 const getCategoryColor = (category) => {
   switch (category) {
@@ -46,6 +48,27 @@ const getCategoryColor = (category) => {
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const { user: currentUser } = useAuth();
+  const [admins, setAdmins] = useState([]);
+  const [adminSearch, setAdminSearch] = useState('');
+  const [savingAdmin, setSavingAdmin] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    name: '',
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const filteredAdmins = admins.filter((a) => {
+    const term = adminSearch.toLowerCase();
+    return (
+      a.name.toLowerCase().includes(term) ||
+      a.email.toLowerCase().includes(term) ||
+      (a.username && a.username.toLowerCase().includes(term))
+    );
+  });
+
   const [stats, setStats] = useState(null);
   const [pendingPandits, setPendingPandits] = useState([]);
   const [allPandits, setAllPandits] = useState([]);
@@ -111,12 +134,20 @@ const AdminDashboard = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
+  const fetchAdmins = async () => {
+    try {
+      const { data } = await getAllAdmins();
+      setAdmins(data.admins || []);
+    } catch {}
+  };
+
   useEffect(() => { fetchAll(); }, []);
   useEffect(() => {
     if (activeTab === 'pandits')  fetchPandits();
     if (activeTab === 'users')    fetchUsers();
     if (activeTab === 'bookings') fetchBookings();
     if (activeTab === 'rituals')  fetchRituals();
+    if (activeTab === 'admins')   fetchAdmins();
   }, [activeTab, panditStatusFilter, userStatusFilter]);
 
   const fetchAll = async () => {
@@ -207,6 +238,96 @@ const AdminDashboard = () => {
         .catch((err) => {
           toast.error(err?.response?.data?.message || 'Failed to delete Pandit');
         });
+    }
+  };
+
+  const validatePassword = (password) => {
+    if (password.length < 8) return 'Password must be at least 8 characters long.';
+    if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter.';
+    if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter.';
+    if (!/[0-9]/.test(password)) return 'Password must contain at least one number.';
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return 'Password must contain at least one special character.';
+    return null;
+  };
+
+  const handleAdminSubmit = async (e) => {
+    e.preventDefault();
+    if (adminForm.password !== adminForm.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    const pwdErr = validatePassword(adminForm.password);
+    if (pwdErr) {
+      toast.error(pwdErr);
+      return;
+    }
+
+    setSavingAdmin(true);
+    try {
+      const payload = {
+        name: adminForm.name,
+        email: adminForm.email,
+        username: adminForm.username || undefined,
+        password: adminForm.password
+      };
+      await createAdmin(payload);
+      toast.success('Admin account created successfully');
+      setAdminForm({
+        name: '',
+        email: '',
+        username: '',
+        password: '',
+        confirmPassword: ''
+      });
+      fetchAdmins();
+      fetchAll();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to create admin');
+    } finally {
+      setSavingAdmin(false);
+    }
+  };
+
+  const handleSuspendAdminClick = async (id, currentStatus) => {
+    const isSuspended = currentStatus;
+    const actionWord = isSuspended ? 'reactivate' : 'suspend';
+    const warningMsg = isSuspended 
+      ? `Are you sure you want to reactivate this administrator?`
+      : `Are you sure you want to suspend this administrator?\n\nThis action will disable dashboard access.`;
+
+    if (!window.confirm(warningMsg)) return;
+
+    const reason = window.prompt(`Provide a reason for administrator ${actionWord} (optional):`) || `${actionWord.toUpperCase()} by administrator`;
+    if (reason === null) return;
+
+    try {
+      if (isSuspended) {
+        await reactivateAdmin(id, reason);
+        toast.success('Admin account reactivated');
+      } else {
+        await suspendAdmin(id, reason);
+        toast.success('Admin account suspended');
+      }
+      fetchAdmins();
+      fetchAll();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || `Failed to ${actionWord} admin`);
+    }
+  };
+
+  const handleDeleteAdminClick = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this administrator? This action cannot be undone.')) return;
+
+    const reason = window.prompt('Provide a reason for administrator deletion (optional):') || 'Deleted by administrator';
+    if (reason === null) return;
+
+    try {
+      await deleteAdmin(id, reason);
+      toast.success('Admin account deleted');
+      fetchAdmins();
+      fetchAll();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to delete admin');
     }
   };
 
@@ -360,6 +481,7 @@ const AdminDashboard = () => {
     { id: 'users',     label: 'Users',        icon: HiUsers },
     { id: 'bookings',  label: 'Bookings',     icon: HiClipboardList },
     { id: 'rituals',   label: 'Rituals',      icon: MdOutlineTempleHindu },
+    { id: 'admins',    label: 'Admin Management', icon: HiShieldCheck },
     { id: 'security',  label: 'Security',     icon: HiLockClosed },
   ];
 
@@ -895,6 +1017,245 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Management */}
+              {activeTab === 'admins' && (
+                <div className="animate-fade-in space-y-6">
+                  {/* Create Admin Card */}
+                  <div className="card p-6">
+                    <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100 mb-4">
+                      Create New Admin
+                    </h3>
+                    <form onSubmit={handleAdminSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                            Full Name <span className="text-saffron-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. Abhirama Admin"
+                            value={adminForm.name}
+                            onChange={(e) => setAdminForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                            Email Address <span className="text-saffron-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="e.g. admin@pujaconnect.com"
+                            value={adminForm.email}
+                            onChange={(e) => setAdminForm(prev => ({ ...prev, email: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                            Username <span className="text-stone-400 dark:text-stone-500 font-normal">(Optional)</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. admin_pujaconnect"
+                            value={adminForm.username}
+                            onChange={(e) => setAdminForm(prev => ({ ...prev, username: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                            Password <span className="text-saffron-500">*</span>
+                          </label>
+                          <input
+                            type="password"
+                            required
+                            placeholder="Minimum 8 characters"
+                            value={adminForm.password}
+                            onChange={(e) => setAdminForm(prev => ({ ...prev, password: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                            Confirm Password <span className="text-saffron-500">*</span>
+                          </label>
+                          <input
+                            type="password"
+                            required
+                            placeholder="Repeat password"
+                            value={adminForm.confirmPassword}
+                            onChange={(e) => setAdminForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                            className="w-full px-4 py-2.5 rounded-xl border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Password validation indicators */}
+                      {adminForm.password && (
+                        <div className="bg-stone-50 dark:bg-stone-900/60 p-4 rounded-xl border border-light-border dark:border-dark-border space-y-2">
+                          <p className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Password Strength Rules:</p>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <span className={adminForm.password.length >= 8 ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-stone-400'}>
+                              ✓ At least 8 characters ({adminForm.password.length}/8)
+                            </span>
+                            <span className={/[A-Z]/.test(adminForm.password) ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-stone-400'}>
+                              ✓ One uppercase letter
+                            </span>
+                            <span className={/[a-z]/.test(adminForm.password) ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-stone-400'}>
+                              ✓ One lowercase letter
+                            </span>
+                            <span className={/[0-9]/.test(adminForm.password) ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-stone-400'}>
+                              ✓ One number
+                            </span>
+                            <span className={/[!@#$%^&*(),.?":{}|<>]/.test(adminForm.password) ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-stone-400'}>
+                              ✓ One special character
+                            </span>
+                            <span className={(adminForm.password && adminForm.password === adminForm.confirmPassword) ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-stone-400'}>
+                              ✓ Passwords match
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={savingAdmin}
+                          className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-saffron-gradient text-white shadow-glow-saffron hover:opacity-90 transition-all flex items-center gap-2"
+                        >
+                          {savingAdmin ? 'Creating...' : 'Create Admin Account'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  {/* Admins List Card */}
+                  <div className="card p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                      <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100">
+                        Administrators
+                      </h3>
+                      <input
+                        type="text"
+                        placeholder="Search by name, email, or username..."
+                        value={adminSearch}
+                        onChange={(e) => setAdminSearch(e.target.value)}
+                        className="px-4 py-2 rounded-xl border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-saffron-500/20 w-full sm:max-w-xs"
+                      />
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-light-border dark:border-dark-border text-stone-400 text-xs font-bold uppercase tracking-wider">
+                            <th className="py-3 px-4">Name & Email</th>
+                            <th className="py-3 px-4">Username</th>
+                            <th className="py-3 px-4">Joined / Created By</th>
+                            <th className="py-3 px-4">Last Login</th>
+                            <th className="py-3 px-4">Status</th>
+                            <th className="py-3 px-4 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-light-border dark:divide-dark-border text-sm">
+                          {filteredAdmins.length === 0 ? (
+                            <tr>
+                              <td colSpan="6" className="py-8 text-center text-stone-400 dark:text-stone-500">
+                                No administrators found.
+                              </td>
+                            </tr>
+                          ) : (
+                            filteredAdmins.map((admin) => {
+                              const isSelf = currentUser?._id === admin._id;
+                              const isSystemAdmin = admin.email.toLowerCase() === 'admin@pujaconnect.com';
+                              const totalActiveAdmins = admins.filter(a => !a.isSuspended && !a.isDeleted).length;
+                              const isLastActive = !admin.isSuspended && totalActiveAdmins <= 1;
+
+                              return (
+                                <tr key={admin._id} id={`admin-row-${admin._id}`} className="hover:bg-stone-50/50 dark:hover:bg-stone-800/20 transition-colors">
+                                  <td className="py-4 px-4">
+                                    <p className="font-semibold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                                      {admin.name} {isSelf && <span className="bg-saffron-50 dark:bg-saffron-950/20 text-saffron-600 dark:text-saffron-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold border border-saffron-100 dark:border-saffron-900/30">You</span>}
+                                    </p>
+                                    <p className="text-xs text-stone-500 dark:text-stone-400">{admin.email}</p>
+                                  </td>
+                                  <td className="py-4 px-4 font-mono text-xs text-stone-600 dark:text-stone-400">
+                                    {admin.username || '—'}
+                                  </td>
+                                  <td className="py-4 px-4 text-xs text-stone-500 dark:text-stone-400">
+                                    <p className="font-medium">{format(new Date(admin.createdAt), 'dd MMM yyyy')}</p>
+                                    {admin.createdBy && (
+                                      <p className="text-[10px] text-stone-400 mt-0.5">
+                                        by {admin.createdBy.name}
+                                      </p>
+                                    )}
+                                  </td>
+                                  <td className="py-4 px-4 text-xs text-stone-500 dark:text-stone-400 font-medium">
+                                    {admin.lastLogin ? format(new Date(admin.lastLogin), 'dd MMM yyyy HH:mm') : 'Never'}
+                                  </td>
+                                  <td className="py-4 px-4">
+                                    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                      admin.isSuspended
+                                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border-rose-100 dark:border-rose-900/30'
+                                        : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30'
+                                    }`}>
+                                      {admin.isSuspended ? '● Suspended' : '● Active'}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 px-4 text-right">
+                                    <div className="flex justify-end gap-1.5">
+                                      <button
+                                        id={`suspend-admin-${admin._id}`}
+                                        disabled={isSelf || isSystemAdmin || isLastActive}
+                                        onClick={() => handleSuspendAdminClick(admin._id, admin.isSuspended)}
+                                        className="px-2.5 py-1 text-xs rounded-lg font-semibold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-saffron-50 hover:text-saffron-600 dark:hover:bg-saffron-950/20 dark:hover:text-saffron-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        title={
+                                          isSelf 
+                                            ? 'You cannot suspend yourself' 
+                                            : isSystemAdmin 
+                                              ? 'Cannot suspend system administrator' 
+                                              : isLastActive 
+                                                ? 'Cannot suspend the last active administrator' 
+                                                : admin.isSuspended ? 'Reactivate Admin' : 'Suspend Admin'
+                                        }
+                                      >
+                                        {admin.isSuspended ? 'Reactivate' : 'Suspend'}
+                                      </button>
+                                      <button
+                                        id={`delete-admin-${admin._id}`}
+                                        disabled={isSelf || isSystemAdmin || isLastActive}
+                                        onClick={() => handleDeleteAdminClick(admin._id)}
+                                        className="px-2.5 py-1 text-xs rounded-lg font-semibold bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        title={
+                                          isSelf 
+                                            ? 'You cannot delete yourself' 
+                                            : isSystemAdmin 
+                                              ? 'Cannot delete system administrator' 
+                                              : isLastActive 
+                                                ? 'Cannot delete the last active administrator' 
+                                                : 'Delete Admin Account'
+                                        }
+                                      >
+                                        Delete
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
