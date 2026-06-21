@@ -23,9 +23,36 @@ const registerRules = [
     .optional()
     .isIn(['user', 'pandit']).withMessage('Role must be "user" or "pandit"'),
 
+  // Phone: required for pandits, optional but validated for users
   body('phone')
+    .if(body('role').equals('pandit'))
+    .notEmpty().withMessage('Phone number is required for Pandit registration')
+    .bail()
+    .matches(/^[0-9]+$/).withMessage('Phone number must contain only digits')
+    .isLength({ min: 10, max: 15 }).withMessage('Phone number must be 10–15 digits'),
+
+  body('phone')
+    .if(body('role').not().equals('pandit'))
     .optional()
-    .isMobilePhone().withMessage('Please enter a valid phone number'),
+    .if(body('phone').notEmpty())
+    .matches(/^[0-9]+$/).withMessage('Phone number must contain only digits')
+    .isLength({ min: 10, max: 15 }).withMessage('Phone number must be 10–15 digits'),
+
+  // City: required for pandits
+  body('city')
+    .if(body('role').equals('pandit'))
+    .notEmpty().withMessage('City is required for Pandit registration')
+    .bail()
+    .isLength({ min: 2 }).withMessage('City name must be at least 2 characters')
+    .trim(),
+
+  // Region / State: required for pandits
+  body('region')
+    .if(body('role').equals('pandit'))
+    .notEmpty().withMessage('State / Region is required for Pandit registration')
+    .bail()
+    .isLength({ min: 2 }).withMessage('State name must be at least 2 characters')
+    .trim(),
 ];
 
 const loginRules = [
