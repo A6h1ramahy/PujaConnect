@@ -827,10 +827,17 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               )}
+
+              {/* Security */}
+              {activeTab === 'security' && (
+                <div className="animate-fade-in">
+                  <ChangePasswordForm />
+                </div>
+              )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
       {/* Detail inspect modal */}
       {selectedRitual && (
@@ -947,17 +954,10 @@ const AdminDashboard = () => {
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-mono bg-stone-50 dark:bg-stone-900/60 p-2 rounded-xl border border-light-border dark:border-dark-border">{selectedRitual.searchKeywords.join(', ')}</p>
                 </div>
               )}
-              {/* Security */}
-              {activeTab === 'security' && (
-                <div className="animate-fade-in">
-                  <ChangePasswordForm />
-                </div>
-              )}
             </div>
           </div>
         </div>
       )}
-    </div>
     </div>
   </PageTransition>
   );
