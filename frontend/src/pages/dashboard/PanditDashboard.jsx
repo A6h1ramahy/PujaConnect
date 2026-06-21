@@ -662,7 +662,7 @@ const PanditDashboard = () => {
           </div>
 
           <div className="p-3.5 bg-crimson-500/10 border border-crimson-500/30 text-crimson-600 dark:text-crimson-400 text-xs rounded-xl leading-relaxed">
-            ⚠️ Warning: Deleting your account will automatically cancel all of your future bookings. Your past and completed bookings will remain archived for records.
+            This action permanently removes the account and all associated data. All bookings, records, and related information will be deleted permanently. This action cannot be undone. Continue?
           </div>
 
           <form onSubmit={handleSelfDelete} className="space-y-4">
@@ -689,7 +689,7 @@ const PanditDashboard = () => {
                 required
               />
               <span className="text-xs text-stone-500 dark:text-stone-400 leading-tight">
-                I understand that my future bookings will be cancelled.
+                I understand that all of my bookings and account records will be permanently deleted.
               </span>
             </label>
 
