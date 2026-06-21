@@ -127,10 +127,14 @@ const UserDashboard = () => {
                         const isCancelledByAdmin = b.status === 'cancelled' && b.statusHistory?.some(h => h.note === 'Cancelled by Administration');
                         return (
                           <StaggerItem key={b._id}>
-                            <div id={`booking-${b._id}`} className="card-hover p-5 flex flex-col gap-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
+                            <Link
+                              to={`/dashboard/bookings/${b._id}`}
+                              id={`booking-${b._id}`}
+                              className="block card-hover p-5 flex flex-col gap-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl transition-all duration-200 hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-md group"
+                            >
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex-1">
-                                  <p className="font-semibold text-stone-900 dark:text-stone-100">
+                                  <p className="font-semibold text-stone-900 dark:text-stone-100 group-hover:text-saffron-700 dark:group-hover:text-saffron-400 transition-colors">
                                     {b.ritual?.pujaName || 'Puja Ceremony'}
                                   </p>
                                   <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
@@ -140,7 +144,12 @@ const UserDashboard = () => {
                                     {b.date ? format(new Date(b.date), 'MMM dd, yyyy') : ''} · {b.time}
                                   </p>
                                 </div>
-                                <StatusBadge status={b.status} />
+                                <div className="flex items-center gap-3">
+                                  <StatusBadge status={b.status} />
+                                  <span className="text-xs font-medium text-saffron-600 dark:text-saffron-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    View Details →
+                                  </span>
+                                </div>
                               </div>
 
                               {isCancelledByAdmin && (
@@ -149,16 +158,22 @@ const UserDashboard = () => {
                                     Your booking has been cancelled because the assigned Pandit is currently unavailable. Please choose another verified Pandit.
                                   </p>
                                   <div>
-                                    <Link
-                                      to={`/pandits?ritual=${b.ritual?._id || ''}&city=${encodeURIComponent(b.location?.city || b.pandit?.location?.city || '')}`}
-                                      className="inline-flex items-center gap-1 font-semibold text-saffron-600 dark:text-saffron-400 hover:underline"
+                                    <span
+                                      className="inline-flex items-center gap-1 font-semibold text-saffron-600 dark:text-saffron-400"
+                                      onClick={(e) => e.stopPropagation()}
                                     >
-                                      Find Replacement Pandit →
-                                    </Link>
+                                      <Link
+                                        to={`/pandits?ritual=${b.ritual?._id || ''}&city=${encodeURIComponent(b.location?.city || b.pandit?.location?.city || '')}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="hover:underline"
+                                      >
+                                        Find Replacement Pandit →
+                                      </Link>
+                                    </span>
                                   </div>
                                 </div>
                               )}
-                            </div>
+                            </Link>
                           </StaggerItem>
                         );
                       })}

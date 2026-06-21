@@ -10,6 +10,7 @@ export const getRitualBySlug = (slug) => api.get(`/rituals/${slug}`);
 
 
 export const getMyBookings    = ()       => api.get('/bookings/my');
+export const getBookingById   = (id)     => api.get(`/bookings/${id}`);
 export const getPanditBookings = ()      => api.get('/bookings/pandit');
 export const createBooking    = (data)   => api.post('/bookings', data);
 export const acceptBooking    = (id)     => api.put(`/bookings/${id}/accept`);
