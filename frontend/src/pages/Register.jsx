@@ -26,7 +26,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationError = validateRegisterForm({ name: form.name, email: form.email, password: form.password, confirmPassword: form.confirmPassword });
+    const validationError = validateRegisterForm(form);
     if (validationError) {
       toast.error(validationError);
       return;
@@ -110,22 +110,61 @@ const Register = () => {
               </div>
 
               {/* Phone + City */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="form-group">
-                  <label htmlFor="reg-phone" className="label">Phone <span className="text-stone-400 font-normal">(optional)</span></label>
+                  <label htmlFor="reg-phone" className="label">
+                    {form.role === 'pandit' ? 'Phone Number *' : 'Phone (optional)'}
+                  </label>
                   <div className="relative">
                     <HiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
-                    <input id="reg-phone" type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="9876543210" className="input-field pl-11" />
+                    <input
+                      id="reg-phone"
+                      type="tel"
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder={form.role === 'pandit' ? '9876543210' : '9876543210'}
+                      className="input-field pl-11"
+                    />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="reg-city" className="label">City <span className="text-stone-400 font-normal">(optional)</span></label>
+                  <label htmlFor="reg-city" className="label">
+                    {form.role === 'pandit' ? 'City *' : 'City (optional)'}
+                  </label>
                   <div className="relative">
                     <HiLocationMarker className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
-                    <input id="reg-city" type="text" name="city" value={form.city} onChange={handleChange} placeholder="Bengaluru" className="input-field pl-11" />
+                    <input
+                      id="reg-city"
+                      type="text"
+                      name="city"
+                      value={form.city}
+                      onChange={handleChange}
+                      placeholder="Bengaluru"
+                      className="input-field pl-11"
+                    />
                   </div>
                 </div>
               </div>
+
+              {/* State / Region (only for Pandit) */}
+              {form.role === 'pandit' && (
+                <div className="form-group animate-fade-in">
+                  <label htmlFor="reg-region" className="label">State / Region *</label>
+                  <div className="relative">
+                    <HiLocationMarker className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
+                    <input
+                      id="reg-region"
+                      type="text"
+                      name="region"
+                      value={form.region}
+                      onChange={handleChange}
+                      placeholder="Enter your state or region"
+                      className="input-field pl-11"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Password */}
               <div className="form-group">
