@@ -10,6 +10,50 @@ const pushHistory = (booking, status, userId, note) => {
   booking.statusHistory.push({ status, changedBy: userId, note, changedAt: new Date() });
 };
 
+// ── Helper: map fallback fields if references are null ──────────
+const mapBookingFallback = (booking) => {
+  if (!booking) return null;
+  const plain = booking.toObject ? booking.toObject() : booking;
+  if (!plain.user) {
+    plain.user = {
+      _id: null,
+      name: plain.userNameSnapshot || 'Former User',
+      email: plain.userEmailSnapshot || '',
+      phone: '',
+      city: '',
+      region: ''
+    };
+  }
+  if (!plain.pandit) {
+    plain.pandit = {
+      _id: null,
+      userId: {
+        _id: null,
+        name: plain.panditNameSnapshot || 'Former Pandit',
+        email: '',
+        phone: plain.panditPhoneSnapshot || ''
+      }
+    };
+  } else if (!plain.pandit.userId) {
+    plain.pandit.userId = {
+      _id: null,
+      name: plain.panditNameSnapshot || 'Former Pandit',
+      email: '',
+      phone: plain.panditPhoneSnapshot || ''
+    };
+  }
+  if (!plain.ritual) {
+    plain.ritual = {
+      _id: null,
+      pujaName: plain.ritualNameSnapshot || 'Former Ritual',
+      category: plain.ritualCategorySnapshot || '',
+      duration: '',
+      priceRange: ''
+    };
+  }
+  return plain;
+};
+
 // @desc  Create a booking (user only)
 // @route POST /api/bookings
 // @access User
@@ -118,7 +162,7 @@ const getMyBookings = async (req, res, next) => {
       .populate('ritual', 'pujaName duration')
       .sort({ createdAt: -1 });
 
-    res.json({ bookings });
+    res.json({ bookings: bookings.map(mapBookingFallback) });
   } catch (error) {
     next(error);
   }
@@ -137,7 +181,7 @@ const getPanditBookings = async (req, res, next) => {
       .populate('ritual', 'pujaName duration priceRange')
       .sort({ date: 1 });
 
-    res.json({ bookings });
+    res.json({ bookings: bookings.map(mapBookingFallback) });
   } catch (error) {
     next(error);
   }
@@ -294,7 +338,7 @@ const getAllBookings = async (req, res, next) => {
       .skip(skip)
       .limit(Number(limit));
 
-    res.json({ bookings, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
+    res.json({ bookings: bookings.map(mapBookingFallback), total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
   } catch (error) {
     next(error);
   }
@@ -315,7 +359,7 @@ const getBookingByIdUser = async (req, res, next) => {
 
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
-    res.json({ booking });
+    res.json({ booking: mapBookingFallback(booking) });
   } catch (error) {
     next(error);
   }
@@ -337,7 +381,7 @@ const getBookingByIdAdmin = async (req, res, next) => {
 
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
-    res.json({ booking });
+    res.json({ booking: mapBookingFallback(booking) });
   } catch (error) {
     next(error);
   }
