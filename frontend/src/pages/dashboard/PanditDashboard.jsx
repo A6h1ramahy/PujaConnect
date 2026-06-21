@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle, HiShieldCheck } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
+import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle, HiShieldCheck, HiBan } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -7,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getPanditBookings, acceptBooking, rejectBooking, completeBooking,
   getMyProfile, updateMyProfile, getRituals,
-  getMyAvailability, setPanditAvail, deletePanditAvail,
+  getMyAvailability, setPanditAvail, deletePanditAvail, deleteAccountSelf,
 } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -23,8 +24,29 @@ const TIME_SLOTS = [
 ];
 
 const PanditDashboard = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('bookings');
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmed, setDeleteConfirmed] = useState(false);
+
+  const handleSelfDelete = async (e) => {
+    e.preventDefault();
+    if (!deleteConfirmed) {
+      toast.error('Please confirm you understand that future bookings will be cancelled');
+      return;
+    }
+    try {
+      const { data } = await deleteAccountSelf({ password: deletePassword });
+      toast.success(data.message || 'Your account has been deleted.');
+      logout();
+      navigate('/');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to delete account');
+    }
+  };
   const [bookings, setBookings] = useState([]);
   const [pandit, setPandit] = useState(null);
   const [rituals, setRituals] = useState([]);
@@ -505,6 +527,28 @@ const PanditDashboard = () => {
                         {saving ? 'Saving...' : 'Save Profile'}
                       </button>
                     </form>
+
+                    {/* Danger Zone */}
+                    <div className="card border border-crimson-100 dark:border-crimson-900/30 bg-crimson-50/10 p-6 rounded-2xl mt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-crimson-50 dark:bg-crimson-950/30 flex items-center justify-center shrink-0">
+                          <HiBan className="text-crimson-600 dark:text-crimson-400 text-lg" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-base font-bold font-display text-stone-900 dark:text-stone-100">Danger Zone</h3>
+                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                            Once you delete your account, there is no going back. All of your upcoming bookings will be cancelled immediately.
+                          </p>
+                          <button
+                            id="delete-account-trigger"
+                            onClick={() => setShowDeleteModal(true)}
+                            className="mt-4 px-4 py-2 bg-crimson-600 hover:bg-crimson-700 text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                          >
+                            Delete My Account
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -598,6 +642,82 @@ const PanditDashboard = () => {
         </div>
       </div>
     </div>
+
+    {/* Self-Deletion Modal */}
+    {showDeleteModal && (
+      <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-stone-900/50 dark:bg-stone-950/80 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white dark:bg-dark-card border border-light-border dark:border-dark-border w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold font-display text-stone-900 dark:text-stone-100">Delete Account</h3>
+            <button
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeletePassword('');
+                setDeleteConfirmed(false);
+              }}
+              className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
+            >
+              <HiX className="text-lg" />
+            </button>
+          </div>
+
+          <div className="p-3.5 bg-crimson-500/10 border border-crimson-500/30 text-crimson-600 dark:text-crimson-400 text-xs rounded-xl leading-relaxed">
+            ⚠️ Warning: Deleting your account will automatically cancel all of your future bookings. Your past and completed bookings will remain archived for records.
+          </div>
+
+          <form onSubmit={handleSelfDelete} className="space-y-4">
+            <div className="form-group space-y-2">
+              <label className="label" htmlFor="delete-pwd">Confirm Password</label>
+              <input
+                id="delete-pwd"
+                type="password"
+                placeholder="Enter your current password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                className="input-field w-full rounded-xl py-2 px-3 text-sm"
+                required
+              />
+            </div>
+
+            <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                id="delete-confirm-checkbox"
+                checked={deleteConfirmed}
+                onChange={(e) => setDeleteConfirmed(e.target.checked)}
+                className="mt-1"
+                required
+              />
+              <span className="text-xs text-stone-500 dark:text-stone-400 leading-tight">
+                I understand that my future bookings will be cancelled.
+              </span>
+            </label>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeletePassword('');
+                  setDeleteConfirmed(false);
+                }}
+                className="px-4 py-2 text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                id="delete-account-submit"
+                disabled={!deleteConfirmed || !deletePassword}
+                className="px-4 py-2 bg-crimson-600 hover:bg-crimson-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl transition-colors"
+              >
+                Delete Account
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
   </PageTransition>
   );
 };
