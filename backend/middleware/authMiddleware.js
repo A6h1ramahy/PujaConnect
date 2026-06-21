@@ -27,10 +27,6 @@ const protect = async (req, res, next) => {
       return res.status(403).json({ message: 'Your account has been temporarily suspended. Please contact the administrator for assistance.' });
     }
 
-    if (user.isDeleted) {
-      return res.status(403).json({ message: 'This account is no longer active. Please contact support if you believe this is an error.' });
-    }
-
     req.user = user;
     next();
   } catch (error) {
@@ -57,7 +53,7 @@ const optionalProtect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded.id).select('-password');
-    if (!user || user.isSuspended || user.isDeleted) {
+    if (!user || user.isSuspended) {
       req.user = null;
       return next();
     }
