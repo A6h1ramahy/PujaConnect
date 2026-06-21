@@ -31,11 +31,13 @@ export const getPanditByIdAdmin = (id)           => api.get(`/admin/pandits/${id
 export const verifyPandit      = (id, note)      => api.put(`/admin/pandits/${id}/verify`, { note });
 export const rejectPanditAdmin = (id, reason)    => api.put(`/admin/pandits/${id}/reject`, { reason });
 export const suspendPandit      = (id, reason)    => api.put(`/admin/pandits/${id}/suspend`, { reason });
-export const getAllUsers        = ()              => api.get('/admin/users');
+export const getAllUsers        = (params)        => api.get('/admin/users', { params });
 export const getUserByIdAdmin   = (id)            => api.get(`/admin/users/${id}`);
 export const suspendUser        = (id, reason)    => api.put(`/admin/users/${id}/suspend`, { reason });
 export const reactivateUser     = (id, reason)    => api.put(`/admin/users/${id}/reactivate`, { reason });
 export const toggleSuspend     = (id)            => api.put(`/admin/users/${id}/suspend`);
+export const deleteUserAdmin    = (id, reason)    => api.delete(`/admin/users/${id}`, { data: { reason } });
+export const deletePanditAdmin  = (id, reason)    => api.delete(`/admin/pandits/${id}`, { data: { reason } });
 export const getAllBookingsAdmin = (params)       => api.get('/admin/bookings', { params });
 export const getBookingByIdAdmin = (id)           => api.get(`/admin/bookings/${id}`);
 
@@ -52,4 +54,5 @@ export const uploadRitualImage = (formData, onUploadProgress) => api.post('/ritu
 export const getUserProfile    = ()     => api.get('/users/profile');
 export const updateUserProfile = (data) => api.put('/users/profile', data);
 export const changePassword    = (data) => api.put('/users/change-password', data);
+export const deleteAccountSelf = (data) => api.delete('/users/delete-account', { data });
 
