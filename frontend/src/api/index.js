@@ -56,3 +56,10 @@ export const updateUserProfile = (data) => api.put('/users/profile', data);
 export const changePassword    = (data) => api.put('/users/change-password', data);
 export const deleteAccountSelf = (data) => api.delete('/users/delete-account', { data });
 
+// Admin Management
+export const getAllAdmins       = ()              => api.get('/admin/admins');
+export const createAdmin         = (data)          => api.post('/admin/admins', data);
+export const suspendAdmin        = (id, reason)    => api.put(`/admin/admins/${id}/suspend`, { reason });
+export const reactivateAdmin     = (id, reason)    => api.put(`/admin/admins/${id}/reactivate`, { reason });
+export const deleteAdmin         = (id, reason)    => api.delete(`/admin/admins/${id}`, { data: { reason } });
+
