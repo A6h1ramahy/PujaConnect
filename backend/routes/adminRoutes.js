@@ -2,6 +2,7 @@ const express = require('express');
 const { getPendingPandits, getAllPanditsAdmin, verifyPandit, rejectPandit, getStats, suspendPandit, getPanditByIdAdmin, deletePanditAdmin } = require('../controllers/adminController');
 const { getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser, deleteUserAdmin } = require('../controllers/userController');
 const { getAllBookings, getBookingByIdAdmin } = require('../controllers/bookingController');
+const { getAllAdmins, createAdmin, suspendAdmin, reactivateAdmin, deleteAdmin } = require('../controllers/adminManagementController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/roleMiddleware');
 
@@ -25,5 +26,12 @@ router.put('/users/:id/reactivate', reactivateUser);
 router.delete('/users/:id', deleteUserAdmin);
 router.get('/bookings', getAllBookings);
 router.get('/bookings/:id', getBookingByIdAdmin);
+
+// Admin Management
+router.get('/admins', getAllAdmins);
+router.post('/admins', createAdmin);
+router.put('/admins/:id/suspend', suspendAdmin);
+router.put('/admins/:id/reactivate', reactivateAdmin);
+router.delete('/admins/:id', deleteAdmin);
 
 module.exports = router;
