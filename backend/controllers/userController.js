@@ -385,31 +385,11 @@ const deleteUserAdmin = async (req, res, next) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     if (user.role === 'admin') return res.status(400).json({ message: 'Cannot delete admin accounts' });
 
-    const deletedBy = req.user._id;
-
-    // Cancel user's future bookings
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    const bookingsToCancel = await Booking.find({
-      user: user._id,
-      status: { $in: ['pending', 'accepted'] },
-      date: { $gte: startOfToday }
-    });
-
-    for (let booking of bookingsToCancel) {
-      booking.status = 'cancelled';
-      booking.statusHistory.push({
-        status: 'cancelled',
-        changedAt: new Date(),
-        changedBy: deletedBy,
-        note: 'Cancelled: User account deleted.'
-      });
-      await booking.save();
-
-      // Free up availability slot
+    // 1. Release slots for all bookings created by this user
+    const userBookings = await Booking.find({ user: user._id });
+    const Availability = require('../models/Availability');
+    for (let booking of userBookings) {
       if (booking.availabilitySlotId) {
-        const Availability = require('../models/Availability');
         const availability = await Availability.findById(booking.availabilitySlotId);
         if (availability) {
           const slot = availability.timeSlots.find(
@@ -424,35 +404,21 @@ const deleteUserAdmin = async (req, res, next) => {
       }
     }
 
-    // If pandit, delete pandit profile and cancel pandit bookings
+    // 2. Physically delete all bookings created by this user
+    await Booking.deleteMany({ user: user._id });
+
+    // 3. If pandit, physically delete their Pandit document, availability slots, and bookings
     if (user.role === 'pandit') {
       const Pandit = require('../models/Pandit');
       const pandit = await Pandit.findOne({ userId: user._id });
       if (pandit) {
-        const Availability = require('../models/Availability');
         await Availability.deleteMany({ pandit: pandit._id });
-
-        const panditBookingsToCancel = await Booking.find({
-          pandit: pandit._id,
-          status: { $in: ['pending', 'accepted'] },
-          date: { $gte: startOfToday }
-        });
-
-        for (let booking of panditBookingsToCancel) {
-          booking.status = 'cancelled';
-          booking.statusHistory.push({
-            status: 'cancelled',
-            changedAt: new Date(),
-            changedBy: deletedBy,
-            note: 'Cancelled: Pandit account deleted.'
-          });
-          await booking.save();
-        }
-
+        await Booking.deleteMany({ pandit: pandit._id });
         await Pandit.deleteOne({ _id: pandit._id });
       }
     }
 
+    // 4. Physically delete the User document
     await User.findByIdAndDelete(user._id);
 
     res.json({ message: 'User account deleted successfully' });
@@ -479,31 +445,11 @@ const deleteAccountSelf = async (req, res, next) => {
       return res.status(400).json({ message: 'Incorrect password' });
     }
 
-    const deletedBy = user._id;
-
-    // Cancel user's future bookings
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    const bookingsToCancel = await Booking.find({
-      user: user._id,
-      status: { $in: ['pending', 'accepted'] },
-      date: { $gte: startOfToday }
-    });
-
-    for (let booking of bookingsToCancel) {
-      booking.status = 'cancelled';
-      booking.statusHistory.push({
-        status: 'cancelled',
-        changedAt: new Date(),
-        changedBy: deletedBy,
-        note: 'Cancelled: User account deleted.'
-      });
-      await booking.save();
-
-      // Free up availability slot
+    // 1. Release slots for all bookings created by this user
+    const userBookings = await Booking.find({ user: user._id });
+    const Availability = require('../models/Availability');
+    for (let booking of userBookings) {
       if (booking.availabilitySlotId) {
-        const Availability = require('../models/Availability');
         const availability = await Availability.findById(booking.availabilitySlotId);
         if (availability) {
           const slot = availability.timeSlots.find(
@@ -518,35 +464,21 @@ const deleteAccountSelf = async (req, res, next) => {
       }
     }
 
-    // If pandit, delete pandit profile and cancel pandit bookings
+    // 2. Physically delete all bookings created by this user
+    await Booking.deleteMany({ user: user._id });
+
+    // 3. If pandit, physically delete their Pandit document, availability slots, and bookings
     if (user.role === 'pandit') {
       const Pandit = require('../models/Pandit');
       const pandit = await Pandit.findOne({ userId: user._id });
       if (pandit) {
-        const Availability = require('../models/Availability');
         await Availability.deleteMany({ pandit: pandit._id });
-
-        const panditBookingsToCancel = await Booking.find({
-          pandit: pandit._id,
-          status: { $in: ['pending', 'accepted'] },
-          date: { $gte: startOfToday }
-        });
-
-        for (let booking of panditBookingsToCancel) {
-          booking.status = 'cancelled';
-          booking.statusHistory.push({
-            status: 'cancelled',
-            changedAt: new Date(),
-            changedBy: deletedBy,
-            note: 'Cancelled: Pandit account deleted.'
-          });
-          await booking.save();
-        }
-
+        await Booking.deleteMany({ pandit: pandit._id });
         await Pandit.deleteOne({ _id: pandit._id });
       }
     }
 
+    // 4. Physically delete the User document
     await User.findByIdAndDelete(user._id);
 
     res.json({ message: 'Your account has been deleted successfully' });
