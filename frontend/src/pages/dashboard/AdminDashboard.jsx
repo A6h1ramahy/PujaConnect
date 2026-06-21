@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash, HiEye, HiUpload } from 'react-icons/hi';
+import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash, HiEye, HiUpload, HiLockClosed } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -14,6 +14,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PanditAvatar from '../../components/common/PanditAvatar';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
+import ChangePasswordForm from '../../components/common/ChangePasswordForm';
 
 const getCategoryColor = (category) => {
   switch (category) {
@@ -320,6 +321,7 @@ const AdminDashboard = () => {
     { id: 'users',     label: 'Users',        icon: HiUsers },
     { id: 'bookings',  label: 'Bookings',     icon: HiClipboardList },
     { id: 'rituals',   label: 'Rituals',      icon: MdOutlineTempleHindu },
+    { id: 'security',  label: 'Security',     icon: HiLockClosed },
   ];
 
   return (
@@ -945,10 +947,17 @@ const AdminDashboard = () => {
                   <p className="text-xs text-stone-500 dark:text-stone-400 font-mono bg-stone-50 dark:bg-stone-900/60 p-2 rounded-xl border border-light-border dark:border-dark-border">{selectedRitual.searchKeywords.join(', ')}</p>
                 </div>
               )}
+              {/* Security */}
+              {activeTab === 'security' && (
+                <div className="animate-fade-in">
+                  <ChangePasswordForm />
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
+    </div>
     </div>
   </PageTransition>
   );

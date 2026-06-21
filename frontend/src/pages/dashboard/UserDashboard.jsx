@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { HiCalendar, HiUser, HiSearch, HiClipboardList } from 'react-icons/hi';
+import {
+  HiCalendar, HiUser, HiSearch, HiClipboardList, HiShieldCheck,
+  HiPhone, HiLocationMarker, HiMail, HiCheckCircle, HiClock, HiBan,
+} from 'react-icons/hi';
+import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
@@ -9,25 +13,52 @@ import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
+import ChangePasswordForm from '../../components/common/ChangePasswordForm';
+import PanditAvatar from '../../components/common/PanditAvatar';
 
+/* ── tiny helpers ─────────────────────────────────────────────── */
+const InfoCard = ({ icon: Icon, label, value }) => (
+  <div className="flex items-start gap-3 p-4 rounded-xl bg-stone-50 dark:bg-stone-900/30 border border-light-border dark:border-dark-border">
+    <div className="w-8 h-8 rounded-lg bg-saffron-50 dark:bg-saffron-950/20 flex items-center justify-center shrink-0 mt-0.5">
+      <Icon className="text-saffron-500 dark:text-saffron-400 text-sm" />
+    </div>
+    <div className="min-w-0">
+      <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">{label}</p>
+      <p className="text-sm font-medium text-stone-800 dark:text-stone-200 mt-0.5 break-words">
+        {value || <span className="italic text-stone-400">Not set</span>}
+      </p>
+    </div>
+  </div>
+);
+
+const StatMini = ({ value, label, color }) => (
+  <div className="flex-1 min-w-0 text-center p-3 rounded-xl bg-stone-50 dark:bg-stone-900/30 border border-light-border dark:border-dark-border">
+    <p className={`text-2xl font-display font-bold ${color}`}>{value}</p>
+    <p className="text-[10px] text-stone-400 font-medium mt-0.5 leading-tight">{label}</p>
+  </div>
+);
+
+/* ══════════════════════════════════════════════════════════════ */
 const UserDashboard = () => {
   const { user, updateUser } = useAuth();
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings]   = useState([]);
+  const [loading, setLoading]     = useState(true);
   const [activeTab, setActiveTab] = useState('bookings');
-  const [profile, setProfile] = useState({ name: user?.name || '', phone: user?.phone || '', city: user?.city || '' });
-  const [saving, setSaving] = useState(false);
+  const [profile, setProfile]     = useState({ name: user?.name || '', phone: user?.phone || '', city: user?.city || '' });
+  const [saving, setSaving]       = useState(false);
+  const [userDetail, setUserDetail] = useState(null);
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchAll = async () => {
       try {
-        const { data } = await getMyBookings();
-        setBookings(data.bookings || []);
+        const [bookRes, profileRes] = await Promise.all([getMyBookings(), getUserProfile()]);
+        setBookings(bookRes.data.bookings || []);
+        setUserDetail(profileRes.data.user);
       } catch { } finally {
         setLoading(false);
       }
     };
-    fetchBookings();
+    fetchAll();
   }, []);
 
   const handleProfileSave = async (e) => {
@@ -44,14 +75,25 @@ const UserDashboard = () => {
     }
   };
 
+  /* derived booking stats */
   const upcoming  = bookings.filter((b) => b.status === 'accepted'  && new Date(b.date) >= new Date());
   const pending   = bookings.filter((b) => b.status === 'pending');
-  const completed = bookings.filter((b) => b.status === 'accepted'  && new Date(b.date) < new Date());
-  const rejected  = bookings.filter((b) => ['rejected', 'cancelled'].includes(b.status));
+  const completed = bookings.filter((b) => b.status === 'completed');
+  const cancelled = bookings.filter((b) => ['rejected', 'cancelled'].includes(b.status));
+
+  /* initials avatar */
+  const initials = (user?.name || 'U').split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+
+  const TABS = [
+    { id: 'bookings',  icon: HiClipboardList,      label: 'My Bookings' },
+    { id: 'profile',   icon: HiUser,                label: 'Profile' },
+    { id: 'security',  icon: HiShieldCheck,          label: 'Security' },
+  ];
 
   return (
     <PageTransition>
       <div className="min-h-screen bg-light-bg dark:bg-dark-bg transition-colors duration-300">
+
         {/* Header */}
         <div className="bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border py-8 transition-colors duration-300">
           <div className="page-container">
@@ -82,10 +124,7 @@ const UserDashboard = () => {
             {/* Sidebar */}
             <ScrollReveal className="lg:col-span-1">
               <div className="space-y-2">
-                {[
-                  { id: 'bookings', icon: HiClipboardList, label: 'My Bookings' },
-                  { id: 'profile',  icon: HiUser,          label: 'Profile'      },
-                ].map((tab) => (
+                {TABS.map((tab) => (
                   <button
                     key={tab.id}
                     id={`user-tab-${tab.id}`}
@@ -99,15 +138,29 @@ const UserDashboard = () => {
                     <tab.icon className="text-base" /> {tab.label}
                   </button>
                 ))}
-                <Link to="/pandits" id="user-find-pandits" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+
+                {/* Redirect links */}
+                <Link
+                  to="/pandits"
+                  id="user-find-pandits"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                >
                   <HiSearch className="text-base" /> Find Pandits
+                </Link>
+                <Link
+                  to="/rituals"
+                  id="user-sacred-rituals"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                >
+                  <MdOutlineTempleHindu className="text-base" /> Sacred Rituals
                 </Link>
               </div>
             </ScrollReveal>
 
             {/* Main */}
             <div className="lg:col-span-3">
-              {/* Bookings Tab */}
+
+              {/* ── Bookings Tab ── */}
               {activeTab === 'bookings' && (
                 <div className="animate-fade-in">
                   <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">Booking History</h2>
@@ -158,18 +211,13 @@ const UserDashboard = () => {
                                     Your booking has been cancelled because the assigned Pandit is currently unavailable. Please choose another verified Pandit.
                                   </p>
                                   <div>
-                                    <span
-                                      className="inline-flex items-center gap-1 font-semibold text-saffron-600 dark:text-saffron-400"
+                                    <Link
+                                      to={`/pandits?ritual=${b.ritual?._id || ''}&city=${encodeURIComponent(b.location?.city || b.pandit?.location?.city || '')}`}
                                       onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex items-center gap-1 font-semibold text-saffron-600 dark:text-saffron-400 hover:underline"
                                     >
-                                      <Link
-                                        to={`/pandits?ritual=${b.ritual?._id || ''}&city=${encodeURIComponent(b.location?.city || b.pandit?.location?.city || '')}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="hover:underline"
-                                      >
-                                        Find Replacement Pandit →
-                                      </Link>
-                                    </span>
+                                      Find Replacement Pandit →
+                                    </Link>
                                   </div>
                                 </div>
                               )}
@@ -182,34 +230,127 @@ const UserDashboard = () => {
                 </div>
               )}
 
-              {/* Profile Tab */}
+              {/* ── Profile Tab ── */}
               {activeTab === 'profile' && (
-                <div className="animate-fade-in card p-6 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
-                  <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-5">Edit Profile</h2>
-                  <form onSubmit={handleProfileSave} id="user-profile-form" className="space-y-4">
-                    <div className="form-group">
-                      <label htmlFor="profile-name" className="label">Full Name</label>
-                      <input id="profile-name" type="text" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className="input-field" />
+                <div className="animate-fade-in space-y-6">
+                  {/* Profile Header */}
+                  <ScrollReveal>
+                    <div className="card p-6 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                        {/* Avatar */}
+                        <div className="w-20 h-20 rounded-2xl bg-saffron-gradient flex items-center justify-center shadow-glow-saffron shrink-0">
+                          <span className="text-2xl font-display font-bold text-white">{initials}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h2 className="font-display text-2xl font-bold text-stone-900 dark:text-stone-100">
+                            {user?.name}
+                          </h2>
+                          <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5 flex items-center gap-1.5">
+                            <HiMail className="shrink-0" /> {user?.email}
+                          </p>
+                          {userDetail?.createdAt && (
+                            <p className="text-xs text-stone-400 mt-1">
+                              Member since {format(new Date(userDetail.createdAt), 'MMMM yyyy')}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <span className={`px-3 py-1 rounded-xl text-xs font-bold border ${
+                            userDetail?.isSuspended
+                              ? 'bg-red-50 dark:bg-red-950/20 text-red-600 border-red-200 dark:border-red-800'
+                              : 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                          }`}>
+                            {userDetail?.isSuspended ? 'Suspended' : '● Active'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Booking mini-stats */}
+                      <div className="flex gap-3 mt-6 pt-5 border-t border-light-border dark:border-dark-border">
+                        <StatMini value={bookings.length} label="Total Bookings"   color="text-saffron-600 dark:text-saffron-400" />
+                        <StatMini value={upcoming.length}  label="Upcoming"         color="text-emerald-600 dark:text-emerald-400" />
+                        <StatMini value={completed.length} label="Completed"        color="text-blue-600 dark:text-blue-400" />
+                        <StatMini value={cancelled.length} label="Cancelled"        color="text-stone-500 dark:text-stone-400" />
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label htmlFor="profile-phone" className="label">Phone</label>
-                      <input id="profile-phone" type="tel" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} className="input-field" />
+                  </ScrollReveal>
+
+                  {/* Edit form */}
+                  <ScrollReveal>
+                    <div className="card p-6 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
+                      <h3 className="font-display text-lg font-bold text-stone-900 dark:text-stone-100 mb-5">Personal Information</h3>
+
+                      {/* Current info display */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                        <InfoCard icon={HiUser}           label="Full Name" value={user?.name} />
+                        <InfoCard icon={HiMail}           label="Email"     value={user?.email} />
+                        <InfoCard icon={HiPhone}          label="Phone"     value={user?.phone} />
+                        <InfoCard icon={HiLocationMarker} label="City"      value={user?.city} />
+                      </div>
+
+                      <div className="border-t border-light-border dark:border-dark-border pt-5">
+                        <h4 className="text-sm font-bold text-stone-700 dark:text-stone-300 mb-4">Edit Information</h4>
+                        <form onSubmit={handleProfileSave} id="user-profile-form" className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="form-group">
+                              <label htmlFor="profile-name" className="label">Full Name</label>
+                              <input
+                                id="profile-name"
+                                type="text"
+                                value={profile.name}
+                                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                                className="input-field"
+                              />
+                            </div>
+                            <div className="form-group">
+                              <label htmlFor="profile-phone" className="label">Phone</label>
+                              <input
+                                id="profile-phone"
+                                type="tel"
+                                value={profile.phone}
+                                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                                className="input-field"
+                              />
+                            </div>
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor="profile-city" className="label">City</label>
+                            <input
+                              id="profile-city"
+                              type="text"
+                              value={profile.city}
+                              onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+                              className="input-field"
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor="profile-email" className="label">Email</label>
+                            <input
+                              id="profile-email"
+                              type="email"
+                              value={user?.email || ''}
+                              disabled
+                              className="input-field opacity-60 cursor-not-allowed"
+                            />
+                            <p className="text-xs text-stone-400 mt-1">Email cannot be changed</p>
+                          </div>
+                          <button type="submit" id="save-profile" disabled={saving} className="btn-primary">
+                            {saving ? 'Saving…' : 'Save Changes'}
+                          </button>
+                        </form>
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label htmlFor="profile-city" className="label">City</label>
-                      <input id="profile-city" type="text" value={profile.city} onChange={(e) => setProfile({ ...profile, city: e.target.value })} className="input-field" />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="profile-email" className="label">Email</label>
-                      <input id="profile-email" type="email" value={user?.email || ''} disabled className="input-field opacity-60 cursor-not-allowed" />
-                      <p className="text-xs text-stone-400 mt-1">Email cannot be changed</p>
-                    </div>
-                    <button type="submit" id="save-profile" disabled={saving} className="btn-primary">
-                      {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                  </form>
+                  </ScrollReveal>
                 </div>
               )}
+
+              {/* ── Security Tab ── */}
+              {activeTab === 'security' && (
+                <ScrollReveal>
+                  <ChangePasswordForm />
+                </ScrollReveal>
+              )}
+
             </div>
           </div>
         </div>

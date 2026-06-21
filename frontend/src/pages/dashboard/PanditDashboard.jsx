@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle } from 'react-icons/hi';
+import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle, HiShieldCheck } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -14,6 +14,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PanditAvatar from '../../components/common/PanditAvatar';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
+import ChangePasswordForm from '../../components/common/ChangePasswordForm';
 
 const TIME_SLOTS = [
   '06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM',
@@ -188,6 +189,7 @@ const PanditDashboard = () => {
     { id: 'bookings',      label: 'Bookings',     icon: HiCalendar },
     { id: 'profile',       label: 'My Profile',   icon: HiUser },
     { id: 'availability',  label: 'Availability', icon: HiClock },
+    { id: 'security',      label: 'Security',     icon: HiShieldCheck },
   ];
 
   return (
@@ -582,6 +584,12 @@ const PanditDashboard = () => {
                         </div>
                       )}
                     </div>
+                  </div>
+                )}
+                {/* Security */}
+                {activeTab === 'security' && (
+                  <div className="animate-fade-in">
+                    <ChangePasswordForm />
                   </div>
                 )}
               </>

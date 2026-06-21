@@ -316,4 +316,56 @@ const reactivateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser };
+
+// @desc  Change password for the authenticated user
+// @route PUT /api/users/change-password
+// @access Private (all roles)
+const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Both current and new password are required' });
+    }
+
+    // Fetch with password field (select: false by default)
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Verify current password
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Strong password validation
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' });
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      return res.status(400).json({ message: 'Password must contain at least one uppercase letter' });
+    }
+    if (!/[a-z]/.test(newPassword)) {
+      return res.status(400).json({ message: 'Password must contain at least one lowercase letter' });
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      return res.status(400).json({ message: 'Password must contain at least one number' });
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(newPassword)) {
+      return res.status(400).json({ message: 'Password must contain at least one special character' });
+    }
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'New password must be different from current password' });
+    }
+
+    user.password = newPassword; // pre-save hook hashes it
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getProfile, updateProfile, getAllUsers, toggleSuspend, getUserByIdAdmin, suspendUser, reactivateUser, changePassword };
+

@@ -49,5 +49,7 @@ export const uploadRitualImage = (formData, onUploadProgress) => api.post('/ritu
 });
 
 // User profile
-export const getUserProfile   = ()     => api.get('/users/profile');
+export const getUserProfile    = ()     => api.get('/users/profile');
 export const updateUserProfile = (data) => api.put('/users/profile', data);
+export const changePassword    = (data) => api.put('/users/change-password', data);
+
