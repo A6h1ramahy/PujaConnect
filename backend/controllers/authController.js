@@ -88,6 +88,10 @@ const login = async (req, res, next) => {
       return res.status(403).json({ message: 'Your account has been temporarily suspended. Please contact the administrator for assistance.' });
     }
 
+    if (user.isDeleted) {
+      return res.status(403).json({ message: 'This account is no longer active. Please contact support if you believe this is an error.' });
+    }
+
     user.lastLogin = new Date();
     await user.save();
 
