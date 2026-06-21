@@ -67,13 +67,32 @@ export const validateBookingForm = ({ ritualId, date, time, locationType, addres
 };
 
 /** Registration form validation — returns first error string or null */
-export const validateRegisterForm = ({ name, email, password, confirmPassword }) => {
+export const validateRegisterForm = (form) => {
+  const { name, email, password, confirmPassword, role, phone, city, region } = form;
   if (!name || !name.trim()) return 'Full name is required';
   const emailErr = validateEmail(email);
   if (emailErr) return emailErr;
   const pwErr = validatePassword(password);
   if (pwErr) return pwErr;
   if (password !== confirmPassword) return 'Passwords do not match';
+
+  if (role === 'pandit') {
+    if (!phone || !phone.trim()) return 'Phone number is required';
+    if (!/^[0-9]+$/.test(phone) || phone.length < 10 || phone.length > 15) {
+      return 'Please enter a valid phone number';
+    }
+    if (!city || !city.trim()) return 'City is required';
+    if (city.trim().length < 2) return 'City must be at least 2 characters';
+
+    if (!region || !region.trim()) return 'State / Region is required';
+    if (region.trim().length < 2) return 'State / Region is required';
+  } else {
+    if (phone && phone.trim()) {
+      if (!/^[0-9]+$/.test(phone) || phone.length < 10 || phone.length > 15) {
+        return 'Please enter a valid phone number';
+      }
+    }
+  }
   return null;
 };
 
