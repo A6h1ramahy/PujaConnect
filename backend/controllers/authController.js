@@ -37,7 +37,14 @@ const register = async (req, res, next) => {
 
     // If registering as pandit, create an empty Pandit profile
     if (user.role === 'pandit') {
-      await Pandit.create({ userId: user._id });
+      await Pandit.create({
+        userId: user._id,
+        location: {
+          city: user.city,
+          region: user.region,
+          state: user.region,
+        },
+      });
     }
 
     const token = generateToken(user._id, user.role);
