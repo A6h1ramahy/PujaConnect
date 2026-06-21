@@ -110,13 +110,22 @@ const getAllPandits = async (req, res, next) => {
         { userId: { $in: userIds } },
         { 'location.city': { $regex: trimmedSearch, $options: 'i' } },
         { 'location.region': { $regex: trimmedSearch, $options: 'i' } },
+        { 'location.state': { $regex: trimmedSearch, $options: 'i' } },
         { languagesSpoken: { $regex: trimmedSearch, $options: 'i' } },
         { supportedRituals: { $in: ritualIds } }
       ];
     }
 
     if (city)     filter['location.city']   = { $regex: city,     $options: 'i' };
-    if (region)   filter['location.region'] = { $regex: region,   $options: 'i' };
+    if (region) {
+      filter.$and = filter.$and || [];
+      filter.$and.push({
+        $or: [
+          { 'location.region': { $regex: region, $options: 'i' } },
+          { 'location.state': { $regex: region, $options: 'i' } }
+        ]
+      });
+    }
     if (ritualId) {
       if (mongoose.Types.ObjectId.isValid(ritualId)) {
         filter.supportedRituals = ritualId;
