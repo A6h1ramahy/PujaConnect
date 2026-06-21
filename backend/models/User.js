@@ -31,14 +31,17 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
+      required: [function () { return this.role === 'pandit'; }, 'Phone number is required'],
     },
     city: {
       type: String,
       trim: true,
+      required: [function () { return this.role === 'pandit'; }, 'City is required'],
     },
     region: {
       type: String,
       trim: true,
+      required: [function () { return this.role === 'pandit'; }, 'State / Region is required'],
     },
     isSuspended: {
       type: Boolean,
