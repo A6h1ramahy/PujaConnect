@@ -133,6 +133,14 @@ const UserDashboard = () => {
   const completed = bookings.filter((b) => b.status === 'completed');
   const cancelled = bookings.filter((b) => ['rejected', 'cancelled'].includes(b.status));
 
+  /** Count messages sent by the other party that this user hasn't read yet */
+  const getUnreadCount = (booking) => {
+    if (!['accepted', 'completed'].includes(booking.status)) return 0;
+    return (booking.messages || []).filter(
+      (m) => !m.isRead && (m.sender?._id || m.sender) !== user?._id
+    ).length;
+  };
+
   /* initials avatar */
   const initials = (user?.name || 'U').split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 
@@ -255,8 +263,17 @@ const UserDashboard = () => {
                                     {b.date ? format(new Date(b.date), 'MMM dd, yyyy') : ''} · {b.time}
                                   </p>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2 flex-wrap justify-end">
                                   <StatusBadge status={b.status} />
+                                  {/* Unread message badge */}
+                                  {(() => {
+                                    const unread = getUnreadCount(b);
+                                    return unread > 0 ? (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-saffron-500 text-white text-[10px] font-bold animate-pulse">
+                                        💬 {unread}
+                                      </span>
+                                    ) : null;
+                                  })()}
                                   <span className="text-xs font-medium text-saffron-600 dark:text-saffron-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                     View Details →
                                   </span>

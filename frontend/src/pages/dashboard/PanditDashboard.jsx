@@ -207,6 +207,15 @@ const PanditDashboard = () => {
   const pending  = bookings.filter((b) => b.status === 'pending');
   const upcoming = bookings.filter((b) => b.status === 'accepted' && new Date(b.date) >= new Date());
 
+  /** Count unread messages from the devotee (for pandit dashboard) */
+  const getUnreadCount = (booking) => {
+    if (!['accepted', 'completed'].includes(booking.status)) return 0;
+    // Pandit reads messages sent by the user (senderRole === 'user')
+    return (booking.messages || []).filter(
+      (m) => !m.isRead && m.senderRole === 'user'
+    ).length;
+  };
+
   const tabs = [
     { id: 'bookings',      label: 'Bookings',     icon: HiCalendar },
     { id: 'profile',       label: 'My Profile',   icon: HiUser },
@@ -319,7 +328,16 @@ const PanditDashboard = () => {
                                     {b.locationType} · {b.location?.city || ''}
                                   </p>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex items-center gap-2">
+                                  {/* Unread badge on pending card (informational) */}
+                                  {(() => {
+                                    const unread = getUnreadCount(b);
+                                    return unread > 0 ? (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-saffron-500 text-white text-[10px] font-bold">
+                                        💬 {unread}
+                                      </span>
+                                    ) : null;
+                                  })()}
                                   <button
                                     id={`accept-${b._id}`}
                                     onClick={(e) => {
@@ -373,8 +391,17 @@ const PanditDashboard = () => {
                                   {b.date ? format(new Date(b.date), 'MMM dd, yyyy') : ''} · {b.time}
                                 </p>
                               </div>
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <StatusBadge status={b.status} />
+                                {/* Unread message badge */}
+                                {(() => {
+                                  const unread = getUnreadCount(b);
+                                  return unread > 0 ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-saffron-500 text-white text-[10px] font-bold animate-pulse">
+                                      💬 {unread}
+                                    </span>
+                                  ) : null;
+                                })()}
                                 {b.status === 'accepted' && (
                                   <button
                                     id={`complete-${b._id}`}

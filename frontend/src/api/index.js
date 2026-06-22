@@ -17,8 +17,10 @@ export const acceptBooking    = (id)     => api.put(`/bookings/${id}/accept`);
 export const rejectBooking    = (id, reason) => api.put(`/bookings/${id}/reject`, { reason });
 export const completeBooking  = (id)     => api.put(`/bookings/${id}/complete`);
 export const cancelBooking    = (id, reason) => api.put(`/bookings/${id}/cancel`, { reason });
-export const getBookingMessages = (id) => api.get(`/bookings/${id}/messages`);
-export const sendBookingMessage = (id, message) => api.post(`/bookings/${id}/messages`, { message });
+export const getBookingMessages  = (id)          => api.get(`/bookings/${id}/messages`);
+export const sendBookingMessage  = (id, message) => api.post(`/bookings/${id}/messages`, { message });
+export const markMessagesRead    = (id)          => api.put(`/bookings/${id}/messages/read`);
+
 
 export const getMyAvailability  = ()     => api.get('/availability/me');
 export const setPanditAvail     = (data) => api.post('/availability', data);
