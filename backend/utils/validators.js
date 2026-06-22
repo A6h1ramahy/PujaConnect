@@ -136,13 +136,63 @@ const bookingRules = [
     .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]( (AM|PM))?$/i)
     .withMessage('Time must be in HH:MM or HH:MM AM/PM format'),
 
-  body('locationType')
-    .optional()
+  body('location')
+    .notEmpty().withMessage('Location is required')
     .isIn(['Home', 'Temple']).withMessage('Location type must be "Home" or "Temple"'),
 
-  body('address')
-    .if(body('locationType').equals('Home'))
-    .notEmpty().withMessage('Address is required for home ceremonies'),
+  // Home Address validation
+  body('address.houseNumber')
+    .if(body('location').equals('Home'))
+    .notEmpty().withMessage('House / Flat Number is required.'),
+
+  body('address.street')
+    .if(body('location').equals('Home'))
+    .notEmpty().withMessage('Street / Area is required.'),
+
+  body('address.city')
+    .if(body('location').equals('Home'))
+    .notEmpty().withMessage('City is required.'),
+
+  body('address.state')
+    .if(body('location').equals('Home'))
+    .notEmpty().withMessage('State / Region is required.'),
+
+  body('address.pincode')
+    .if(body('location').equals('Home'))
+    .notEmpty().withMessage('Pincode is required.')
+    .bail()
+    .matches(/^[0-9]{6}$/).withMessage('Pincode must be exactly 6 digits.'),
+
+  body('address.fullAddress')
+    .if(body('location').equals('Home'))
+    .notEmpty().withMessage('Full Address is required.'),
+
+  // Temple details validation
+  body('templeDetails.templeName')
+    .if(body('location').equals('Temple'))
+    .notEmpty().withMessage('Temple Name is required.'),
+
+  body('templeDetails.templeAddress')
+    .if(body('location').equals('Temple'))
+    .notEmpty().withMessage('Temple Address is required.'),
+
+  body('templeDetails.city')
+    .if(body('location').equals('Temple'))
+    .notEmpty().withMessage('City is required.'),
+
+  body('templeDetails.state')
+    .if(body('location').equals('Temple'))
+    .notEmpty().withMessage('State / Region is required.'),
+
+  body('templeDetails.pincode')
+    .if(body('location').equals('Temple'))
+    .notEmpty().withMessage('Pincode is required.')
+    .bail()
+    .matches(/^[0-9]{6}$/).withMessage('Pincode must be exactly 6 digits.'),
+
+  body('templeDetails.locality')
+    .if(body('location').equals('Temple'))
+    .notEmpty().withMessage('Temple Area / Locality is required.'),
 ];
 
 // ── Ritual ───────────────────────────────────────────────────

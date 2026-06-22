@@ -22,7 +22,18 @@ const createBooking = async (req, res, next) => {
       return res.status(400).json({ message: errors.array()[0].msg, errors: errors.array() });
     }
 
-    const { panditId, ritualId, date, time, locationType, address, city, region, notes } = req.body;
+    const {
+      panditId,
+      ritualId,
+      date,
+      time,
+      location,
+      locationType,
+      address,
+      templeDetails,
+      specialNotes,
+      notes
+    } = req.body;
 
     // Verify pandit is verified and active
     const pandit = await Pandit.findById(panditId).populate('userId');
@@ -70,15 +81,21 @@ const createBooking = async (req, res, next) => {
       }
     }
 
+    const finalLocation = location || locationType || 'Home';
+    const finalNotes = specialNotes || notes || '';
+
     const booking = await Booking.create({
       user:    req.user._id,
       pandit:  panditId,
       ritual:  ritualId,
       date:    bookingDate,
       time,
-      locationType: locationType || 'Home',
-      location: { address, city, region },
-      notes,
+      location: finalLocation,
+      locationType: finalLocation,
+      address: finalLocation === 'Home' ? address : undefined,
+      templeDetails: finalLocation === 'Temple' ? templeDetails : undefined,
+      specialNotes: finalNotes,
+      notes: finalNotes,
       availabilitySlotId: availability?._id,
       statusHistory: [{ status: 'pending', changedBy: req.user._id, changedAt: new Date() }],
     });
