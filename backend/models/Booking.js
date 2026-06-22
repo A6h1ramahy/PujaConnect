@@ -37,6 +37,16 @@ const bookingSchema = new mongoose.Schema(
     },
     location: {
       type: String,
+      // Support both 'Home'/'Temple' strings and legacy stored objects
+      set: (v) => {
+        if (typeof v === 'string') return v;
+        // Legacy object: { address, city, region } → infer 'Home'
+        if (v && typeof v === 'object') {
+          if (v.locationType) return v.locationType;
+          return 'Home'; // safe default for legacy data
+        }
+        return v;
+      },
       enum: ['Home', 'Temple'],
       default: 'Home',
     },
@@ -125,5 +135,27 @@ const bookingSchema = new mongoose.Schema(
 bookingSchema.index({ user:  1, createdAt: -1 });
 bookingSchema.index({ pandit: 1, status: 1 });
 bookingSchema.index({ status: 1, date:   1 });
+
+// ── Pre-save: sanitize legacy location values ───────────────────
+// If legacy data has stored an object in 'location', coerce it to
+// the expected string so booking.save() never throws a cast error.
+bookingSchema.pre('save', function (next) {
+  if (this.location && typeof this.location === 'object') {
+    const loc = this.location;
+    if (loc.locationType) {
+      this.location = loc.locationType;
+    } else if (loc.templeName || loc.templeAddress) {
+      this.location = 'Temple';
+    } else {
+      this.location = 'Home';
+    }
+  }
+  // Keep locationType in sync
+  if (this.location && !this.locationType) {
+    this.locationType = this.location;
+  }
+  next();
+});
+
 
 module.exports = mongoose.model('Booking', bookingSchema);
