@@ -364,11 +364,14 @@ const UserBookingDetail = () => {
                           <InfoRow label="Additional Instructions" value={booking.address?.additionalInstructions} />
                         )}
                       </div>
-                      {booking.address?.fullAddress && (
+                      {booking.address && (
                         <div className="pt-2 border-t border-light-border dark:border-dark-border">
                           <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1">Full Address</p>
-                          <p className="text-sm font-semibold text-stone-805 dark:text-stone-200 bg-stone-50 dark:bg-stone-900/30 rounded-xl p-3 leading-relaxed">
-                            {booking.address.fullAddress}
+                          <p className="text-sm font-semibold text-stone-805 dark:text-stone-200 bg-stone-50 dark:bg-stone-900/30 rounded-xl p-3 leading-relaxed whitespace-pre-line">
+                            {booking.address.houseNumber},<br />
+                            {booking.address.street},<br />
+                            {booking.address.city},<br />
+                            {booking.address.state} - {booking.address.pincode}
                           </p>
                         </div>
                       )}
