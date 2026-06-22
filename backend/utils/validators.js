@@ -163,10 +163,6 @@ const bookingRules = [
     .bail()
     .matches(/^[0-9]{6}$/).withMessage('Pincode must be exactly 6 digits.'),
 
-  body('address.fullAddress')
-    .if(body('location').equals('Home'))
-    .notEmpty().withMessage('Full Address is required.'),
-
   // Temple details validation
   body('templeDetails.templeName')
     .if(body('location').equals('Temple'))

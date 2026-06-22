@@ -52,7 +52,6 @@ const bookingSchema = new mongoose.Schema(
       state: { type: String, trim: true },
       pincode: { type: String, trim: true },
       landmark: { type: String, trim: true },
-      fullAddress: { type: String, trim: true },
       nearbyPlace: { type: String, trim: true },
       additionalInstructions: { type: String, trim: true },
     },
