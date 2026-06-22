@@ -52,13 +52,16 @@ const Register = () => {
   return (
     <PageTransition>
       <div className="min-h-screen bg-light-bg dark:bg-dark-bg flex items-center justify-center p-4 py-6 md:py-8 transition-colors duration-300">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Background layer */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-saffron-500/10 blur-3xl" />
           <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-gold-500/10 blur-3xl" />
         </div>
 
-        <div className="w-full max-w-lg md:max-w-3xl relative animate-slide-up">
-          <div className="card p-6 md:p-8">
+        {/* Content layer */}
+        <div className="w-full max-w-lg md:max-w-3xl relative z-10 animate-slide-up">
+          {/* Card layer */}
+          <div className="card p-6 md:p-8 relative z-20">
             {/* Logo */}
             <div className="text-center mb-5">
               <Link to="/" className="inline-flex items-center gap-2 mb-2">
