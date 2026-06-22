@@ -44,7 +44,9 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const [bookings, setBookings]   = useState([]);
   const [loading, setLoading]     = useState(true);
-  const [activeTab, setActiveTab] = useState('bookings');
+  const [activeTab, setActiveTab] = useState(
+    user?.role === 'user' && (!user.phone || !user.city) ? 'profile' : 'bookings'
+  );
   const [profile, setProfile]     = useState({ name: user?.name || '', phone: user?.phone || '', city: user?.city || '' });
   const [saving, setSaving]       = useState(false);
   const [userDetail, setUserDetail] = useState(null);
@@ -74,7 +76,15 @@ const UserDashboard = () => {
       try {
         const [bookRes, profileRes] = await Promise.all([getMyBookings(), getUserProfile()]);
         setBookings(bookRes.data.bookings || []);
-        setUserDetail(profileRes.data.user);
+        const uDetail = profileRes.data.user;
+        setUserDetail(uDetail);
+        if (uDetail) {
+          setProfile({
+            name: uDetail.name || '',
+            phone: uDetail.phone || '',
+            city: uDetail.city || '',
+          });
+        }
       } catch { } finally {
         setLoading(false);
       }
@@ -84,6 +94,27 @@ const UserDashboard = () => {
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
+    if (!profile.name || !profile.name.trim()) {
+      toast.error('Full Name is required.');
+      return;
+    }
+    if (!profile.phone || !profile.phone.trim()) {
+      toast.error('Phone number is required.');
+      return;
+    }
+    if (!/^[0-9]+$/.test(profile.phone) || profile.phone.length < 10 || profile.phone.length > 15) {
+      toast.error('Please enter a valid phone number.');
+      return;
+    }
+    if (!profile.city || !profile.city.trim()) {
+      toast.error('City is required.');
+      return;
+    }
+    if (profile.city.trim().length < 2) {
+      toast.error('City is required.');
+      return;
+    }
+
     setSaving(true);
     try {
       const { data } = await updateUserProfile(profile);
@@ -124,6 +155,12 @@ const UserDashboard = () => {
         </div>
 
         <div className="page-container py-8">
+          {user?.role === 'user' && (!user.phone || !user.city) && (
+            <div id="1rhn6y" className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 text-sm font-medium mb-6 animate-fade-in">
+              Please complete your profile information.
+            </div>
+          )}
+
           {/* Stats */}
           <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
@@ -324,7 +361,7 @@ const UserDashboard = () => {
                               />
                             </div>
                             <div className="form-group">
-                              <label htmlFor="profile-phone" className="label">Phone</label>
+                              <label htmlFor="profile-phone" className="label">Phone Number *</label>
                               <input
                                 id="profile-phone"
                                 type="tel"
@@ -335,7 +372,7 @@ const UserDashboard = () => {
                             </div>
                           </div>
                           <div className="form-group">
-                            <label htmlFor="profile-city" className="label">City</label>
+                            <label htmlFor="profile-city" className="label">City *</label>
                             <input
                               id="profile-city"
                               type="text"
@@ -355,7 +392,21 @@ const UserDashboard = () => {
                             />
                             <p className="text-xs text-stone-400 mt-1">Email cannot be changed</p>
                           </div>
-                          <button type="submit" id="save-profile" disabled={saving} className="btn-primary">
+                          <button
+                            type="submit"
+                            id="save-profile"
+                            disabled={
+                              saving ||
+                              !profile.name?.trim() ||
+                              !profile.phone?.trim() ||
+                              !/^[0-9]+$/.test(profile.phone) ||
+                              profile.phone.length < 10 ||
+                              profile.phone.length > 15 ||
+                              !profile.city?.trim() ||
+                              profile.city.trim().length < 2
+                            }
+                            className="btn-primary"
+                          >
                             {saving ? 'Saving…' : 'Save Changes'}
                           </button>
                         </form>

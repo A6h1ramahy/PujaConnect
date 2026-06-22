@@ -408,7 +408,7 @@ const PanditDashboard = () => {
                     <form onSubmit={handleProfileSave} id="pandit-profile-form" className="space-y-4">
                       {/* Profile Photo Upload */}
                       <div className="form-group">
-                        <label className="label">Profile Photo</label>
+                        <label className="label">Profile Photo (Optional)</label>
                         <div className="flex items-center gap-4">
                           <PanditAvatar photo={photoPreview} name={user?.name} size={80} />
                           <div>
@@ -431,7 +431,7 @@ const PanditDashboard = () => {
                       </div>
 
                       <div className="form-group">
-                        <label htmlFor="pandit-bio" className="label">Bio</label>
+                        <label htmlFor="pandit-bio" className="label">Bio (Optional)</label>
                         <textarea id="pandit-bio" value={profileForm.bio} onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })} rows={4} placeholder="Tell devotees about yourself, your training, and specialization..." className="input-field resize-none" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
