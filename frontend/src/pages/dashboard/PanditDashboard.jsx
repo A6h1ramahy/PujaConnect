@@ -301,10 +301,15 @@ const PanditDashboard = () => {
                         </h3>
                         <div className="space-y-3">
                           {pending.map((b) => (
-                            <div key={b._id} id={`booking-req-${b._id}`} className="card p-5">
+                            <div
+                              key={b._id}
+                              id={`booking-req-${b._id}`}
+                              onClick={() => navigate(`/dashboard/pandit/booking/${b._id}`)}
+                              className="card p-5 cursor-pointer hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-md transition-all duration-200 group"
+                            >
                               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <div className="flex-1">
-                                  <p className="font-semibold text-stone-900 dark:text-stone-100">
+                                  <p className="font-semibold text-stone-900 dark:text-stone-100 group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors">
                                     {b.ritual?.pujaName || 'Puja'} — {b.user?.name}
                                   </p>
                                   <p className="text-sm text-stone-500 dark:text-stone-400">
@@ -315,10 +320,24 @@ const PanditDashboard = () => {
                                   </p>
                                 </div>
                                 <div className="flex gap-2">
-                                  <button id={`accept-${b._id}`} onClick={() => handleAccept(b._id)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors">
+                                  <button
+                                    id={`accept-${b._id}`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAccept(b._id);
+                                    }}
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors"
+                                  >
                                     <HiCheck /> Accept
                                   </button>
-                                  <button id={`reject-${b._id}`} onClick={() => handleReject(b._id)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 text-sm font-semibold transition-colors">
+                                  <button
+                                    id={`reject-${b._id}`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleReject(b._id);
+                                    }}
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 text-sm font-semibold transition-colors"
+                                  >
                                     <HiX /> Reject
                                   </button>
                                 </div>
@@ -341,9 +360,13 @@ const PanditDashboard = () => {
                       ) : (
                         <div className="space-y-2">
                           {bookings.map((b) => (
-                            <div key={b._id} className="card p-4 flex items-center justify-between gap-3">
+                            <div
+                              key={b._id}
+                              onClick={() => navigate(`/dashboard/pandit/booking/${b._id}`)}
+                              className="card p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-md transition-all duration-200 group"
+                            >
                               <div className="flex-1">
-                                <p className="font-medium text-stone-900 dark:text-stone-100 text-sm">
+                                <p className="font-medium text-stone-900 dark:text-stone-100 text-sm group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors">
                                   {b.ritual?.pujaName} — {b.user?.name}
                                 </p>
                                 <p className="text-xs text-stone-400">
@@ -355,7 +378,10 @@ const PanditDashboard = () => {
                                 {b.status === 'accepted' && (
                                   <button
                                     id={`complete-${b._id}`}
-                                    onClick={() => handleComplete(b._id)}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleComplete(b._id);
+                                    }}
                                     className="px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition-colors"
                                   >
                                     Mark Completed

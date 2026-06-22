@@ -24,6 +24,7 @@ import AdminPanditDetail from './pages/dashboard/AdminPanditDetail';
 import AdminBookingDetail from './pages/dashboard/AdminBookingDetail';
 import AdminUserDetail from './pages/dashboard/AdminUserDetail';
 import UserBookingDetail from './pages/dashboard/UserBookingDetail';
+import PanditBookingDetail from './pages/dashboard/PanditBookingDetail';
 
 const Layout = ({ children }) => (
   <div className="flex flex-col min-h-screen">
@@ -98,6 +99,11 @@ function App() {
             <Route path="/pandit/dashboard" element={
               <ProtectedRoute role="pandit">
                 <Layout><PanditDashboard /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/pandit/booking/:id" element={
+              <ProtectedRoute role="pandit">
+                <Layout><PanditBookingDetail /></Layout>
               </ProtectedRoute>
             } />
 

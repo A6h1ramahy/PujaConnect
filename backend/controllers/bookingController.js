@@ -296,18 +296,34 @@ const getAllBookings = async (req, res, next) => {
   }
 };
 
-// @desc  Get single booking by ID for the booking's owner (user)
+// @desc  Get single booking by ID for the booking's owner (user) or assigned Pandit
 // @route GET /api/bookings/:id
-// @access User (own bookings only)
+// @access User (own bookings only) | Pandit (assigned bookings only)
 const getBookingByIdUser = async (req, res, next) => {
   try {
-    const booking = await Booking.findOne({ _id: req.params.id, user: req.user._id })
-      .populate({
-        path: 'pandit',
-        populate: { path: 'userId', select: 'name email phone' },
-      })
-      .populate('ritual', 'pujaName category duration durationMinutes priceRange locationType description slug')
-      .populate('statusHistory.changedBy', 'name role');
+    let booking;
+
+    if (req.user.role === 'pandit') {
+      const pandit = await Pandit.findOne({ userId: req.user._id });
+      if (!pandit) return res.status(404).json({ message: 'Pandit profile not found' });
+
+      booking = await Booking.findOne({ _id: req.params.id, pandit: pandit._id })
+        .populate('user', 'name email phone city region')
+        .populate({
+          path: 'pandit',
+          populate: { path: 'userId', select: 'name email phone' },
+        })
+        .populate('ritual', 'pujaName category duration durationMinutes priceRange locationType description slug')
+        .populate('statusHistory.changedBy', 'name role');
+    } else {
+      booking = await Booking.findOne({ _id: req.params.id, user: req.user._id })
+        .populate({
+          path: 'pandit',
+          populate: { path: 'userId', select: 'name email phone' },
+        })
+        .populate('ritual', 'pujaName category duration durationMinutes priceRange locationType description slug')
+        .populate('statusHistory.changedBy', 'name role');
+    }
 
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
 

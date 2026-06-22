@@ -17,7 +17,7 @@ router.put('/:id/accept',     protect, requireRole('pandit'),          acceptBoo
 router.put('/:id/reject',     protect, requireRole('pandit'),          rejectBooking);
 router.put('/:id/complete',   protect, requireRole('pandit', 'admin'), completeBooking);
 router.put('/:id/cancel',     protect, requireRole('user'),            cancelBooking);
-router.get('/:id',            protect, requireRole('user'),            getBookingByIdUser);
+router.get('/:id',            protect, requireRole('user', 'pandit'),  getBookingByIdUser);
 router.get('/',               protect, requireRole('admin'),           getAllBookings);
 
 module.exports = router;
