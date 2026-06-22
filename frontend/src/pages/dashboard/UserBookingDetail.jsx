@@ -15,6 +15,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
 import PanditAvatar from '../../components/common/PanditAvatar';
+import { useAuth } from '../../context/AuthContext';
+import BookingChat from '../../components/booking/BookingChat';
 
 /* ── helpers ─────────────────────────────────────────────────── */
 const InfoRow = ({ label, value, icon: Icon }) => (
@@ -87,10 +89,12 @@ const ConfirmDialog = ({ onConfirm, onCancel, loading }) => (
 const UserBookingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -422,6 +426,18 @@ const UserBookingDetail = () => {
                 </ScrollReveal>
               )}
 
+              {/* Chat Conversation */}
+              {showChat && ['accepted', 'completed'].includes(booking.status) && (
+                <ScrollReveal>
+                  <SectionCard title="Conversation with Pandit">
+                    <BookingChat
+                      bookingId={booking._id}
+                      currentUserId={user?._id}
+                      readOnly={booking.status === 'completed'}
+                    />
+                  </SectionCard>
+                </ScrollReveal>
+              )}
 
               {/* Timeline */}
               <ScrollReveal>
@@ -465,11 +481,23 @@ const UserBookingDetail = () => {
               {/* Actions */}
               <ScrollReveal>
                 <SectionCard title="Actions">
-                  {canCancel ? (
-                    <div className="space-y-3">
-                      <p className="text-xs text-stone-500 dark:text-stone-400">
-                        You can cancel this booking before the ritual date.
-                      </p>
+                  <div className="space-y-3">
+                    {/* Chat button for Accepted/Completed bookings */}
+                    {['accepted', 'completed'].includes(booking.status) && (
+                      <button
+                        id="toggle-chat-btn"
+                        onClick={() => setShowChat(!showChat)}
+                        className={`w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+                          showChat 
+                            ? 'bg-stone-200 dark:bg-stone-850 text-stone-700 dark:text-stone-300 border border-light-border dark:border-dark-border/40' 
+                            : 'bg-gradient-to-r from-saffron-500 to-gold-600 text-white shadow-glow-saffron'
+                        }`}
+                      >
+                        💬 {showChat ? 'Close Messages' : 'Chat with Pandit'}
+                      </button>
+                    )}
+
+                    {canCancel && (
                       <button
                         id="cancel-booking-btn"
                         onClick={() => setShowConfirm(true)}
@@ -477,16 +505,17 @@ const UserBookingDetail = () => {
                       >
                         <HiBan /> Cancel Booking
                       </button>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-stone-400 italic">
-                      {booking.status === 'completed'  ? 'This booking is completed and read-only.' :
-                       booking.status === 'cancelled'  ? 'This booking has already been cancelled.' :
-                       booking.status === 'rejected'   ? 'This booking was rejected.' :
-                       ritualPassed                    ? 'The ritual date has passed.' :
-                       'No actions available.'}
-                    </p>
-                  )}
+                    )}
+
+                    {!canCancel && !['accepted', 'completed'].includes(booking.status) && (
+                      <p className="text-xs text-stone-400 italic">
+                        {booking.status === 'cancelled'  ? 'This booking has already been cancelled.' :
+                         booking.status === 'rejected'   ? 'This booking was rejected.' :
+                         ritualPassed                    ? 'The ritual date has passed.' :
+                         'No actions available.'}
+                      </p>
+                    )}
+                  </div>
                 </SectionCard>
               </ScrollReveal>
 

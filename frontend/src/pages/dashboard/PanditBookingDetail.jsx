@@ -13,6 +13,8 @@ import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../../components/common/ScrollReveal';
+import { useAuth } from '../../context/AuthContext';
+import BookingChat from '../../components/booking/BookingChat';
 
 /* ── helpers ─────────────────────────────────────────────────── */
 const InfoRow = ({ label, value, icon: Icon }) => (
@@ -100,12 +102,14 @@ const ActionConfirmDialog = ({ title, message, confirmText, confirmBg, onConfirm
 const PanditBookingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   
   // Action Modals State
   const [actionType, setActionType] = useState(null); // 'accept', 'reject', 'complete'
   const [actionLoading, setActionLoading] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
 
   useEffect(() => {
@@ -470,6 +474,19 @@ const PanditBookingDetail = () => {
                 </ScrollReveal>
               )}
 
+              {/* Chat Conversation */}
+              {showChat && ['accepted', 'completed'].includes(booking.status) && (
+                <ScrollReveal>
+                  <SectionCard title="Conversation with Devotee">
+                    <BookingChat
+                      bookingId={booking._id}
+                      currentUserId={user?._id}
+                      readOnly={booking.status === 'completed'}
+                    />
+                  </SectionCard>
+                </ScrollReveal>
+              )}
+
               {/* Timeline */}
               <ScrollReveal>
                 <SectionCard title="Booking Timeline">
@@ -512,44 +529,65 @@ const PanditBookingDetail = () => {
               {/* Actions Card */}
               <ScrollReveal>
                 <SectionCard title="Actions">
-                  {booking.status === 'pending' ? (
-                    <div className="space-y-3">
-                      <p className="text-xs text-stone-500 dark:text-stone-400">
-                        Please review customer details and accept or reject this request.
+                  <div className="space-y-3">
+                    {/* Chat button for Accepted/Completed bookings */}
+                    {['accepted', 'completed'].includes(booking.status) && (
+                      <button
+                        id="toggle-chat-btn"
+                        onClick={() => setShowChat(!showChat)}
+                        className={`w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+                          showChat 
+                            ? 'bg-stone-200 dark:bg-stone-850 text-stone-700 dark:text-stone-300 border border-light-border dark:border-dark-border/40' 
+                            : 'bg-gradient-to-r from-saffron-500 to-gold-600 text-white shadow-glow-saffron'
+                        }`}
+                      >
+                        💬 {showChat ? 'Close Messages' : 'Chat with Devotee'}
+                      </button>
+                    )}
+
+                    {booking.status === 'pending' && (
+                      <div className="space-y-3">
+                        <p className="text-xs text-stone-500 dark:text-stone-400">
+                          Please review customer details and accept or reject this request.
+                        </p>
+                        <button
+                          onClick={() => setActionType('accept')}
+                          className="w-full px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                        >
+                          <HiCheck className="text-base" /> Accept Request
+                        </button>
+                        <button
+                          onClick={() => setActionType('reject')}
+                          className="w-full px-4 py-2.5 rounded-xl border-2 border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <HiX className="text-base" /> Reject Request
+                        </button>
+                      </div>
+                    )}
+
+                    {booking.status === 'accepted' && (
+                      <div className="space-y-3 pt-1">
+                        <p className="text-xs text-stone-500 dark:text-stone-400">
+                          This booking is accepted. Once the ceremony is complete, mark it as finished.
+                        </p>
+                        <button
+                          onClick={() => setActionType('complete')}
+                          className="w-full px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                        >
+                          <HiShieldCheck className="text-base" /> Mark as Completed
+                        </button>
+                      </div>
+                    )}
+
+                    {!['pending', 'accepted'].includes(booking.status) && (
+                      <p className="text-xs text-stone-400 italic pt-1">
+                        {booking.status === 'completed' ? 'This booking is completed.' :
+                         booking.status === 'cancelled' ? 'This booking has been cancelled by the devotee.' :
+                         booking.status === 'rejected' ? 'This request was rejected.' :
+                         'No actions available.'}
                       </p>
-                      <button
-                        onClick={() => setActionType('accept')}
-                        className="w-full px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-                      >
-                        <HiCheck className="text-base" /> Accept Request
-                      </button>
-                      <button
-                        onClick={() => setActionType('reject')}
-                        className="w-full px-4 py-2.5 rounded-xl border-2 border-crimson-500 text-crimson-600 dark:text-crimson-400 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <HiX className="text-base" /> Reject Request
-                      </button>
-                    </div>
-                  ) : booking.status === 'accepted' ? (
-                    <div className="space-y-3">
-                      <p className="text-xs text-stone-500 dark:text-stone-400">
-                        This booking is accepted. Once the ceremony is complete, mark it as finished.
-                      </p>
-                      <button
-                        onClick={() => setActionType('complete')}
-                        className="w-full px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-                      >
-                        <HiShieldCheck className="text-base" /> Mark as Completed
-                      </button>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-stone-400 italic">
-                      {booking.status === 'completed' ? 'This booking is completed and read-only.' :
-                       booking.status === 'cancelled' ? 'This booking has been cancelled by the devotee.' :
-                       booking.status === 'rejected' ? 'This request was rejected.' :
-                       'No actions available.'}
-                    </p>
-                  )}
+                    )}
+                  </div>
                 </SectionCard>
               </ScrollReveal>
 

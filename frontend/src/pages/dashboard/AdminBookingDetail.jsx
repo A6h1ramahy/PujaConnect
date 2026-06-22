@@ -13,6 +13,8 @@ import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PageTransition from '../../components/common/PageTransition';
 import { ScrollReveal } from '../../components/common/ScrollReveal';
+import { useAuth } from '../../context/AuthContext';
+import BookingChat from '../../components/booking/BookingChat';
 
 /* ── tiny helpers ─────────────────────────────────────────────── */
 const InfoRow = ({ label, value, icon: Icon }) => (
@@ -50,6 +52,7 @@ const TimelineIcon = ({ status }) => {
 const AdminBookingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -310,6 +313,19 @@ const AdminBookingDetail = () => {
                   )}
                 </SectionCard>
               </ScrollReveal>
+
+              {/* Chat Conversation (Admin Read-Only) */}
+              {['accepted', 'completed'].includes(booking.status) && (
+                <ScrollReveal>
+                  <SectionCard title="Conversation Logs (Read-Only)">
+                    <BookingChat
+                      bookingId={booking._id}
+                      currentUserId={currentUser?._id}
+                      readOnly={true}
+                    />
+                  </SectionCard>
+                </ScrollReveal>
+              )}
 
               {/* Status Timeline */}
               <ScrollReveal>
