@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { HiSearch, HiFilter, HiX } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { getPandits, getRituals } from '../api';
@@ -10,6 +10,7 @@ import { PanditCardSkeleton } from '../components/common/SkeletonLoader';
 
 const PanditList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const [pandits, setPandits] = useState([]);
   const [rituals, setRituals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,13 +19,16 @@ const PanditList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
-  const [filters, setFilters] = useState({
-    search:   searchParams.get('search')   || '',
-    city:     searchParams.get('city')     || '',
-    region:   searchParams.get('region')   || '',
-    ritualId: searchParams.get('ritual')   || '',
-    language: searchParams.get('language') || '',
-    minExp:   searchParams.get('minExp')   || '',
+  const [filters, setFilters] = useState(() => {
+    const searchVal = searchParams.get('search') || location.state?.search || searchParams.get('city') || '';
+    return {
+      search:   searchVal,
+      city:     searchParams.get('city') && !searchVal ? searchParams.get('city') : '',
+      region:   searchParams.get('region')   || '',
+      ritualId: searchParams.get('ritual')   || '',
+      language: searchParams.get('language') || '',
+      minExp:   searchParams.get('minExp')   || '',
+    };
   });
 
   useEffect(() => {
@@ -34,6 +38,49 @@ const PanditList = () => {
   useEffect(() => {
     fetchPandits();
   }, [filters, page]);
+
+  useEffect(() => {
+    const searchVal = searchParams.get('search') || location.state?.search || searchParams.get('city') || '';
+    const queryRitual = searchParams.get('ritual') || '';
+    
+    // Resolve ritual slug/name/ID to MongoDB ID if rituals are loaded
+    let resolvedRitualId = queryRitual;
+    if (queryRitual && rituals.length > 0) {
+      const matched = rituals.find(
+        (r) =>
+          r._id === queryRitual ||
+          r.slug === queryRitual ||
+          r.pujaName.toLowerCase() === queryRitual.toLowerCase()
+      );
+      if (matched) {
+        resolvedRitualId = matched._id;
+      }
+    }
+
+    const regionVal = searchParams.get('region') || '';
+    const langVal   = searchParams.get('language') || '';
+    const expVal    = searchParams.get('minExp') || '';
+
+    setFilters((prev) => {
+      if (
+        prev.search === searchVal &&
+        prev.ritualId === resolvedRitualId &&
+        prev.region === regionVal &&
+        prev.language === langVal &&
+        prev.minExp === expVal
+      ) {
+        return prev;
+      }
+      return {
+        search:   searchVal,
+        city:     searchParams.get('city') && !searchVal ? searchParams.get('city') : '',
+        region:   regionVal,
+        ritualId: resolvedRitualId,
+        language: langVal,
+        minExp:   expVal,
+      };
+    });
+  }, [searchParams, location.state, rituals]);
 
   const fetchRituals = async () => {
     try {
@@ -77,7 +124,24 @@ const PanditList = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => {
+      const nextFilters = { ...prev, [key]: value };
+      
+      // Update URL search params to keep them synchronized
+      const newParams = {};
+      Object.entries(nextFilters).forEach(([k, v]) => {
+        if (v) {
+          if (k === 'ritualId') {
+            newParams.ritual = v;
+          } else {
+            newParams[k] = v;
+          }
+        }
+      });
+      setSearchParams(newParams, { replace: true });
+      
+      return nextFilters;
+    });
     setPage(1);
   };
 

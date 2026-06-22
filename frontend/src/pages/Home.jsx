@@ -95,7 +95,13 @@ const Home = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/pandits${searchCity ? `?city=${encodeURIComponent(searchCity)}` : ''}`);
+    if (searchCity) {
+      navigate(`/pandits?search=${encodeURIComponent(searchCity)}`, {
+        state: { search: searchCity }
+      });
+    } else {
+      navigate('/pandits');
+    }
   };
 
   const getActiveRituals = () => {
