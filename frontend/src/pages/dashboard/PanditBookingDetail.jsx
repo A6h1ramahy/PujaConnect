@@ -386,23 +386,84 @@ const PanditBookingDetail = () => {
               {/* Ceremony Location */}
               <ScrollReveal>
                 <SectionCard title="Ceremony Location">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <InfoRow label="Location Type" value={booking.locationType} />
-                    <InfoRow label="Address" value={booking.location?.address} />
-                    <InfoRow label="City" icon={HiLocationMarker} value={booking.location?.city} />
-                    <InfoRow label="Region/State" value={booking.location?.region} />
-                  </div>
+                  {booking.location === 'Home' ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100">
+                        <span className="text-xl">🏠</span>
+                        <span className="font-bold text-sm uppercase tracking-wide text-saffron-600 dark:text-saffron-400">Home Puja</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <InfoRow label="House/Flat Number" value={booking.address?.houseNumber} />
+                        <InfoRow label="Street/Area" value={booking.address?.street} />
+                        <InfoRow label="City" icon={HiLocationMarker} value={booking.address?.city} />
+                        <InfoRow label="State/Region" value={booking.address?.state} />
+                        <InfoRow label="Pincode" value={booking.address?.pincode} />
+                        {booking.address?.landmark && (
+                          <InfoRow label="Landmark" value={booking.address?.landmark} />
+                        )}
+                        {booking.address?.nearbyPlace && (
+                          <InfoRow label="Nearby Place" value={booking.address?.nearbyPlace} />
+                        )}
+                        {booking.address?.additionalInstructions && (
+                          <InfoRow label="Additional Instructions" value={booking.address?.additionalInstructions} />
+                        )}
+                      </div>
+                      {booking.address?.fullAddress && (
+                        <div className="pt-2 border-t border-light-border dark:border-dark-border">
+                          <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1">Full Address</p>
+                          <p className="text-sm font-semibold text-stone-805 dark:text-stone-200 bg-stone-50 dark:bg-stone-900/30 rounded-xl p-3 leading-relaxed">
+                            {booking.address.fullAddress}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : booking.location === 'Temple' ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-stone-900 dark:text-stone-100">
+                        <span className="text-xl">🛕</span>
+                        <span className="font-bold text-sm uppercase tracking-wide text-saffron-600 dark:text-saffron-400">Temple Puja</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <InfoRow label="Temple Name" value={booking.templeDetails?.templeName} />
+                        <InfoRow label="Temple Address" value={booking.templeDetails?.templeAddress} />
+                        <InfoRow label="City" icon={HiLocationMarker} value={booking.templeDetails?.city} />
+                        <InfoRow label="State/Region" value={booking.templeDetails?.state} />
+                        <InfoRow label="Pincode" value={booking.templeDetails?.pincode} />
+                        <InfoRow label="Locality/Area" value={booking.templeDetails?.locality} />
+                        {booking.templeDetails?.landmark && (
+                          <InfoRow label="Landmark" value={booking.templeDetails?.landmark} />
+                        )}
+                        {booking.templeDetails?.templeContact && (
+                          <InfoRow label="Contact Number" value={booking.templeDetails?.templeContact} />
+                        )}
+                        {booking.templeDetails?.specialInstructions && (
+                          <InfoRow label="Special Instructions" value={booking.templeDetails?.specialInstructions} />
+                        )}
+                        {booking.templeDetails?.additionalNotes && (
+                          <InfoRow label="Additional Notes" value={booking.templeDetails?.additionalNotes} />
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    // Legacy Fallback
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <InfoRow label="Location Type" value={booking.locationType || 'Home'} />
+                      <InfoRow label="City" icon={HiLocationMarker} value={booking.location?.city} />
+                      <InfoRow label="Address" value={booking.location?.address} />
+                      <InfoRow label="Region" value={booking.location?.region} />
+                    </div>
+                  )}
                 </SectionCard>
               </ScrollReveal>
 
               {/* Additional Notes */}
-              {booking.notes && (
+              {(booking.specialNotes || booking.notes) && (
                 <ScrollReveal>
                   <SectionCard title="Additional Information">
                     <div className="space-y-0.5">
                       <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Notes / Special Requests</p>
                       <p className="text-sm text-stone-700 dark:text-stone-300 bg-stone-50 dark:bg-stone-900/30 rounded-xl p-3 leading-relaxed">
-                        {booking.notes}
+                        {booking.specialNotes || booking.notes}
                       </p>
                     </div>
                   </SectionCard>
