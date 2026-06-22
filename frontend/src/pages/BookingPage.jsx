@@ -29,6 +29,7 @@ const BookingPage = () => {
   });
   const [incompatibleRitual, setIncompatibleRitual] = useState(false);
   const [bookingSource, setBookingSource] = useState('');
+  const [preSelectedRitualId, setPreSelectedRitualId] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,12 +65,13 @@ const BookingPage = () => {
 
           if (matched) {
             setForm((f) => ({ ...f, ritualId: matched._id }));
-            setStep(1); // Auto-advance to Date & Time selection step
+            setPreSelectedRitualId(matched._id);
             setBookingSource(ritualState.source || 'Ritual Search');
             setIncompatibleRitual(false);
           } else {
             setIncompatibleRitual(true);
             setBookingSource('');
+            setPreSelectedRitualId('');
             setStep(0);
           }
         }
@@ -241,6 +243,16 @@ const BookingPage = () => {
           {step === 0 && (
             <div className="animate-slide-up">
               <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">Select Ritual</h2>
+              {form.ritualId && form.ritualId === preSelectedRitualId && (
+                <div className="mb-5 p-4 rounded-2xl bg-saffron-550/5 dark:bg-saffron-950/10 border border-saffron-100 dark:border-saffron-900/30 animate-fade-in text-sm">
+                  <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-1">Selected Ritual</p>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-emerald-500 font-bold text-base">✓</span>
+                    <p className="font-semibold text-stone-900 dark:text-stone-100">{selectedRitual?.pujaName}</p>
+                  </div>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">Selected from your previous search.</p>
+                </div>
+              )}
               {rituals.length === 0 ? (
                 <p className="text-stone-400">This Pandit hasn't listed any supported rituals yet.</p>
               ) : (
@@ -418,7 +430,7 @@ const BookingPage = () => {
                 disabled={!canProceed()}
                 className="btn-primary flex-1 disabled:opacity-50"
               >
-                Next <HiArrowRight />
+                {step === 0 ? 'Continue' : 'Next'} <HiArrowRight />
               </button>
             ) : (
               <button
