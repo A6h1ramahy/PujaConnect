@@ -48,7 +48,7 @@ export const validateTime = (time) => {
  * Returns an object keyed by field name, with error strings as values.
  * An empty object means the form is valid.
  */
-export const validateBookingForm = ({ ritualId, date, time, locationType, address }) => {
+export const validateBookingForm = ({ ritualId, date, time, location, address, templeDetails }) => {
   const errors = {};
 
   if (!ritualId) errors.ritualId = 'Please select a ritual';
@@ -59,8 +59,36 @@ export const validateBookingForm = ({ ritualId, date, time, locationType, addres
   const timeErr = validateTime(time);
   if (timeErr) errors.time = timeErr;
 
-  if (locationType === 'Home' && (!address || !address.trim())) {
-    errors.address = 'Address is required for home ceremonies';
+  if (location === 'Home') {
+    if (!address) {
+      errors.address = 'Address is required.';
+    } else {
+      if (!address.houseNumber || !address.houseNumber.trim()) errors.houseNumber = 'House / Flat Number is required.';
+      if (!address.street || !address.street.trim()) errors.street = 'Street / Area is required.';
+      if (!address.city || !address.city.trim()) errors.city = 'City is required.';
+      if (!address.state || !address.state.trim()) errors.state = 'State / Region is required.';
+      if (!address.pincode || !address.pincode.trim()) {
+        errors.pincode = 'Pincode is required.';
+      } else if (!/^[0-9]{6}$/.test(address.pincode)) {
+        errors.pincode = 'Pincode must be exactly 6 digits.';
+      }
+      if (!address.fullAddress || !address.fullAddress.trim()) errors.fullAddress = 'Full Address is required.';
+    }
+  } else if (location === 'Temple') {
+    if (!templeDetails) {
+      errors.templeDetails = 'Temple details are required.';
+    } else {
+      if (!templeDetails.templeName || !templeDetails.templeName.trim()) errors.templeName = 'Temple Name is required.';
+      if (!templeDetails.templeAddress || !templeDetails.templeAddress.trim()) errors.templeAddress = 'Temple Address is required.';
+      if (!templeDetails.city || !templeDetails.city.trim()) errors.city = 'City is required.';
+      if (!templeDetails.state || !templeDetails.state.trim()) errors.state = 'State / Region is required.';
+      if (!templeDetails.pincode || !templeDetails.pincode.trim()) {
+        errors.pincode = 'Pincode is required.';
+      } else if (!/^[0-9]{6}$/.test(templeDetails.pincode)) {
+        errors.pincode = 'Pincode must be exactly 6 digits.';
+      }
+      if (!templeDetails.locality || !templeDetails.locality.trim()) errors.locality = 'Temple Area / Locality is required.';
+    }
   }
 
   return errors;
