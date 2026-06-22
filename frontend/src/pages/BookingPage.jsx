@@ -29,7 +29,7 @@ const BookingPage = () => {
   });
   const [incompatibleRitual, setIncompatibleRitual] = useState(false);
   const [bookingSource, setBookingSource] = useState('');
-  const [preSelectedRitualId, setPreSelectedRitualId] = useState('');
+  const [initialRitualId, setInitialRitualId] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,13 +65,13 @@ const BookingPage = () => {
 
           if (matched) {
             setForm((f) => ({ ...f, ritualId: matched._id }));
-            setPreSelectedRitualId(matched._id);
+            setInitialRitualId(matched._id);
             setBookingSource(ritualState.source || 'Ritual Search');
             setIncompatibleRitual(false);
           } else {
             setIncompatibleRitual(true);
             setBookingSource('');
-            setPreSelectedRitualId('');
+            setInitialRitualId('');
             setStep(0);
           }
         }
@@ -187,7 +187,7 @@ const BookingPage = () => {
         {form.ritualId && (
           <div className="card p-4 bg-saffron-550/5 dark:bg-saffron-950/10 border border-saffron-100 dark:border-saffron-900/30 mb-6 transition-all duration-300">
             <h3 className="text-xs font-bold uppercase tracking-wider text-saffron-600 dark:text-saffron-400 mb-2.5">Booking Summary</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            <div className={`grid grid-cols-1 ${initialRitualId && form.ritualId === initialRitualId && bookingSource ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-4 text-sm`}>
               <div>
                 <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide">Pandit</p>
                 <p className="font-semibold text-stone-900 dark:text-stone-100 mt-0.5">{panditName}</p>
@@ -207,7 +207,7 @@ const BookingPage = () => {
                   )}
                 </div>
               </div>
-              {bookingSource && (
+              {initialRitualId && form.ritualId === initialRitualId && bookingSource && (
                 <div>
                   <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide">Source</p>
                   <p className="text-xs font-medium text-stone-500 dark:text-stone-400 italic mt-0.5">Selected from {bookingSource}</p>
@@ -243,7 +243,7 @@ const BookingPage = () => {
           {step === 0 && (
             <div className="animate-slide-up">
               <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">Select Ritual</h2>
-              {form.ritualId && form.ritualId === preSelectedRitualId && (
+              {form.ritualId && form.ritualId === initialRitualId && (
                 <div className="mb-5 p-4 rounded-2xl bg-saffron-550/5 dark:bg-saffron-950/10 border border-saffron-100 dark:border-saffron-900/30 animate-fade-in text-sm">
                   <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide mb-1">Selected Ritual</p>
                   <div className="flex items-center gap-1.5">
