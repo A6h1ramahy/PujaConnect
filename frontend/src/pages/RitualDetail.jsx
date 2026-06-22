@@ -185,6 +185,12 @@ const RitualDetail = () => {
 
                 <Link 
                   to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
+                  state={{
+                    ritualId: ritual._id,
+                    ritualName: ritual.pujaName,
+                    ritualSlug: ritual.slug,
+                    source: 'Ritual Search'
+                  }}
                   className="w-full flex items-center justify-center gap-2 btn-primary py-3.5 shadow-glow-saffron text-sm"
                 >
                   Find & Book Pandits 🕉️
@@ -326,6 +332,12 @@ const RitualDetail = () => {
                           </div>
                           <Link 
                             to={`/pandits/${pandit._id}?ritual=${encodeURIComponent(ritual.slug)}`}
+                            state={{
+                              ritualId: ritual._id,
+                              ritualName: ritual.pujaName,
+                              ritualSlug: ritual.slug,
+                              source: 'Ritual Search'
+                            }}
                             className="btn-secondary btn-sm py-1.5 px-3.5 text-xs font-bold"
                           >
                             View
@@ -350,6 +362,12 @@ const RitualDetail = () => {
                       </div>
                       <Link 
                         to={`/pandits?ritual=${encodeURIComponent(ritual.slug)}`}
+                        state={{
+                          ritualId: ritual._id,
+                          ritualName: ritual.pujaName,
+                          ritualSlug: ritual.slug,
+                          source: 'Ritual Search'
+                        }}
                         className="btn-primary btn-sm py-2 px-4 whitespace-nowrap text-xs font-bold shrink-0 self-start sm:self-auto flex items-center gap-1 shadow-glow-saffron"
                       >
                         Find & Book Pandits 🕉️

@@ -4,7 +4,7 @@ import { HiLocationMarker, HiCheckCircle, HiClock } from 'react-icons/hi';
 import PanditAvatar from '../common/PanditAvatar';
 import { useAuth } from '../../context/AuthContext';
 
-const PanditCard = ({ pandit }) => {
+const PanditCard = ({ pandit, selectedRitual }) => {
   const { user } = useAuth();
   const { _id, photo, bio, location, yearsOfExperience, supportedRituals, languagesSpoken, userId, pricing } = pandit;
   const name   = userId?.name || 'Pandit';
@@ -16,8 +16,20 @@ const PanditCard = ({ pandit }) => {
   const priceValues = pricing ? Object.values(Object.fromEntries ? (pricing instanceof Map ? pricing : new Map(Object.entries(pricing))) : pricing) : [];
   const minPrice = priceValues.length ? Math.min(...priceValues) : null;
 
+  const ritualQuery = selectedRitual ? `?ritual=${encodeURIComponent(selectedRitual.slug)}` : '';
+
   return (
-    <Link to={`/pandits/${_id}`} id={`pandit-card-${_id}`} className="card-hover block group animate-fade-in">
+    <Link 
+      to={`/pandits/${_id}${ritualQuery}`} 
+      state={{ 
+        ritualId: selectedRitual?._id, 
+        ritualName: selectedRitual?.pujaName, 
+        ritualSlug: selectedRitual?.slug,
+        source: 'Filtered Pandit Search'
+      }}
+      id={`pandit-card-${_id}`} 
+      className="card-hover block group animate-fade-in"
+    >
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start gap-4">

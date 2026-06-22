@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { HiLocationMarker, HiClock, HiCheckCircle, HiCalendar, HiArrowLeft } from 'react-icons/hi';
 import { getPanditById, getPanditAvailability } from '../api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -14,6 +14,8 @@ const PanditProfile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const ritualState = location.state || {};
   const ritualParam = searchParams.get('ritual') || searchParams.get('ritualId') || '';
   const [pandit, setPandit] = useState(null);
   const [availability, setAvailability] = useState([]);
@@ -63,7 +65,7 @@ const PanditProfile = () => {
     </PageTransition>
   );
 
-  const { photo, bio, location, yearsOfExperience, supportedRituals, languagesSpoken, userId, pricing, verificationStatus } = pandit;
+  const { photo, bio, location: panditLocation, yearsOfExperience, supportedRituals, languagesSpoken, userId, pricing, verificationStatus } = pandit;
   const name = userId?.name || 'Pandit';  return (
     <PageTransition>
       <div className="min-h-screen bg-light-bg dark:bg-dark-bg transition-colors duration-300">
@@ -92,10 +94,10 @@ const PanditProfile = () => {
 
                   <h1 className="text-2xl font-display font-bold text-stone-900 dark:text-stone-100 mb-1">{name}</h1>
 
-                  {user && (location?.city || location?.region) && (
+                  {user && (panditLocation?.city || panditLocation?.region) && (
                     <p className="flex items-center justify-center gap-1 text-sm text-stone-500 dark:text-stone-400 mb-3">
                       <HiLocationMarker className="text-saffron-500" />
-                      {[location.city, location.region, location.state].filter(Boolean).join(', ')}
+                      {[panditLocation.city, panditLocation.region, panditLocation.state].filter(Boolean).join(', ')}
                     </p>
                   )}
 
@@ -121,6 +123,12 @@ const PanditProfile = () => {
                   {user?.role === 'user' ? (
                     <Link
                       to={`/book/${id}${ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : ''}`}
+                      state={{
+                        ritualId: ritualState.ritualId || searchParams.get('ritualId') || '',
+                        ritualName: ritualState.ritualName || searchParams.get('ritualName') || ritualParam,
+                        ritualSlug: ritualState.ritualSlug || ritualParam,
+                        source: ritualState.source || 'Filtered Pandit Search'
+                      }}
                       id="book-pandit-btn"
                       className="btn-primary w-full"
                     >
@@ -325,6 +333,12 @@ const PanditProfile = () => {
                         {user?.role === 'user' && (
                           <Link 
                             to={`/book/${id}${ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : ''}`} 
+                            state={{
+                              ritualId: ritualState.ritualId || searchParams.get('ritualId') || '',
+                              ritualName: ritualState.ritualName || searchParams.get('ritualName') || ritualParam,
+                              ritualSlug: ritualState.ritualSlug || ritualParam,
+                              source: ritualState.source || 'Filtered Pandit Search'
+                            }}
                             id="book-now-availability-tab" 
                             className="btn-primary mt-4 inline-flex animate-fade-in"
                           >

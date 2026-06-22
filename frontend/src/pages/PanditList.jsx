@@ -202,11 +202,14 @@ const PanditList = () => {
           ) : pandits.length > 0 ? (
             <>
               <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pandits.map((p) => (
-                  <StaggerItem key={p._id}>
-                    <PanditCard pandit={p} />
-                  </StaggerItem>
-                ))}
+                {pandits.map((p) => {
+                  const selectedRitualObj = rituals.find((r) => r._id === filters.ritualId);
+                  return (
+                    <StaggerItem key={p._id}>
+                      <PanditCard pandit={p} selectedRitual={selectedRitualObj} />
+                    </StaggerItem>
+                  );
+                })}
               </StaggerContainer>
 
               {/* Pagination */}
