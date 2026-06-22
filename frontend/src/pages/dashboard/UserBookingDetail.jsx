@@ -95,6 +95,7 @@ const UserBookingDetail = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const chatSectionRef = React.useRef(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -431,15 +432,17 @@ const UserBookingDetail = () => {
 
               {/* Chat Conversation */}
               {showChat && ['accepted', 'completed'].includes(booking.status) && (
-                <ScrollReveal>
-                  <SectionCard title="Conversation with Pandit">
-                    <BookingChat
-                      bookingId={booking._id}
-                      currentUserId={user?._id}
-                      readOnly={booking.status === 'completed'}
-                    />
-                  </SectionCard>
-                </ScrollReveal>
+                <div ref={chatSectionRef}>
+                  <ScrollReveal>
+                    <SectionCard title="Conversation with Pandit">
+                      <BookingChat
+                        bookingId={booking._id}
+                        currentUserId={user?._id}
+                        readOnly={booking.status === 'completed'}
+                      />
+                    </SectionCard>
+                  </ScrollReveal>
+                </div>
               )}
 
               {/* Timeline */}
@@ -489,7 +492,19 @@ const UserBookingDetail = () => {
                     {['accepted', 'completed'].includes(booking.status) && (
                       <button
                         id="toggle-chat-btn"
-                        onClick={() => setShowChat(!showChat)}
+                        onClick={() => {
+                          const opening = !showChat;
+                          setShowChat(opening);
+                          if (opening) {
+                            // Scroll precisely to the chat section after it mounts
+                            setTimeout(() => {
+                              chatSectionRef.current?.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                              });
+                            }, 80);
+                          }
+                        }}
                         className={`w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
                           showChat 
                             ? 'bg-stone-200 dark:bg-stone-850 text-stone-700 dark:text-stone-300 border border-light-border dark:border-dark-border/40' 

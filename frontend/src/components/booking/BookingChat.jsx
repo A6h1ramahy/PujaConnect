@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { getBookingMessages, sendBookingMessage } from '../../api';
 import { HiPaperAirplane, HiClock } from 'react-icons/hi';
 import toast from 'react-hot-toast';
@@ -9,7 +9,18 @@ const BookingChat = ({ bookingId, currentUserId, readOnly = false }) => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const chatEndRef = useRef(null);
+
+  // Ref to the scrollable messages DIV — NOT to a child element.
+  // We scroll the container itself via scrollTop so the page never moves.
+  const messagesContainerRef = useRef(null);
+
+  /** Scroll only the chat container to the bottom — page stays still. */
+  const scrollChatToBottom = useCallback(() => {
+    const el = messagesContainerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, []);
 
   const fetchMessages = async (showLoading = false) => {
     if (showLoading) setLoading(true);
@@ -23,7 +34,7 @@ const BookingChat = ({ bookingId, currentUserId, readOnly = false }) => {
     }
   };
 
-  // Poll for new messages every 5 seconds
+  // Initial load + poll every 5 s
   useEffect(() => {
     fetchMessages(true);
     const interval = setInterval(() => {
@@ -32,14 +43,13 @@ const BookingChat = ({ bookingId, currentUserId, readOnly = false }) => {
     return () => clearInterval(interval);
   }, [bookingId]);
 
-  // Scroll to bottom
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Scroll chat container (NOT the page) whenever messages update
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Use requestAnimationFrame to ensure the DOM has painted new messages
+    requestAnimationFrame(() => {
+      scrollChatToBottom();
+    });
+  }, [messages, scrollChatToBottom]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -52,10 +62,10 @@ const BookingChat = ({ bookingId, currentUserId, readOnly = false }) => {
     try {
       const res = await sendBookingMessage(bookingId, msgText);
       setMessages(res.data.messages || []);
-      scrollToBottom();
+      // scrollChatToBottom is called via the messages useEffect above
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to send message');
-      setNewMessage(msgText); // Restore input in case of failure
+      setNewMessage(msgText); // Restore input on failure
     } finally {
       setSending(false);
     }
@@ -72,8 +82,12 @@ const BookingChat = ({ bookingId, currentUserId, readOnly = false }) => {
 
   return (
     <div className="flex flex-col h-[450px] bg-stone-50 dark:bg-stone-950/40 rounded-2xl border border-light-border dark:border-dark-border overflow-hidden">
-      {/* Messages list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Messages list — this is the ONLY thing that scrolls */}
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        style={{ overscrollBehavior: 'contain' }}
+      >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-stone-400 dark:text-stone-500 text-center p-4">
             <span className="text-3xl">💬</span>
@@ -113,7 +127,6 @@ const BookingChat = ({ bookingId, currentUserId, readOnly = false }) => {
             );
           })
         )}
-        <div ref={chatEndRef} />
       </div>
 
       {/* Input area */}
