@@ -72,7 +72,6 @@ export const validateBookingForm = ({ ritualId, date, time, location, address, t
       } else if (!/^[0-9]{6}$/.test(address.pincode)) {
         errors.pincode = 'Pincode must be exactly 6 digits.';
       }
-      if (!address.fullAddress || !address.fullAddress.trim()) errors.fullAddress = 'Full Address is required.';
     }
   } else if (location === 'Temple') {
     if (!templeDetails) {

@@ -29,7 +29,7 @@ const BookingPage = () => {
     ritualId: '', date: '', time: '',
     location: 'Home',
     address: {
-      houseNumber: '', street: '', city: '', state: '', pincode: '', landmark: '', fullAddress: '',
+      houseNumber: '', street: '', city: '', state: '', pincode: '', landmark: '',
       nearbyPlace: '', additionalInstructions: ''
     },
     templeDetails: {
@@ -54,25 +54,6 @@ const BookingPage = () => {
       }
     }
   }, [selectedRitual, rituals]);
-
-  // Auto-compile devotee fullAddress
-  useEffect(() => {
-    if (form.location === 'Home') {
-      const { houseNumber, street, city, state, pincode } = form.address;
-      const compiled = [houseNumber, street, city, state].filter(Boolean).join(', ') + (pincode ? ` - ${pincode}` : '');
-      setForm((f) => {
-        const currentFull = f.address.fullAddress;
-        const shouldOverwrite = !currentFull || currentFull === '' || currentFull === compiled;
-        return {
-          ...f,
-          address: {
-            ...f.address,
-            fullAddress: shouldOverwrite ? compiled : currentFull
-          }
-        };
-      });
-    }
-  }, [form.address.houseNumber, form.address.street, form.address.city, form.address.state, form.address.pincode, form.location]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,8 +126,7 @@ const BookingPage = () => {
           !!addr.city?.trim() &&
           !!addr.state?.trim() &&
           !!addr.pincode?.trim() &&
-          /^[0-9]{6}$/.test(addr.pincode) &&
-          !!addr.fullAddress?.trim()
+          /^[0-9]{6}$/.test(addr.pincode)
         );
       } else if (form.location === 'Temple') {
         const temp = form.templeDetails || {};
@@ -182,12 +162,6 @@ const BookingPage = () => {
       return;
     }
 
-    let finalAddress = { ...form.address };
-    if (form.location === 'Home' && (!finalAddress.fullAddress || !finalAddress.fullAddress.trim())) {
-      const { houseNumber, street, city, state, pincode } = finalAddress;
-      finalAddress.fullAddress = [houseNumber, street, city, state].filter(Boolean).join(', ') + (pincode ? ` - ${pincode}` : '');
-    }
-
     setSubmitting(true);
     try {
       await createBooking({
@@ -197,7 +171,7 @@ const BookingPage = () => {
         time:          form.time,
         location:      form.location,
         locationType:  form.location,
-        address:       form.location === 'Home' ? finalAddress : undefined,
+        address:       form.location === 'Home' ? form.address : undefined,
         templeDetails: form.location === 'Temple' ? form.templeDetails : undefined,
         specialNotes:  form.specialNotes,
         notes:         form.specialNotes,
@@ -585,21 +559,6 @@ const BookingPage = () => {
                           className="input-field text-sm"
                         />
                       </div>
-                    </div>
-                    <div className="form-group mt-3">
-                      <label htmlFor="full-address" className="label">Full Address *</label>
-                      <textarea
-                        id="full-address"
-                        rows={2}
-                        placeholder="Enter the complete address..."
-                        value={form.address.fullAddress}
-                        onChange={(e) => setForm({
-                          ...form,
-                          address: { ...form.address, fullAddress: e.target.value }
-                        })}
-                        className="input-field text-sm resize-none"
-                        required
-                      />
                     </div>
                   </div>
                 </div>
