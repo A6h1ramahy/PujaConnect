@@ -91,6 +91,29 @@ const bookingSchema = new mongoose.Schema(
     rejectionReason: {
       type: String,
     },
+    messages: [
+      {
+        sender: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        senderRole: {
+          type: String,
+          required: true,
+          enum: ['user', 'pandit'],
+        },
+        message: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     availabilitySlotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Availability',

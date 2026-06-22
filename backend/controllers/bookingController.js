@@ -372,6 +372,104 @@ const getBookingByIdAdmin = async (req, res, next) => {
   }
 };
 
+// @desc    Get all messages for a booking
+// @route   GET /api/bookings/:id/messages
+// @access  User (devotee) | Pandit (assigned) | Admin (read-only)
+const getBookingMessages = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate('messages.sender', 'name role');
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // Check if status is accepted or completed
+    if (!['accepted', 'completed'].includes(booking.status)) {
+      return res.status(400).json({ message: 'Chat is only available for accepted or completed bookings' });
+    }
+
+    // Access control
+    if (req.user.role === 'user') {
+      if (booking.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to view messages for this booking' });
+      }
+    } else if (req.user.role === 'pandit') {
+      const pandit = await Pandit.findOne({ userId: req.user._id });
+      if (!pandit || booking.pandit.toString() !== pandit._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to view messages for this booking' });
+      }
+    } else if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to view messages' });
+    }
+
+    res.json({ messages: booking.messages || [] });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Send a message for a booking
+// @route   POST /api/bookings/:id/messages
+// @access  User (devotee) | Pandit (assigned)
+const sendBookingMessage = async (req, res, next) => {
+  try {
+    const { message } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ message: 'Message content is required' });
+    }
+
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // Check if status is accepted
+    if (booking.status !== 'accepted') {
+      return res.status(400).json({ message: 'Can only send messages for accepted bookings' });
+    }
+
+    // Access control and role identification
+    let senderRole = '';
+    if (req.user.role === 'user') {
+      if (booking.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to send messages for this booking' });
+      }
+      senderRole = 'user';
+    } else if (req.user.role === 'pandit') {
+      const pandit = await Pandit.findOne({ userId: req.user._id });
+      if (!pandit || booking.pandit.toString() !== pandit._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to send messages for this booking' });
+      }
+      senderRole = 'pandit';
+    } else {
+      return res.status(403).json({ message: 'Admins cannot send messages to bookings' });
+    }
+
+    // Push new message
+    const newMessage = {
+      sender: req.user._id,
+      senderRole,
+      message: message.trim(),
+      createdAt: new Date()
+    };
+
+    booking.messages.push(newMessage);
+    await booking.save();
+
+    // Populate sender name before returning the updated array
+    const updatedBooking = await Booking.findById(booking._id)
+      .populate('messages.sender', 'name role');
+
+    res.status(201).json({ 
+      message: 'Message sent successfully', 
+      messages: updatedBooking.messages 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createBooking,
   getMyBookings,
@@ -383,4 +481,6 @@ module.exports = {
   getAllBookings,
   getBookingByIdAdmin,
   getBookingByIdUser,
+  getBookingMessages,
+  sendBookingMessage,
 };
