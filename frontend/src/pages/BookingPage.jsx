@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { HiCalendar, HiClock, HiLocationMarker, HiArrowLeft, HiArrowRight, HiCheckCircle } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import toast from 'react-hot-toast';
@@ -14,6 +14,8 @@ const BookingPage = () => {
   const { panditId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const ritualState = location.state || {};
   const ritualParam = searchParams.get('ritual') || searchParams.get('ritualId') || '';
   const [pandit, setPandit] = useState(null);
   const [rituals, setRituals] = useState([]);
@@ -25,6 +27,8 @@ const BookingPage = () => {
     ritualId: '', date: '', time: '', locationType: 'Home',
     address: '', city: '', region: '', notes: '',
   });
+  const [incompatibleRitual, setIncompatibleRitual] = useState(false);
+  const [bookingSource, setBookingSource] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,16 +46,31 @@ const BookingPage = () => {
         setRituals(filtered);
         setAvailability(availRes.data.slots || []);
 
-        // Pre-fill ritual if passed in query param
-        if (ritualParam) {
+        // Resolve incoming ritual info from either route state or query parameters
+        const incomingId = ritualState.ritualId;
+        const incomingSlug = ritualState.ritualSlug || ritualParam;
+        const incomingName = ritualState.ritualName;
+
+        if (incomingId || incomingSlug || incomingName) {
           const matched = filtered.find(
             (r) =>
+              r._id === incomingId ||
+              r.slug === incomingSlug ||
+              r.pujaName.toLowerCase() === (incomingName || '').toLowerCase() ||
               r._id === ritualParam ||
               r.slug === ritualParam ||
               r.pujaName.toLowerCase() === ritualParam.toLowerCase()
           );
+
           if (matched) {
             setForm((f) => ({ ...f, ritualId: matched._id }));
+            setStep(1); // Auto-advance to Date & Time selection step
+            setBookingSource(ritualState.source || 'Ritual Search');
+            setIncompatibleRitual(false);
+          } else {
+            setIncompatibleRitual(true);
+            setBookingSource('');
+            setStep(0);
           }
         }
       } catch (err) {
@@ -61,7 +80,7 @@ const BookingPage = () => {
       }
     };
     fetchData();
-  }, [panditId, ritualParam]);
+  }, [panditId, ritualParam, ritualState.ritualId, ritualState.ritualSlug, ritualState.ritualName, ritualState.source]);
 
   const availableDates = availability.filter((s) => s.status === 'available');
   const selectedDateSlots = availableDates.find((s) => s.date?.slice(0, 10) === form.date || new Date(s.date).toISOString().slice(0, 10) === form.date);
@@ -125,8 +144,12 @@ const BookingPage = () => {
         <button 
           id="back-from-booking" 
           onClick={() => {
-            const query = ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : '';
-            navigate(`/pandits/${panditId}${query}`, { replace: true });
+            if (window.history.state && window.history.state.idx > 0) {
+              navigate(-1);
+            } else {
+              const query = ritualParam ? `?ritual=${encodeURIComponent(ritualParam)}` : '';
+              navigate(`/pandits/${panditId}${query}`, { replace: true });
+            }
           }} 
           className="btn-ghost btn-sm mb-6"
         >
@@ -146,6 +169,51 @@ const BookingPage = () => {
           </div>
           <span className="ml-auto badge-verified"><HiCheckCircle /> Verified</span>
         </div>
+
+        {/* Incompatibility Warning Banner */}
+        {incompatibleRitual && (
+          <div className="p-4 mb-6 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 text-red-750 dark:text-red-400 text-sm flex items-start gap-2.5 shadow-sm">
+            <span className="text-base shrink-0 mt-0.5">⚠️</span>
+            <div>
+              <p className="font-semibold">Incompatible Ritual Selection</p>
+              <p className="text-xs mt-0.5">This Pandit does not currently support the selected ritual. Please select a supported ritual from the list below.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Booking Summary */}
+        {form.ritualId && (
+          <div className="card p-4 bg-saffron-550/5 dark:bg-saffron-950/10 border border-saffron-100 dark:border-saffron-900/30 mb-6 transition-all duration-300">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-saffron-600 dark:text-saffron-400 mb-2.5">Booking Summary</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              <div>
+                <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide">Pandit</p>
+                <p className="font-semibold text-stone-900 dark:text-stone-100 mt-0.5">{panditName}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide">Ritual</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <p className="font-semibold text-stone-900 dark:text-stone-100">{selectedRitual?.pujaName || 'Loading...'}</p>
+                  {step > 0 && (
+                    <button 
+                      id="change-ritual-btn"
+                      onClick={() => setStep(0)} 
+                      className="text-xs font-semibold text-saffron-600 dark:text-saffron-450 hover:underline inline-flex items-center gap-0.5"
+                    >
+                      [Change]
+                    </button>
+                  )}
+                </div>
+              </div>
+              {bookingSource && (
+                <div>
+                  <p className="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wide">Source</p>
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 italic mt-0.5">Selected from {bookingSource}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Stepper */}
         <div className="flex mb-8">
