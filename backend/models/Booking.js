@@ -35,19 +35,17 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Time is required'],
     },
+    // ── location ─────────────────────────────────────────────────
+    // Stored as 'Home' or 'Temple' (String) in all new bookings.
+    // Legacy bookings may have stored an object { address, city, region }
+    // directly in this field.  Using Mixed prevents Mongoose from throwing
+    // "Cast to string failed" when it hydrates those old documents from
+    // MongoDB (hydration happens BEFORE any hooks/setters run, so a plain
+    // String type would always fail on legacy records).
+    // The pre-save middleware below normalises every saved value back to
+    // the canonical string form.
     location: {
-      type: String,
-      // Support both 'Home'/'Temple' strings and legacy stored objects
-      set: (v) => {
-        if (typeof v === 'string') return v;
-        // Legacy object: { address, city, region } → infer 'Home'
-        if (v && typeof v === 'object') {
-          if (v.locationType) return v.locationType;
-          return 'Home'; // safe default for legacy data
-        }
-        return v;
-      },
-      enum: ['Home', 'Temple'],
+      type: mongoose.Schema.Types.Mixed,
       default: 'Home',
     },
     locationType: {
@@ -136,26 +134,39 @@ bookingSchema.index({ user:  1, createdAt: -1 });
 bookingSchema.index({ pandit: 1, status: 1 });
 bookingSchema.index({ status: 1, date:   1 });
 
-// ── Pre-save: sanitize legacy location values ───────────────────
-// If legacy data has stored an object in 'location', coerce it to
-// the expected string so booking.save() never throws a cast error.
+// ── Pre-save: normalise location to canonical string ───────────
+// Because location is Mixed, Mongoose will accept any value from
+// MongoDB without throwing.  This hook converts every possible
+// legacy shape to 'Home' or 'Temple' before the document is
+// written, so future reads always get a clean string.
 bookingSchema.pre('save', function (next) {
-  if (this.location && typeof this.location === 'object') {
-    const loc = this.location;
-    if (loc.locationType) {
-      this.location = loc.locationType;
-    } else if (loc.templeName || loc.templeAddress) {
+  const loc = this.location;
+
+  if (typeof loc === 'string') {
+    // Already a string — accept 'Home'/'Temple', map anything else to 'Home'
+    if (loc !== 'Home' && loc !== 'Temple') {
+      this.location = 'Home';
+    }
+  } else if (loc && typeof loc === 'object') {
+    // Legacy object shape e.g. { address, city, region } or { locationType }
+    if (loc.locationType === 'Temple' || loc.templeName || loc.templeAddress) {
       this.location = 'Temple';
     } else {
       this.location = 'Home';
     }
+  } else {
+    // null / undefined / anything else
+    this.location = 'Home';
   }
-  // Keep locationType in sync
-  if (this.location && !this.locationType) {
+
+  // Keep locationType in sync with location
+  if (!this.locationType) {
     this.locationType = this.location;
   }
+
   next();
 });
+
 
 
 module.exports = mongoose.model('Booking', bookingSchema);
