@@ -23,6 +23,21 @@ const updateProfile = async (req, res, next) => {
     const user = await User.findById(req.user._id).select('+password');
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    if (user.role === 'user') {
+      const finalPhone = phone !== undefined ? phone : user.phone;
+      if (!finalPhone || !finalPhone.trim()) {
+        return res.status(400).json({ message: 'Phone number is required.' });
+      }
+      if (!/^[0-9]+$/.test(finalPhone) || finalPhone.length < 10 || finalPhone.length > 15) {
+        return res.status(400).json({ message: 'Please enter a valid phone number.' });
+      }
+
+      const finalCity = city !== undefined ? city : user.city;
+      if (!finalCity || !finalCity.trim() || finalCity.trim().length < 2) {
+        return res.status(400).json({ message: 'City is required.' });
+      }
+    }
+
     if (user.role === 'pandit') {
       if (city !== undefined && !city.trim()) {
         return res.status(400).json({ message: 'City is required for Pandits' });

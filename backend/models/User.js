@@ -45,12 +45,12 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
-      required: [function () { return this.role === 'pandit'; }, 'Phone number is required'],
+      required: [function () { return this.role === 'pandit' || this.role === 'user'; }, 'Phone number is required'],
     },
     city: {
       type: String,
       trim: true,
-      required: [function () { return this.role === 'pandit'; }, 'City is required'],
+      required: [function () { return this.role === 'pandit' || this.role === 'user'; }, 'City is required'],
     },
     region: {
       type: String,

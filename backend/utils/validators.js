@@ -23,27 +23,18 @@ const registerRules = [
     .optional()
     .isIn(['user', 'pandit']).withMessage('Role must be "user" or "pandit"'),
 
-  // Phone: required for pandits, optional but validated for users
+  // Phone: required for all registrations
   body('phone')
-    .if(body('role').equals('pandit'))
-    .notEmpty().withMessage('Phone number is required for Pandit registration')
+    .notEmpty().withMessage('Phone number is required.')
     .bail()
-    .matches(/^[0-9]+$/).withMessage('Phone number must contain only digits')
-    .isLength({ min: 10, max: 15 }).withMessage('Phone number must be 10–15 digits'),
+    .matches(/^[0-9]+$/).withMessage('Please enter a valid phone number.')
+    .isLength({ min: 10, max: 15 }).withMessage('Please enter a valid phone number.'),
 
-  body('phone')
-    .if(body('role').not().equals('pandit'))
-    .optional()
-    .if(body('phone').notEmpty())
-    .matches(/^[0-9]+$/).withMessage('Phone number must contain only digits')
-    .isLength({ min: 10, max: 15 }).withMessage('Phone number must be 10–15 digits'),
-
-  // City: required for pandits
+  // City: required for all registrations
   body('city')
-    .if(body('role').equals('pandit'))
-    .notEmpty().withMessage('City is required for Pandit registration')
+    .notEmpty().withMessage('City is required.')
     .bail()
-    .isLength({ min: 2 }).withMessage('City name must be at least 2 characters')
+    .isLength({ min: 2 }).withMessage('City is required.')
     .trim(),
 
   // Region / State: required for pandits
