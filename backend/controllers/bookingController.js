@@ -446,11 +446,13 @@ const sendBookingMessage = async (req, res, next) => {
       return res.status(403).json({ message: 'Admins cannot send messages to bookings' });
     }
 
-    // Push new message
+    // Push new message (isRead defaults to false)
     const newMessage = {
       sender: req.user._id,
       senderRole,
       message: message.trim(),
+      isRead: false,
+      readBy: [],
       createdAt: new Date()
     };
 
@@ -470,6 +472,56 @@ const sendBookingMessage = async (req, res, next) => {
   }
 };
 
+// @desc    Mark all received messages as read (for current user)
+// @route   PUT /api/bookings/:id/messages/read
+// @access  User (devotee) | Pandit (assigned)
+const markMessagesRead = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // Access control
+    if (req.user.role === 'user') {
+      if (booking.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+    } else if (req.user.role === 'pandit') {
+      const pandit = await Pandit.findOne({ userId: req.user._id });
+      if (!pandit || booking.pandit.toString() !== pandit._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+    } else {
+      return res.status(403).json({ message: 'Admins cannot mark messages as read' });
+    }
+
+    // Mark all messages NOT sent by the current user as read
+    let modified = false;
+    booking.messages.forEach((msg) => {
+      if (msg.sender.toString() !== req.user._id.toString() && !msg.isRead) {
+        msg.isRead = true;
+        const alreadyRead = msg.readBy.some(
+          (uid) => uid.toString() === req.user._id.toString()
+        );
+        if (!alreadyRead) {
+          msg.readBy.push(req.user._id);
+        }
+        modified = true;
+      }
+    });
+
+    if (modified) {
+      await booking.save();
+    }
+
+    res.json({ message: 'Messages marked as read', modified });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 module.exports = {
   createBooking,
   getMyBookings,
@@ -483,4 +535,6 @@ module.exports = {
   getBookingByIdUser,
   getBookingMessages,
   sendBookingMessage,
+  markMessagesRead,
 };
+

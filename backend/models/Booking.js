@@ -115,6 +115,17 @@ const bookingSchema = new mongoose.Schema(
           required: true,
           trim: true,
         },
+        // Read-status tracking (WhatsApp-style ✓ / ✓✓)
+        isRead: {
+          type: Boolean,
+          default: false,
+        },
+        readBy: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+          },
+        ],
         createdAt: {
           type: Date,
           default: Date.now,
