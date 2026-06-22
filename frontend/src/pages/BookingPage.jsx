@@ -7,10 +7,12 @@ import { getPanditById, getPanditAvailability, getRituals, createBooking } from 
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { format } from 'date-fns';
 import { validateBookingForm } from '../utils/validators';
+import { useAuth } from '../context/AuthContext';
 
 const STEPS = ['Ritual', 'Date & Time', 'Location', 'Confirm'];
 
 const BookingPage = () => {
+  const { user } = useAuth();
   const { panditId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -138,6 +140,30 @@ const BookingPage = () => {
 
   if (loading) return <LoadingSpinner size="lg" text="Loading booking..." />;
   if (!pandit) return <div className="text-center py-20 text-stone-500">Pandit not found.</div>;
+
+  if (user?.role === 'user' && (!user.phone || !user.city)) {
+    return (
+      <div className="min-h-screen bg-light-bg dark:bg-dark-bg flex items-center justify-center p-4 animate-fade-in">
+        <div className="card max-w-md p-6 text-center shadow-lg space-y-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl">
+          <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-950/20 text-amber-500 dark:text-amber-400 flex items-center justify-center text-3xl mx-auto">
+            ⚠️
+          </div>
+          <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100">
+            Profile Incomplete
+          </h2>
+          <p className="text-stone-600 dark:text-stone-400 text-sm">
+            Please complete your profile information (Phone Number and City) before booking a ceremony.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="btn-primary w-full py-2.5 rounded-xl text-sm font-semibold"
+          >
+            Go to Dashboard & Complete Profile
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg animate-fade-in py-8">
