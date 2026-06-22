@@ -76,22 +76,19 @@ export const validateRegisterForm = (form) => {
   if (pwErr) return pwErr;
   if (password !== confirmPassword) return 'Passwords do not match';
 
-  if (role === 'pandit') {
-    if (!phone || !phone.trim()) return 'Phone number is required';
-    if (!/^[0-9]+$/.test(phone) || phone.length < 10 || phone.length > 15) {
-      return 'Please enter a valid phone number';
-    }
-    if (!city || !city.trim()) return 'City is required';
-    if (city.trim().length < 2) return 'City must be at least 2 characters';
+  // Phone validation
+  if (!phone || !phone.trim()) return 'Phone number is required.';
+  if (!/^[0-9]+$/.test(phone) || phone.length < 10 || phone.length > 15) {
+    return 'Please enter a valid phone number.';
+  }
 
+  // City validation
+  if (!city || !city.trim()) return 'City is required.';
+  if (city.trim().length < 2) return 'City is required.';
+
+  if (role === 'pandit') {
     if (!region || !region.trim()) return 'State / Region is required';
     if (region.trim().length < 2) return 'State / Region is required';
-  } else {
-    if (phone && phone.trim()) {
-      if (!/^[0-9]+$/.test(phone) || phone.length < 10 || phone.length > 15) {
-        return 'Please enter a valid phone number';
-      }
-    }
   }
   return null;
 };

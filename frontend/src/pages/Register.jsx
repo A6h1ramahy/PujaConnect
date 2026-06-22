@@ -121,7 +121,7 @@ const Register = () => {
                   {/* Phone */}
                   <div className="form-group">
                     <label htmlFor="reg-phone" className="label">
-                      {form.role === 'pandit' ? 'Phone Number *' : 'Phone (optional)'}
+                      Phone Number *
                     </label>
                     <div className="relative">
                       <HiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
@@ -140,7 +140,7 @@ const Register = () => {
                   {/* City */}
                   <div className="form-group">
                     <label htmlFor="reg-city" className="label">
-                      {form.role === 'pandit' ? 'City *' : 'City (optional)'}
+                      City *
                     </label>
                     <div className="relative">
                       <HiLocationMarker className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-lg" />
@@ -207,7 +207,7 @@ const Register = () => {
                 </div>
               )}
 
-              <button type="submit" id="register-submit" disabled={loading} className="btn-primary w-full mt-2">
+              <button type="submit" id="register-submit" disabled={loading || validateRegisterForm(form) !== null} className="btn-primary w-full mt-2">
                 {loading ? 'Creating Account...' : 'Create Account 🙏'}
               </button>
             </form>
