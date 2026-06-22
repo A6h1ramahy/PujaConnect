@@ -1024,7 +1024,7 @@ const AdminDashboard = () => {
                           <input
                             type="text"
                             required
-                            placeholder="e.g. Abhirama Admin"
+                            placeholder="e.g. Admin1"
                             value={adminForm.name}
                             onChange={(e) => setAdminForm(prev => ({ ...prev, name: e.target.value }))}
                             className="w-full px-4 py-2.5 rounded-xl border border-light-border dark:border-dark-border bg-white dark:bg-dark-bg text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all text-sm"
