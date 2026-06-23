@@ -228,7 +228,12 @@ const updateAvailability = async (req, res, next) => {
       select: 'status'
     });
 
-    res.json({ message: 'Availability updated successfully', availability: populated });
+    res.json({
+      success: true,
+      message: 'Availability updated successfully',
+      updatedAvailability: populated,
+      availability: populated
+    });
   } catch (error) {
     next(error);
   }
