@@ -473,39 +473,74 @@ All core features implemented, tested, and ready for deployment. The application
 *A modern platform bridging the sacred gap between devotees and verified Pandits.*
 
 </div>
+## 📂 Project Structure
+
+```text
+PujaConnect/
 │
-└── frontend/
-    ├── public/
-    ├── src/
-    │   ├── api/
-    │   │   ├── axios.js              # Axios instance configured with JWT request headers
-    │   │   └── index.js              # Complete collection of REST API caller routines
-    │   ├── components/
-    │   │   ├── common/               # Navbar, Footer, ThemeToggle, ProtectedRoute, PanditAvatar
-    │   │   └── pandit/               # PanditCard listings
-    │   ├── context/
-    │   │   ├── AuthContext.jsx       # Global login state, session checks & profile sync
-    │   │   └── ThemeContext.jsx      # Light/Dark mode state managers
-    │   ├── pages/
-    │   │   ├── Home.jsx              # Landing page with Karnataka-focused search parameters
-    │   │   ├── Login.jsx             # Sign-in page (secured with no visible credentials)
-    │   │   ├── Register.jsx          # Register page (including min 8-char validation hints)
-    │   │   ├── PanditList.jsx        # Search results page with region & language filters
-    │   │   ├── PanditProfile.jsx     # Pandit profiles with booking slot selector
-    │   │   ├── BookingPage.jsx       # Address & slot booking transaction wizard
-    │   │   ├── Rituals.jsx           # Public catalog of pujas
-    │   │   ├── PlaceholderPage.jsx   # Dynamic themed Coming Soon page for future sections
-    │   │   └── dashboard/
-    │   │       ├── UserDashboard.jsx    # Devotee dashboard (history logs, profile edits)
-    │   │       ├── PanditDashboard.jsx  # Pandit dashboard (accept/reject/complete, scheduling)
-    │   │       └── AdminDashboard.jsx   # Admin dashboard (verification flow, stats, user list)
-    │   ├── App.jsx                   # React Router route registry
-    │   ├── main.jsx                  # ReactDOM render bootstrap
-    │   └── index.css                 # Tailwind utility imports & global font bindings
-    ├── tailwind.config.js            # Font mappings and palette configuration
-    ├── vite.config.js
-    └── package.json
+├── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── seed/
+│   └── server.js
+│
+├── frontend/
+│   ├── public/
+│   │
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── axios.js
+│   │   │   └── index.js
+│   │   │
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   └── pandit/
+│   │   │
+│   │   ├── context/
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── ThemeContext.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── Rituals.jsx
+│   │   │   ├── PanditList.jsx
+│   │   │   ├── PanditProfile.jsx
+│   │   │   ├── BookingPage.jsx
+│   │   │   └── dashboard/
+│   │   │       ├── UserDashboard.jsx
+│   │   │       ├── PanditDashboard.jsx
+│   │   │       └── AdminDashboard.jsx
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   │
+│   ├── tailwind.config.js
+│   ├── vite.config.js
+│   └── package.json
+│
+└── README.md
 ```
+
+### Key Modules
+
+| Module            | Description                          |
+| ----------------- | ------------------------------------ |
+| Authentication    | JWT-based secure authentication      |
+| Ritual Management | 100+ rituals with categories         |
+| Pandit Discovery  | Search, filters, and profiles        |
+| Booking System    | Slot-based booking workflow          |
+| Availability      | Custom scheduling system             |
+| Messaging         | User ↔ Pandit communication          |
+| Dashboards        | User, Pandit, and Admin portals      |
+| Administration    | Verification and platform management |
+
 
 ---
 
