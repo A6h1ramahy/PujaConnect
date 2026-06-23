@@ -1,104 +1,478 @@
-# PujaConnect – Online Pandit & Puja Booking Platform
+# 🛕 PujaConnect
 
 <div align="center">
-  <h3>🛕 Connecting Devotees with Verified Pandits for Sacred Ceremonies 🙏</h3>
+
+### Connecting Devotees with Verified Pandits for Sacred Ceremonies Across India 🙏
+
+A modern full-stack platform for discovering, booking, and managing verified Pandits for religious ceremonies and rituals across multiple regions of India.
+
+[Live Demo](#) • [Features](#-major-features) • [Technology](#-technology-stack) • [Roles](#-user-roles)
+
 </div>
 
 ---
 
-## 📋 Project Overview
+## 📊 Project Overview
 
-PujaConnect is a production-quality, secure, and fully responsive full-stack web platform that simplifies the discovery, comparison, and booking of verified Pandits for Hindu religious ceremonies. The application bridges the gap between devotees seeking authentic spiritual rituals and professional Pandits offering these sacred services.
+**PujaConnect** is a production-ready digital platform that bridges the gap between devotees seeking authentic spiritual rituals and professional Pandits offering sacred services. 
 
-Currently booking a Pandit relies heavily on word-of-mouth or unverified channels. PujaConnect establishes transparency in pricing, schedules, and Pandit credentials, providing a seamless digital workflow for devotees and Pandits alike.
+In traditional contexts, booking a Pandit relied heavily on word-of-mouth recommendations or unverified channels, creating challenges in transparency, pricing consistency, and service reliability. PujaConnect solves these problems by providing:
 
-**Supported Ceremonies Include:** Satyanarayan Katha · Naamkaran · Griha Pravesh · Havan · Mundan · Ganesh Puja · Lakshmi Puja · Vivah & more (expandable catalog managed by system administrators).
+- **Transparency**: Clear pricing, verified credentials, and published schedules
+- **Trust**: Admin-verified Pandits with detailed profiles and ratings
+- **Accessibility**: Multi-region support with 100+ rituals across India
+- **Convenience**: Seamless digital workflow for devotees and Pandits alike
+- **Communication**: Built-in messaging system for direct user-Pandit interaction
 
----
-
-## ✨ Core Features
-
-### 1. User Authentication & Security
-- **Secure Authentication:** JWT-based user session handling with secure cookie/header authorization.
-- **Suspension Protection:** Access-control mechanism checking `isSuspended` flag on login. Suspended users are immediately denied access with a professional feedback notice.
-- **Dual-Layer Validation:** Inputs are schema-validated on the backend (using `express-validator`) and dynamically checked on the frontend before form submission (matching email RFC formats, password complexity, and future-date selections).
-
-### 2. Pandit Discovery & Search
-- **Verification Gatekeeping:** Only Pandits approved by platform administrators are displayed in public search feeds.
-- **Search & Filtering:** Devotees can search for verified Pandits by city and refine results by region/state, specific rituals, languages spoken, and years of experience.
-- **Index Optimization:** Database queries are optimized with indexes on `location.city`, `location.region`, `verificationStatus`, `supportedRituals`, `languagesSpoken`, and `yearsOfExperience`.
-
-### 3. Smart Booking Lifecycle
-- **5-State Transaction Engine:** Bookings transition through standard statuses: `pending` ➔ `accepted` ➔ `rejected` ➔ `cancelled` ➔ `completed`.
-- **History Tracking & Audit Logs:** Every state change is recorded in a `statusHistory` timeline, indicating status changes, timestamps, and optional notes.
-- **Slot Selection:** Real-time checking of Pandit availability slots prevents booking conflicts.
-
-### 4. Cloudinary Image Storage
-- **Direct Buffering:** Profile photos uploaded by Pandits are processed via memory storage (`multer.memoryStorage()`) and streamed directly to Cloudinary.
-- **Zero Local Disk Writes:** Images are never saved locally to server disks or stored as binary values inside the MongoDB database.
-- **Three-Tier Fallback Avatar:** A robust custom component (`<PanditAvatar />`) renders:
-  1. The Cloudinary secure HTTPS URL if present.
-  2. Initials via the UI Avatars API with a traditional saffron background.
-  3. A clean inline React Icon if network requests fail.
-
-### 5. Traditional Spiritual Typography & UI
-- **Spiritual Serif System:** Configured `Cormorant Garamond` for headings (adding a traditional, premium look) and `Source Serif 4` for body text, with fallbacks to `Georgia` and `Times New Roman`.
-- **Theme Support:** Native dark and light mode stylesheets integrated seamlessly with user settings saved to `localStorage`.
-- **Placeholder Redirection:** Unimplemented Resource or Trust links automatically route to a dynamic Coming Soon page that reads the active URL path to display a custom themed header.
+The platform operates as an interconnected ecosystem with three primary user roles: **Users** (devotees seeking services), **Pandits** (service providers), and **Admins** (platform managers ensuring quality and compliance).
 
 ---
 
-## 🛠 Tech Stack
+## ✨ Core Objectives
 
-| Layer | Technology |
+The PujaConnect platform is designed to achieve the following objectives:
+
+| Objective | Description |
+|-----------|-------------|
+| **✓ Trusted Pandit Discovery** | Enable users to discover verified Pandits with comprehensive profiles and credentials |
+| **✓ Ritual Management** | Maintain and curate an extensive catalog of rituals (100+) across multiple categories |
+| **✓ Online Booking** | Provide a seamless slot-based booking system with real-time availability |
+| **✓ Availability Scheduling** | Allow Pandits to manage custom time slots with automatic conflict prevention |
+| **✓ Direct Communication** | Enable real-time messaging between users and Pandits for coordination and queries |
+| **✓ Multi-Region Support** | Support rituals and Pandits across diverse regions of India |
+| **✓ Administrative Control** | Empower admins to verify Pandits, manage platform content, and ensure data integrity |
+
+---
+
+## 🛠 Technology Stack
+
+### Frontend
+- **React** 18 - Modern UI library with hooks
+- **Vite** - Lightning-fast build tool and development server
+- **Tailwind CSS** - Utility-first CSS framework for responsive design
+- **React Router DOM** - Client-side routing and navigation
+- **Axios** - Promise-based HTTP client for API communication
+- **Framer Motion** - Smooth animations and transitions
+- **React Icons** - Comprehensive icon library
+
+### Backend
+- **Node.js** - JavaScript runtime environment
+- **Express.js** - Fast and flexible web framework
+- **Multer** - Middleware for file uploads (memory-based streaming)
+
+### Database & ODM
+- **MongoDB** - NoSQL document database
+- **Mongoose** - ODM with schema validation and indexing
+
+### Authentication & Security
+- **JWT (JSON Web Tokens)** - Stateless authentication
+- **bcryptjs** - Password hashing with 12-round salt
+- **Role-Based Access Control (RBAC)** - Multi-tier authorization
+
+### Cloud & Integrations
+- **Cloudinary** - Cloud image storage and optimization
+- **UI Avatars API** - Fallback avatar generation
+
+### Utilities
+- **date-fns** - Modern date manipulation library
+
+---
+
+## 👥 User Roles
+
+PujaConnect operates with three distinct user roles, each with specific capabilities and responsibilities:
+
+### 👤 User (Devotee)
+Users are individuals seeking ritual services. They can:
+- ✓ Create and manage accounts
+- ✓ Search and browse Pandits by name, city, or region
+- ✓ Filter and discover rituals by category
+- ✓ View Pandit profiles, credentials, and availability
+- ✓ Book Pandits for specific rituals and dates
+- ✓ Select available time slots for ceremonies
+- ✓ Provide booking address and special requirements
+- ✓ Accept or cancel bookings
+- ✓ Communicate with Pandits through messaging
+- ✓ Track booking history and status
+- ✓ Manage profile and update personal information
+- ✓ Change password and delete account
+
+### 🕉️ Pandit (Service Provider)
+Pandits are verified service providers offering ritual expertise. They can:
+- ✓ Create and verify professional profiles
+- ✓ Manage pricing for individual rituals
+- ✓ Define supported rituals and languages
+- ✓ Create custom availability slots
+- ✓ Set multiple slots for different time periods
+- ✓ Accept or reject booking requests
+- ✓ Communicate with users through messaging
+- ✓ Track upcoming schedule and bookings
+- ✓ View booking history and completed ceremonies
+- ✓ Manage profile information and credentials
+
+### 👨‍💼 Admin (Platform Manager)
+Admins manage the platform, ensure quality, and maintain data integrity. They can:
+- ✓ Verify and approve Pandits
+- ✓ Manage user accounts and suspend problematic users
+- ✓ Manage Pandit accounts and suspensions
+- ✓ View and manage all bookings on the platform
+- ✓ Create and manage the ritual catalog (100+ rituals)
+- ✓ Modify ritual details, categories, and pricing
+- ✓ Create additional administrator accounts
+- ✓ Delete user or Pandit accounts when necessary
+- ✓ View platform statistics and analytics
+- ✓ Monitor booking trends and platform activity
+
+---
+
+## ⭐ Major Features
+
+### Authentication & Security
+- ✓ **JWT Authentication** - Secure token-based authentication with expiration
+- ✓ **Role-Based Access Control** - Fine-grained permission system for each user role
+- ✓ **Protected Routes** - Frontend and backend route protection based on roles
+- ✓ **Secure Password Handling** - bcryptjs hashing with 12-round salt
+- ✓ **Input Validation** - Dual-layer validation (backend + frontend)
+- ✓ **API Protection** - Middleware-based access control on all endpoints
+- ✓ **Account Suspension** - Ability to suspend problematic users with immediate access denial
+
+### Pandit Discovery & Search
+- ✓ **Verified Pandit Listings** - Only admin-approved Pandits are visible
+- ✓ **Name Search** - Search Pandits by full name
+- ✓ **City Filtering** - Find Pandits available in specific cities
+- ✓ **Region Filtering** - Filter by geographic region
+- ✓ **Ritual Filtering** - Search Pandits by supported rituals
+- ✓ **Language Filtering** - Find Pandits who speak required languages
+- ✓ **Experience Filtering** - Filter by years of experience
+- ✓ **Advanced Search** - Combine multiple filters for precise results
+
+### Ritual Catalog
+- ✓ **100+ Rituals** - Comprehensive catalog of Hindu ceremonies and rituals
+- ✓ **Ritual Categories** - Organized by type (Pujas, Samskaras, Festivals, etc.)
+- ✓ **Detailed Information** - Duration, significance, and traditional guidelines
+- ✓ **Search Functionality** - Find rituals by name or category
+- ✓ **Advanced Filtering** - Filter by region, cost, or requirements
+- ✓ **Featured Rituals** - Highlight popular or trending ceremonies
+- ✓ **Admin Management** - Create, update, and manage ritual catalog
+
+### Booking System
+- ✓ **Ritual Selection** - Choose from available rituals
+- ✓ **Date Selection** - Pick ceremony dates with calendar interface
+- ✓ **Slot-Based Booking** - Select from Pandit's available time slots
+- ✓ **Address Collection** - Capture ceremony location details
+- ✓ **Booking Requests** - Submit requests for Pandit approval
+- ✓ **Request Status Flow** - Pending → Accepted/Rejected → Completed/Cancelled
+- ✓ **One-Hour Buffer** - Automatic conflict prevention with buffer time
+- ✓ **Automatic Slot Locking** - Prevent double-booking during transaction
+- ✓ **Automatic Slot Release** - Release slots if bookings expire or are cancelled
+- ✓ **Booking Expiration** - Auto-cancel bookings that are not accepted timely
+- ✓ **Cancellation System** - Users can cancel; Pandits can reject
+- ✓ **Booking History** - Maintain complete record of all bookings with timestamps
+
+### Availability Management
+- ✓ **Custom Slot Creation** - Pandits create custom time slots
+- ✓ **Multiple Slots** - Support for multiple slots on same day
+- ✓ **Date Range Selection** - Create recurring or specific availability
+- ✓ **Conflict Detection** - Prevent overlapping slots automatically
+- ✓ **Real-Time Updates** - Availability updates instantly on the platform
+- ✓ **Slot Duration** - Configurable duration for each slot
+- ✓ **Slot Deletion** - Remove or modify available slots
+
+### Messaging System
+- ✓ **Booking-Based Chat** - Direct messaging tied to specific bookings
+- ✓ **User ↔ Pandit Communication** - Seamless conversation interface
+- ✓ **Message History** - Complete message thread for each booking
+- ✓ **Read Receipts** - Track when messages are read
+- ✓ **Unread Badges** - Visual indicators for unread messages
+- ✓ **Real-Time Updates** - Messages appear instantly
+- ✓ **Conversation Threading** - Organized by booking for clarity
+
+### User Experience
+- ✓ **Dark Mode** - Fully functional dark theme with theme persistence
+- ✓ **Light Mode** - Default light theme for day-time usage
+- ✓ **Responsive Design** - Optimized for desktop, tablet, and mobile
+- ✓ **Smooth Animations** - Framer Motion transitions and interactions
+- ✓ **Modern Cards** - Clean, professional card-based layouts
+- ✓ **Mobile Support** - Touch-friendly interface and gestures
+- ✓ **Professional Design** - Premium UI with spiritual aesthetics
+- ✓ **Loading States** - Skeleton loaders and spinners for feedback
+- ✓ **Toast Notifications** - Non-intrusive success and error messages
+- ✓ **Spiritual Typography** - Cormorant Garamond & Source Serif fonts
+
+### Profile Management
+- ✓ **User Profiles** - Display personal information and booking history
+- ✓ **Pandit Profiles** - Showcase credentials, experience, and available rituals
+- ✓ **Profile Photos** - Upload and display profile images via Cloudinary
+- ✓ **Avatar Fallbacks** - Smart fallback system: Cloudinary URL → Initials → Icon
+- ✓ **Password Change** - Secure password update mechanism
+- ✓ **Account Deletion** - Users can delete their accounts permanently
+
+### Cloud & Media
+- ✓ **Cloudinary Integration** - Professional image storage and optimization
+- ✓ **Memory-Based Uploads** - No local disk writes; stream directly to cloud
+- ✓ **Secure URLs** - HTTPS image delivery with automatic optimization
+- ✓ **Zero Local Storage** - Images never stored on server disk
+
+---
+
+## 📖 Ritual Management
+
+PujaConnect maintains an extensive ritual catalog supporting Hindu ceremonies across India:
+
+### Ritual Catalog
+- **100+ Rituals** - Comprehensive collection of verified rituals
+- **Multiple Categories** - Organized by type and occasion:
+  - Daily Pujas (Surya Puja, Lakshmi Puja, etc.)
+  - Life Ceremonies (Naamkaran, Mundan, Vivah, etc.)
+  - Festivals (Durga Puja, Diwali, Holi celebrations)
+  - House Rituals (Griha Pravesh, Vastu Pujan)
+  - Remedial Ceremonies (Navagraha Shanti, etc.)
+
+### Search & Discovery
+- **Ritual Search** - Find rituals by name or keyword
+- **Category Filtering** - Browse by ritual type
+- **Regional Variations** - Rituals with regional customizations
+- **Featured Rituals** - Highlight popular or trending ceremonies
+- **Pandit Compatibility** - See which Pandits offer each ritual
+
+### Admin Controls
+- **Create Rituals** - Add new rituals to the platform
+- **Update Details** - Modify ritual information anytime
+- **Manage Categories** - Organize rituals hierarchically
+- **Price Management** - Set standard pricing guidelines
+- **Deprecate Rituals** - Remove rituals when needed
+
+---
+
+## 📅 Booking System
+
+The booking system provides a robust transaction engine for ceremony reservations:
+
+### Booking Workflow
+```
+User Initiates → Selects Ritual → Chooses Date → Selects Slot → 
+Provides Address → Submits Request → Pandit Reviews → 
+Accepts/Rejects → Booking Confirmed/Cancelled
+```
+
+### Booking States
+- **Pending** - Initial state; awaiting Pandit confirmation
+- **Accepted** - Pandit approved; booking confirmed
+- **Rejected** - Pandit declined; user can rebook
+- **Cancelled** - User or expiration triggered cancellation
+- **Completed** - Ceremony finished; booking archived
+
+### Features
+- **State History** - Complete audit log of all status changes
+- **Automatic Expiration** - Pending bookings expire after set duration
+- **One-Hour Buffer** - Enforced gap between consecutive bookings
+- **Real-Time Availability** - Slots locked during transaction
+- **Conflict Prevention** - No double-booking possible
+- **Cancellation Rights** - Users can cancel anytime; Pandits can reject
+
+---
+
+## ⏰ Availability Management
+
+Pandits have full control over their schedules:
+
+### Custom Slots
+- **Time-Based Slots** - Define availability by specific time windows
+- **Multiple Slots** - Create several slots on the same day
+- **Duration Control** - Set slot length (typically 1-4 hours)
+- **Date Selection** - Specify exact dates or date ranges
+
+### Slot Protection
+- **Conflict Prevention** - System prevents overlapping slots
+- **Automatic Locking** - Slots lock when booking is confirmed
+- **Automatic Unlocking** - Slots unlock if booking is cancelled
+- **Real-Time Updates** - Availability reflects instantly
+- **Buffer Enforcement** - One-hour gap maintained between bookings
+
+---
+
+## 💬 Messaging System
+
+Real-time communication between users and Pandits:
+
+### Features
+- **Booking-Linked Chat** - Messages tied to specific bookings
+- **Direct Messaging** - One-to-one conversations
+- **Message History** - Full thread of all communications
+- **Read Status** - Track message read receipts
+- **Unread Notifications** - Badge count for unread messages
+- **Conversation Threading** - Organized by booking context
+
+### Use Cases
+- Ask questions about rituals
+- Clarify ceremony requirements
+- Discuss special requests
+- Confirm booking details
+- Reschedule if needed
+
+---
+
+## 🌏 Multi-Regional Support
+
+PujaConnect supports Pandits and rituals across India:
+
+### Supported Regions
+- 🏛️ Karnataka
+- 🏛️ Maharashtra
+- 🏛️ Delhi
+- 🏛️ West Bengal
+- 🏛️ Tamil Nadu
+- 🏛️ Telangana
+- 🏛️ Uttar Pradesh
+
+### Language Support
+- 🗣️ Kannada
+- 🗣️ Hindi
+- 🗣️ Sanskrit
+- 🗣️ Marathi
+- 🗣️ Bengali
+- 🗣️ Tamil
+- 🗣️ Telugu
+
+### Regional Variations
+- Rituals adapted to regional traditions
+- Pandits specialized in regional practices
+- Local pricing considerations
+- Regional festival calendars
+
+---
+
+## 🔒 Security Features
+
+PujaConnect implements comprehensive security measures:
+
+| Security Layer | Implementation |
 |---|---|
-| **Frontend** | React 18 · Vite · Tailwind CSS v3 · React Router DOM v6 |
-| **Backend** | Node.js · Express.js · Multer (memory-only buffer uploads) |
-| **Database** | MongoDB · Mongoose (with indexing & compound key configurations) |
-| **Integrations** | Cloudinary SDK (Direct Upload Stream API) · UI Avatars API |
-| **Auth & Security** | JWT (JSON Web Tokens) · bcryptjs (12 rounds) |
-| **Validation** | express-validator (backend schemas) · Frontend regex helpers |
-| **Icons & Style** | React Icons (`MdOutlineTempleHindu`, etc.) · Cormorant Garamond & Source Serif 4 |
-| **Date Utilities** | date-fns |
+| **Authentication** | JWT token-based with secure expiration |
+| **Authorization** | Role-Based Access Control (RBAC) |
+| **Protected Routes** | Frontend and backend route guards |
+| **Password Security** | bcryptjs with 12-round hashing |
+| **Input Validation** | Server-side schema validation + client-side checks |
+| **API Protection** | Middleware-based authentication on all endpoints |
+| **Account Management** | User suspension mechanism for problematic accounts |
+| **Data Integrity** | Mongoose schema validation |
+| **HTTPS Ready** | Secure cloud media delivery via Cloudinary |
 
 ---
 
-## 📁 Project Structure
+## 👨‍💼 Admin Features
 
-```text
-PujaConnect/
-├── backend/
-│   ├── config/
-│   │   ├── db.js                     # MongoDB connection wrapper
-│   │   └── cloudinary.js             # Cloudinary configuration & SDK client
-│   ├── controllers/
-│   │   ├── authController.js         # User registration, login, and getMe sessions
-│   │   ├── userController.js         # Devotee profile edits & Admin user suspension toggle
-│   │   ├── panditController.js       # Pandit profile CRUD & search listings
-│   │   ├── ritualController.js       # Admin ritual catalog management
-│   │   ├── bookingController.js      # Booking lifecycle (create, accept, reject, complete, cancel)
-│   │   ├── availabilityController.js  # Pandit availability slot scheduling
-│   │   └── adminController.js        # Admin dashboard verification & platform stats
-│   ├── middleware/
-│   │   ├── authMiddleware.js         # JWT token verification
-│   │   ├── roleMiddleware.js         # Role-based access control (RBAC) guards
-│   │   ├── errorMiddleware.js        # Global Express exception handler
-│   │   └── uploadMiddleware.js       # Multer configuration routing to memoryStorage
-│   ├── models/
-│   │   ├── User.js                   # Authentication & role schema
-│   │   ├── Pandit.js                 # Pandit bio, location, pricing & verification state
-│   │   ├── Ritual.js                 # Puja details, duration, and pricing schema
-│   │   ├── Booking.js                # Booking transactions, timeline, & statusHistory logs
-│   │   └── Availability.js           # Pandit schedule date & time slot schema
-│   ├── routes/                       # Express router routes mapping requests to controllers
-│   ├── seed/
-│   │   └── seed.js                   # Idempotent database seeder for default rituals & admin
-│   ├── utils/
-│   │   ├── generateToken.js          # JWT signed token helper
-│   │   └── validators.js             # express-validator schemas for input constraints
-│   ├── server.js                     # Express app configuration & server startup entrypoint
-│   └── package.json
-│
+Comprehensive administrative dashboard for platform management:
+
+### User Management
+- View all users with account status
+- Suspend or unsuspend problematic users
+- Delete user accounts if necessary
+- Monitor user activity and booking history
+
+### Pandit Management
+- View all Pandits with verification status
+- Approve or reject Pandit registrations
+- Suspend or unsuspend Pandit accounts
+- Monitor Pandit ratings and reviews
+- Manage Pandit credentials and verification
+
+### Booking Management
+- View all bookings across the platform
+- Monitor booking status and timeline
+- Intervene in disputes between users and Pandits
+- Generate booking reports and statistics
+
+### Ritual Management
+- Create new rituals in the catalog
+- Update existing ritual information
+- Manage ritual categories and pricing
+- View ritual popularity and demand
+
+### Dashboard Analytics
+- Total users, Pandits, and bookings
+- Pending verifications queue
+- Recent activity feed
+- Platform statistics and trends
+
+---
+
+## 🎨 User Experience Design
+
+PujaConnect prioritizes a professional, modern user experience:
+
+### Visual Design
+- ✓ Clean, minimalist interface
+- ✓ Spiritual aesthetic with Cormorant Garamond typography
+- ✓ Consistent color scheme and branding
+- ✓ Professional card-based layouts
+- ✓ Smooth transitions and animations
+
+### Accessibility
+- ✓ Responsive design for all devices
+- ✓ Touch-friendly mobile interface
+- ✓ Fast loading with optimized images
+- ✓ Clear navigation and information hierarchy
+- ✓ Accessible form validation
+
+### Theme Support
+- ✓ Dark mode for low-light environments
+- ✓ Light mode for day-time usage
+- ✓ Theme preference saved in browser
+- ✓ Smooth theme switching transitions
+
+---
+
+## 🚀 Future Scope
+
+PujaConnect is positioned for future expansion:
+
+- **📱 Mobile Applications** - Native iOS and Android apps for on-the-go booking
+- **💳 Online Payments** - Integrated payment gateway for direct transactions
+- **📹 Video Consultations** - Pre-ceremony video consultation with Pandits
+- **🎬 Live Rituals** - Stream ceremonies for remote participation
+- **🔔 Notification Services** - Push notifications for bookings and messages
+- **⭐ Review System** - User ratings and reviews for Pandits
+- **📊 Advanced Analytics** - Detailed reporting for platform insights
+
+---
+
+## 📊 Project Status
+
+```
+🟢 Production Ready
+━━━━━━━━━━━━━━━━━
+Status: Fully Functional
+Version: 1.0.0
+Last Updated: June 2026
+```
+
+All core features implemented, tested, and ready for deployment. The application operates as a complete, production-ready platform for Pandit discovery and booking.
+
+---
+
+## 👨‍💻 About the Developer
+
+**Abhirama H Y**
+
+- 🎓 Computer Science Engineering
+- 🏫 PES University
+- 💼 Full-Stack Developer
+
+### Connect
+- 🔗 [LinkedIn](#)
+- 🐙 [GitHub](#)
+- 🌐 [Portfolio](#)
+
+---
+
+<div align="center">
+
+### 🙏 PujaConnect - Connecting Devotion with Service
+
+*A modern platform bridging the sacred gap between devotees and verified Pandits.*
+
+</div>│
 └── frontend/
     ├── public/
     ├── src/
