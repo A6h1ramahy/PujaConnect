@@ -310,31 +310,46 @@ const PanditDashboard = () => {
 
     const targetSlot = dayAvail.timeSlots.find((ts) => ts._id === slotId);
     if (targetSlot && targetSlot.isBooked) {
-      toast.error('Locked slot cannot be removed or modified');
+      toast.error('This slot is associated with an accepted booking and cannot be removed.');
       return;
     }
 
-    if (!window.confirm(`Are you sure you want to remove the slot "${targetSlot.time}"?`)) return;
+    if (!window.confirm("Remove this time slot?")) return;
 
     const updatedSlots = dayAvail.timeSlots.filter((ts) => ts._id !== slotId);
 
     try {
-      await updatePanditAvail(availId, { timeSlots: updatedSlots });
-      toast.success('Time slot removed successfully.');
-      const { data } = await getMyAvailability();
-      setAvailability(data.slots || []);
+      const { data } = await updatePanditAvail(availId, { timeSlots: updatedSlots });
+      toast.success(data.message || 'Time slot removed successfully.');
+      if (data.success && data.updatedAvailability) {
+        setAvailability((prev) =>
+          prev.map((slot) => (slot._id === availId ? data.updatedAvailability : slot))
+        );
+      } else {
+        const { data: res } = await getMyAvailability();
+        setAvailability(res.slots || []);
+      }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Failed to remove time slot');
+      toast.error('Unable to remove the slot.\nPlease try again.');
     }
   };
 
   const toggleTimeSlot = (time) => {
-    setAvailForm((prev) => ({
-      ...prev,
-      timeSlots: prev.timeSlots.includes(time)
-        ? prev.timeSlots.filter((t) => t !== time)
-        : [...prev.timeSlots, time],
-    }));
+    const isCustom = addedCustomSlots.includes(time);
+    if (isCustom) {
+      setAvailForm((prev) => ({
+        ...prev,
+        timeSlots: prev.timeSlots.filter((t) => t !== time),
+      }));
+      setAddedCustomSlots((prev) => prev.filter((t) => t !== time));
+    } else {
+      setAvailForm((prev) => ({
+        ...prev,
+        timeSlots: prev.timeSlots.includes(time)
+          ? prev.timeSlots.filter((t) => t !== time)
+          : [...prev.timeSlots, time],
+      }));
+    }
   };
 
   const pending  = bookings.filter((b) => b.status === 'pending');
@@ -877,15 +892,23 @@ const PanditDashboard = () => {
                                           <span>{ts.time}</span>
                                           <span className="font-normal text-stone-400/60 dark:text-stone-500/60">|</span>
                                           <span>{statusIcon} {statusLabel}</span>
-                                          {!isBooked && (
-                                            <button
-                                              onClick={() => handleRemoveIndividualSlot(slot._id, ts._id)}
-                                              className="ml-1 text-stone-400 hover:text-crimson-500 p-0.5 rounded-md hover:bg-stone-200/55 dark:hover:bg-stone-700/50 transition-colors cursor-pointer"
-                                              title="Remove time slot"
+                                          <button
+                                              onClick={() => {
+                                                if (isBooked) {
+                                                  toast.error("This slot is associated with an accepted booking and cannot be removed.");
+                                                  return;
+                                                }
+                                                handleRemoveIndividualSlot(slot._id, ts._id);
+                                              }}
+                                              className={`ml-1 p-0.5 rounded-md transition-colors ${
+                                                isBooked
+                                                  ? 'text-stone-300 dark:text-stone-600 cursor-not-allowed opacity-40'
+                                                  : 'text-stone-400 hover:text-crimson-500 hover:bg-stone-200/55 dark:hover:bg-stone-700/50 cursor-pointer'
+                                              }`}
+                                              title={isBooked ? "This slot is associated with an accepted booking and cannot be removed" : "Remove time slot"}
                                             >
                                               <HiX className="w-3.5 h-3.5" />
                                             </button>
-                                          )}
                                         </div>
                                       );
                                     })}
