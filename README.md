@@ -472,7 +472,8 @@ All core features implemented, tested, and ready for deployment. The application
 
 *A modern platform bridging the sacred gap between devotees and verified Pandits.*
 
-</div>│
+</div>
+│
 └── frontend/
     ├── public/
     ├── src/
