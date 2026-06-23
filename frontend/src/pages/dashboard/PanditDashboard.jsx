@@ -252,6 +252,11 @@ const PanditDashboard = () => {
         "This date already has availability.\n\nDo you want to add these slots to the existing schedule?"
       );
       if (!confirmAdd) return;
+    } else {
+      const confirmCreate = window.confirm(
+        "Users will only be able to book the slots you make available.\n\nCustom booking times will be disabled for these dates.\n\nDo you want to continue?"
+      );
+      if (!confirmCreate) return;
     }
 
     try {
