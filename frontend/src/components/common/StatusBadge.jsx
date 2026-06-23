@@ -6,6 +6,7 @@ const statusConfig = {
   accepted:  { icon: HiCheckCircle,  cls: 'badge-accepted',  label: 'Accepted'  },
   rejected:  { icon: HiXCircle,      cls: 'badge-rejected',  label: 'Rejected'  },
   cancelled: { icon: HiBan,          cls: 'badge-cancelled', label: 'Cancelled' },
+  expired:   { icon: HiBan,          cls: 'badge-expired',   label: 'Expired'   },
   completed: { icon: HiCheckCircle,  cls: 'badge-completed', label: 'Completed' },
   verified:  { icon: HiCheckCircle,  cls: 'badge-verified',  label: 'Verified'  },
 };
