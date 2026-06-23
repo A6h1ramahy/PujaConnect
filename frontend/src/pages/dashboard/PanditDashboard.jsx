@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   getPanditBookings, acceptBooking, rejectBooking, completeBooking,
   getMyProfile, updateMyProfile, getRituals,
-  getMyAvailability, setPanditAvail, deletePanditAvail, deleteAccountSelf,
+  getMyAvailability, setPanditAvail, updatePanditAvail, deletePanditAvail, deleteAccountSelf,
 } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -59,6 +59,8 @@ const PanditDashboard = () => {
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [availForm, setAvailForm] = useState({ date: '', timeSlots: [] });
+  const [customSlot, setCustomSlot] = useState({ startTime: '', endTime: '' });
+  const [addedCustomSlots, setAddedCustomSlots] = useState([]);
   const [saving, setSaving] = useState(false);
   const [isSupportedRitualsOpen, setIsSupportedRitualsOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
@@ -171,30 +173,153 @@ const PanditDashboard = () => {
     }));
   };
 
+  const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr) return null;
+    const singleTime = timeStr.includes(' - ') ? timeStr.split(' - ')[0].trim() : timeStr.trim();
+    const match12 = singleTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (match12) {
+      let hours = parseInt(match12[1], 10);
+      const minutes = parseInt(match12[2], 10);
+      const ampm = match12[3].toUpperCase();
+      if (ampm === 'PM' && hours < 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+      return hours * 60 + minutes;
+    }
+    const match24 = singleTime.match(/^(\d{1,2}):(\d{2})$/);
+    if (match24) {
+      const hours = parseInt(match24[1], 10);
+      const minutes = parseInt(match24[2], 10);
+      return hours * 60 + minutes;
+    }
+    return null;
+  };
+
+  const convert24To12 = (time24) => {
+    if (!time24) return '';
+    const [hoursStr, minutesStr] = time24.split(':');
+    let hours = parseInt(hoursStr, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursFormatted = hours < 10 ? `0${hours}` : hours;
+    return `${hoursFormatted}:${minutesStr} ${ampm}`;
+  };
+
+  const handleAddCustomSlot = () => {
+    if (!customSlot.startTime) {
+      toast.error('Please enter a start time');
+      return;
+    }
+    const start12 = convert24To12(customSlot.startTime);
+    let finalSlot = start12;
+
+    if (customSlot.endTime) {
+      const end12 = convert24To12(customSlot.endTime);
+      const startMin = parseTimeToMinutes(start12);
+      const endMin = parseTimeToMinutes(end12);
+      if (endMin <= startMin) {
+        toast.error('End Time must be after Start Time');
+        return;
+      }
+      finalSlot = `${start12} - ${end12}`;
+    }
+
+    if (availForm.timeSlots.includes(finalSlot)) {
+      toast.error(`Slot "${finalSlot}" is already selected`);
+      return;
+    }
+
+    setAvailForm((prev) => ({
+      ...prev,
+      timeSlots: [...prev.timeSlots, finalSlot],
+    }));
+    setAddedCustomSlots((prev) => [...prev, finalSlot]);
+    setCustomSlot({ startTime: '', endTime: '' });
+  };
+
   const handleAddAvailability = async () => {
     if (!availForm.date || availForm.timeSlots.length === 0) {
       toast.error('Please select a date and at least one time slot');
       return;
     }
+
+    const existingDay = availability.find(
+      (s) => format(new Date(s.date), 'yyyy-MM-dd') === availForm.date
+    );
+
+    if (existingDay) {
+      const confirmAdd = window.confirm(
+        "This date already has availability.\n\nDo you want to add these slots to the existing schedule?"
+      );
+      if (!confirmAdd) return;
+    }
+
     try {
-      await setPanditAvail({ date: availForm.date, timeSlots: availForm.timeSlots });
-      toast.success('Availability set!');
+      const { data } = await setPanditAvail({ date: availForm.date, timeSlots: availForm.timeSlots });
+      toast.success(data.message || 'Availability added successfully.');
       setAvailForm({ date: '', timeSlots: [] });
-      const { data } = await getMyAvailability();
-      setAvailability(data.slots || []);
+      setAddedCustomSlots([]);
+      const res = await getMyAvailability();
+      setAvailability(res.data.slots || []);
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to set availability');
     }
   };
 
   const handleDeleteAvail = async (id) => {
-    if (!window.confirm('Remove this availability?')) return;
+    const dayAvail = availability.find((s) => s._id === id);
+    if (!dayAvail) return;
+
+    const hasBooked = dayAvail.timeSlots.some((ts) => ts.isBooked);
+
+    if (hasBooked) {
+      const confirmRemoveAvailable = window.confirm(
+        "Some slots are currently booked and cannot be removed.\n\nRemove only the available slots?"
+      );
+      if (!confirmRemoveAvailable) return;
+
+      const onlyBookedSlots = dayAvail.timeSlots.filter((ts) => ts.isBooked);
+      try {
+        await updatePanditAvail(id, { timeSlots: onlyBookedSlots });
+        toast.success('Available slots removed. Confirmed booking slots remain.');
+        const { data } = await getMyAvailability();
+        setAvailability(data.slots || []);
+      } catch (err) {
+        toast.error(err?.response?.data?.message || 'Failed to remove available slots');
+      }
+    } else {
+      if (!window.confirm('Are you sure you want to remove the entire day\'s availability?')) return;
+      try {
+        await deletePanditAvail(id);
+        setAvailability((prev) => prev.filter((s) => s._id !== id));
+        toast.success('Availability removed successfully.');
+      } catch (err) {
+        toast.error(err?.response?.data?.message || 'Failed to remove availability');
+      }
+    }
+  };
+
+  const handleRemoveIndividualSlot = async (availId, slotId) => {
+    const dayAvail = availability.find((s) => s._id === availId);
+    if (!dayAvail) return;
+
+    const targetSlot = dayAvail.timeSlots.find((ts) => ts._id === slotId);
+    if (targetSlot && targetSlot.isBooked) {
+      toast.error('Locked slot cannot be removed or modified');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to remove the slot "${targetSlot.time}"?`)) return;
+
+    const updatedSlots = dayAvail.timeSlots.filter((ts) => ts._id !== slotId);
+
     try {
-      await deletePanditAvail(id);
-      setAvailability((prev) => prev.filter((s) => s._id !== id));
-      toast.success('Removed');
-    } catch {
-      toast.error('Failed to remove');
+      await updatePanditAvail(availId, { timeSlots: updatedSlots });
+      toast.success('Time slot removed successfully.');
+      const { data } = await getMyAvailability();
+      setAvailability(data.slots || []);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to remove time slot');
     }
   };
 
@@ -616,7 +741,17 @@ const PanditDashboard = () => {
                       <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100 mb-4">Add Availability</h3>
                       <div className="form-group mb-4">
                         <label htmlFor="avail-date" className="label">Date</label>
-                        <input id="avail-date" type="date" value={availForm.date} min={new Date().toISOString().split('T')[0]} onChange={(e) => setAvailForm({ ...availForm, date: e.target.value })} className="input-field max-w-xs" />
+                        <input
+                          id="avail-date"
+                          type="date"
+                          value={availForm.date}
+                          min={new Date().toISOString().split('T')[0]}
+                          onChange={(e) => {
+                            setAvailForm({ date: e.target.value, timeSlots: [] });
+                            setAddedCustomSlots([]);
+                          }}
+                          className="input-field max-w-xs"
+                        />
                       </div>
                       <label className="label mb-2">Select Time Slots</label>
                       <div className="flex flex-wrap gap-2 mb-4">
@@ -626,7 +761,7 @@ const PanditDashboard = () => {
                             type="button"
                             id={`add-slot-${time}`}
                             onClick={() => toggleTimeSlot(time)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-all ${
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-all cursor-pointer ${
                               availForm.timeSlots.includes(time)
                                 ? 'bg-emerald-500 border-emerald-500 text-white'
                                 : 'border-light-border dark:border-dark-border text-stone-600 dark:text-stone-300 hover:border-emerald-400'
@@ -635,8 +770,52 @@ const PanditDashboard = () => {
                             {time}
                           </button>
                         ))}
+                        {addedCustomSlots.map((time) => (
+                          <button
+                            key={time}
+                            type="button"
+                            id={`add-slot-${time}`}
+                            onClick={() => toggleTimeSlot(time)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium border-2 border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700 transition-all cursor-pointer flex items-center gap-1"
+                          >
+                            {time} ✕
+                          </button>
+                        ))}
                       </div>
-                      <button id="add-availability" onClick={handleAddAvailability} className="btn-primary btn-sm">
+
+                      {/* Custom Time Slot Builder */}
+                      <div className="border-t border-light-border dark:border-dark-border pt-4 mt-4 mb-4">
+                        <h4 className="font-display font-semibold text-sm text-stone-800 dark:text-stone-200 mb-2">Custom Time Slot</h4>
+                        <div className="flex flex-wrap items-end gap-3">
+                          <div className="w-full sm:w-auto">
+                            <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">Start Time</label>
+                            <input
+                              type="time"
+                              value={customSlot.startTime}
+                              onChange={(e) => setCustomSlot({ ...customSlot, startTime: e.target.value })}
+                              className="input-field max-w-xs text-xs h-9 py-1"
+                            />
+                          </div>
+                          <div className="w-full sm:w-auto">
+                            <label className="text-xs text-stone-500 dark:text-stone-400 mb-1 block">End Time (Optional)</label>
+                            <input
+                              type="time"
+                              value={customSlot.endTime}
+                              onChange={(e) => setCustomSlot({ ...customSlot, endTime: e.target.value })}
+                              className="input-field max-w-xs text-xs h-9 py-1"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleAddCustomSlot}
+                            className="btn-secondary h-9 w-full sm:w-auto text-xs font-semibold px-4 rounded-xl cursor-pointer"
+                          >
+                            Add Custom Slot
+                          </button>
+                        </div>
+                      </div>
+
+                      <button id="add-availability" onClick={handleAddAvailability} className="btn-primary btn-sm mt-2">
                         <HiPlus /> Add Availability
                       </button>
                     </div>
@@ -651,32 +830,69 @@ const PanditDashboard = () => {
                           {availability.map((slot) => (
                             <div key={slot._id} className="card p-4">
                               <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <p className="font-semibold text-stone-900 dark:text-stone-100 mb-2">
+                                <div className="flex-1">
+                                  <p className="font-semibold text-stone-900 dark:text-stone-100 mb-3 flex items-center gap-2">
+                                    <HiCalendar className="text-saffron-500 shrink-0" />
                                     {format(new Date(slot.date), 'EEEE, MMM dd yyyy')}
                                   </p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {slot.timeSlots.map((ts) => (
-                                      <span
-                                        key={ts._id}
-                                        className={`px-3 py-1 rounded-lg text-xs font-medium ${
-                                          ts.isBooked
-                                            ? 'bg-crimson-50 dark:bg-crimson-900/20 text-crimson-600 dark:text-crimson-400'
-                                            : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                                        }`}
-                                      >
-                                        {ts.time} {ts.isBooked ? '🔒' : '✓'}
-                                      </span>
-                                    ))}
+                                  <div className="flex flex-wrap gap-2.5">
+                                    {slot.timeSlots.map((ts) => {
+                                      const isBooked = ts.isBooked;
+                                      let badgeClass = "bg-stone-100 dark:bg-stone-850 text-stone-700 dark:text-stone-300 border border-light-border dark:border-dark-border/40";
+                                      let dotClass = "bg-emerald-500";
+                                      let statusLabel = "Available";
+                                      let statusIcon = "✓";
+
+                                      if (isBooked) {
+                                        badgeClass = "bg-crimson-500/10 text-crimson-600 dark:text-crimson-400 border border-crimson-500/20";
+                                        dotClass = "bg-crimson-500 animate-pulse";
+                                        statusLabel = "Booked";
+                                        statusIcon = "🔒";
+                                      } else if (ts.bookingId) {
+                                        const status = ts.bookingId.status;
+                                        if (status === 'cancelled') {
+                                          badgeClass = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20";
+                                          dotClass = "bg-emerald-500";
+                                          statusLabel = "Available Again";
+                                          statusIcon = "✓";
+                                        } else if (status === 'expired') {
+                                          badgeClass = "bg-amber-500/10 text-amber-600 dark:text-amber-450 border border-amber-500/20";
+                                          dotClass = "bg-amber-500";
+                                          statusLabel = "Released";
+                                          statusIcon = "✓";
+                                        }
+                                      }
+
+                                      return (
+                                        <div
+                                          key={ts._id}
+                                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold ${badgeClass}`}
+                                        >
+                                          <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
+                                          <span>{ts.time}</span>
+                                          <span className="font-normal text-stone-400/60 dark:text-stone-500/60">|</span>
+                                          <span>{statusIcon} {statusLabel}</span>
+                                          {!isBooked && (
+                                            <button
+                                              onClick={() => handleRemoveIndividualSlot(slot._id, ts._id)}
+                                              className="ml-1 text-stone-400 hover:text-crimson-500 p-0.5 rounded-md hover:bg-stone-200/55 dark:hover:bg-stone-700/50 transition-colors cursor-pointer"
+                                              title="Remove time slot"
+                                            >
+                                              <HiX className="w-3.5 h-3.5" />
+                                            </button>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
                                   </div>
                                 </div>
                                 <button
                                   id={`delete-avail-${slot._id}`}
                                   onClick={() => handleDeleteAvail(slot._id)}
-                                  className="p-2 rounded-lg text-stone-400 hover:text-crimson-500 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 transition-colors"
-                                  title="Remove availability"
+                                  className="p-2 rounded-xl text-stone-400 hover:text-crimson-500 hover:bg-crimson-50 dark:hover:bg-crimson-900/20 transition-colors cursor-pointer shrink-0"
+                                  title="Delete Entire Day Availability"
                                 >
-                                  <HiTrash />
+                                  <HiTrash className="w-5 h-5" />
                                 </button>
                               </div>
                             </div>
