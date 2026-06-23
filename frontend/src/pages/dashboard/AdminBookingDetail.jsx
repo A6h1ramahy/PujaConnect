@@ -155,6 +155,14 @@ const AdminBookingDetail = () => {
             </div>
           </ScrollReveal>
 
+          {['cancelled', 'rejected', 'expired'].includes(booking.status) && (
+            <ScrollReveal>
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-750 dark:text-emerald-400 text-sm font-semibold flex items-center gap-2">
+                <span>✓</span> Availability Released
+              </div>
+            </ScrollReveal>
+          )}
+
           {/* ── 3-col grid ───────────────────────────────────────── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
