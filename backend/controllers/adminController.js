@@ -2,6 +2,8 @@ const Pandit = require('../models/Pandit');
 const User = require('../models/User');
 const Booking = require('../models/Booking');
 const Ritual = require('../models/Ritual');
+const { expireStaleBookings } = require('./bookingController');
+
 
 // @desc  Get all pending pandits
 // @route GET /api/admin/pandits/pending
@@ -209,6 +211,7 @@ const getPanditByIdAdmin = async (req, res, next) => {
     if (!pandit) return res.status(404).json({ message: 'Pandit not found' });
 
     // Fetch bookings summary
+    await expireStaleBookings();
     const bookings = await Booking.find({ pandit: pandit._id });
     const bookingSummary = {
       total: bookings.length,
@@ -216,7 +219,8 @@ const getPanditByIdAdmin = async (req, res, next) => {
       pending: bookings.filter(b => b.status === 'pending').length,
       cancelled: bookings.filter(b => b.status === 'cancelled').length,
       accepted: bookings.filter(b => b.status === 'accepted').length,
-      rejected: bookings.filter(b => b.status === 'rejected').length
+      rejected: bookings.filter(b => b.status === 'rejected').length,
+      expired: bookings.filter(b => b.status === 'expired').length
     };
 
     res.json({ pandit, bookingSummary });
@@ -230,6 +234,7 @@ const getPanditByIdAdmin = async (req, res, next) => {
 // @access Admin
 const getStats = async (req, res, next) => {
   try {
+    await expireStaleBookings();
     const panditUsers = await User.find({ role: 'pandit' }).select('_id');
     const panditUserIds = panditUsers.map(u => u._id);
 
@@ -242,6 +247,7 @@ const getStats = async (req, res, next) => {
       pendingBookings,
       acceptedBookings,
       rejectedBookings,
+      expiredBookings,
       totalRituals,
       totalAdmins,
     ] = await Promise.all([
@@ -253,6 +259,7 @@ const getStats = async (req, res, next) => {
       Booking.countDocuments({ status: 'pending' }),
       Booking.countDocuments({ status: 'accepted' }),
       Booking.countDocuments({ status: 'rejected' }),
+      Booking.countDocuments({ status: 'expired' }),
       Ritual.countDocuments({ isActive: true }),
       User.countDocuments({ role: 'admin' }),
     ]);
@@ -260,7 +267,7 @@ const getStats = async (req, res, next) => {
     res.json({
       users:    { total: totalUsers },
       pandits:  { total: totalPandits, verified: verifiedPandits, pending: pendingPandits },
-      bookings: { total: totalBookings, pending: pendingBookings, accepted: acceptedBookings, rejected: rejectedBookings },
+      bookings: { total: totalBookings, pending: pendingBookings, accepted: acceptedBookings, rejected: rejectedBookings, expired: expiredBookings },
       rituals:  { total: totalRituals },
       admins:   { total: totalAdmins },
     });
