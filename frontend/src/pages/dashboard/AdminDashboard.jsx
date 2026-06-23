@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash, HiEye, HiUpload, HiLockClosed } from 'react-icons/hi';
+import { HiShieldCheck, HiX, HiUsers, HiClipboardList, HiViewGrid, HiBan, HiPlus, HiPencil, HiTrash, HiEye, HiUpload, HiLockClosed, HiFilter, HiSortDescending, HiRefresh, HiChevronDown, HiCalendar } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -76,6 +76,16 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [rituals, setRituals] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  /* ── Booking Filter / Sort state ───────────────────────── */
+  const [showBookingFilters, setShowBookingFilters] = useState(false);
+  const [bkFilterStatus, setBkFilterStatus]   = useState('');
+  const [bkFilterDate, setBkFilterDate]       = useState('');
+  const [bkFilterBefore, setBkFilterBefore]   = useState('');
+  const [bkFilterAfter, setBkFilterAfter]     = useState('');
+  const [bkFilterSort, setBkFilterSort]       = useState('newest');
+  const [bkQuickFilter, setBkQuickFilter]     = useState('all');
+  const [bkFilterLoading, setBkFilterLoading] = useState(false);
   
   // Search and filter states
   const [userSearch, setUserSearch] = useState('');
@@ -174,10 +184,63 @@ const AdminDashboard = () => {
     } catch {}
   };
   const fetchBookings = async () => {
-    try { const { data } = await getAllBookingsAdmin(); setBookings(data.bookings || []); } catch {}
+    try { const { data } = await getAllBookingsAdmin({ limit: 200 }); setBookings(data.bookings || []); } catch {}
   };
   const fetchRituals = async () => {
     try { const { data } = await getAllRitualsAdmin(); setRituals(data.rituals || []); } catch {}
+  };
+
+  const getLocalDateString = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const local = new Date(now.getTime() - (offset * 60 * 1000));
+    return local.toISOString().slice(0, 10);
+  };
+
+  const fetchFilteredBookings = useCallback(async () => {
+    setBkFilterLoading(true);
+    try {
+      const params = { limit: 200 };
+      if (bkFilterStatus) params.status = bkFilterStatus;
+      if (bkFilterSort)   params.sort = bkFilterSort;
+
+      if (bkQuickFilter === 'today') {
+        params.date = getLocalDateString();
+      } else if (bkQuickFilter === 'upcoming') {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const offset = yesterday.getTimezoneOffset();
+        const local = new Date(yesterday.getTime() - (offset * 60 * 1000));
+        params.after = local.toISOString().slice(0, 10);
+      } else if (bkQuickFilter === 'past') {
+        params.before = getLocalDateString();
+      } else {
+        if (bkFilterDate)   params.date   = bkFilterDate;
+        if (bkFilterBefore) params.before = bkFilterBefore;
+        if (bkFilterAfter)  params.after  = bkFilterAfter;
+      }
+
+      const { data } = await getAllBookingsAdmin(params);
+      setBookings(data.bookings || []);
+    } catch { } finally {
+      setBkFilterLoading(false);
+    }
+  }, [bkFilterStatus, bkFilterDate, bkFilterBefore, bkFilterAfter, bkFilterSort, bkQuickFilter]);
+
+  /* Re-fetch bookings whenever admin filters change */
+  useEffect(() => {
+    if (!loading && activeTab === 'bookings') fetchFilteredBookings();
+  }, [fetchFilteredBookings]);
+
+  const isBkFilterActive = bkFilterStatus || bkFilterDate || bkFilterBefore || bkFilterAfter || bkFilterSort !== 'newest' || bkQuickFilter !== 'all';
+
+  const resetBkFilters = () => {
+    setBkFilterStatus('');
+    setBkFilterDate('');
+    setBkFilterBefore('');
+    setBkFilterAfter('');
+    setBkFilterSort('newest');
+    setBkQuickFilter('all');
   };
 
   const handleVerify = async (id) => {
@@ -739,7 +802,187 @@ const AdminDashboard = () => {
               {/* Bookings */}
               {activeTab === 'bookings' && (
                 <div className="animate-fade-in">
-                  <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">All Bookings ({bookings.length})</h2>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100">All Bookings ({bookings.length})</h2>
+                    <button
+                      id="toggle-admin-booking-filters"
+                      onClick={() => setShowBookingFilters(!showBookingFilters)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                        showBookingFilters || isBkFilterActive
+                          ? 'bg-saffron-500 text-white shadow-glow-saffron'
+                          : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                      }`}
+                    >
+                      <HiFilter className="text-sm" />
+                      Filters
+                      <HiChevronDown className={`text-sm transition-transform duration-300 ${showBookingFilters ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+
+                  {/* Collapsible Filter Panel */}
+                  {showBookingFilters && (
+                    <div className="card p-5 mb-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl animate-fade-in space-y-4">
+                      {/* Quick Filter Pills */}
+                      <div>
+                        <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2 block">Quick Filters</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: 'all', label: 'All Dates' },
+                            { id: 'today', label: 'Today' },
+                            { id: 'upcoming', label: 'Upcoming' },
+                            { id: 'past', label: 'Past' },
+                          ].map((qf) => (
+                            <button
+                              key={qf.id}
+                              id={`admin-quick-filter-${qf.id}`}
+                              onClick={() => {
+                                setBkQuickFilter(qf.id);
+                                if (qf.id !== 'all') {
+                                  setBkFilterDate('');
+                                  setBkFilterBefore('');
+                                  setBkFilterAfter('');
+                                }
+                              }}
+                              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border-2 transition-all duration-200 cursor-pointer ${
+                                bkQuickFilter === qf.id
+                                  ? 'border-saffron-500 bg-saffron-50 dark:bg-saffron-900/20 text-saffron-700 dark:text-saffron-400'
+                                  : 'border-light-border dark:border-dark-border text-stone-500 dark:text-stone-400 hover:border-saffron-300'
+                              }`}
+                            >
+                              {qf.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Date / Status / Sort */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Status</label>
+                          <select
+                            id="admin-filter-status"
+                            value={bkFilterStatus}
+                            onChange={(e) => setBkFilterStatus(e.target.value)}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          >
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="expired">Expired</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Exact Date</label>
+                          <input
+                            id="admin-filter-date"
+                            type="date"
+                            value={bkFilterDate}
+                            onChange={(e) => {
+                              setBkFilterDate(e.target.value);
+                              setBkQuickFilter('all');
+                              setBkFilterBefore('');
+                              setBkFilterAfter('');
+                            }}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">After Date</label>
+                          <input
+                            id="admin-filter-after"
+                            type="date"
+                            value={bkFilterAfter}
+                            onChange={(e) => {
+                              setBkFilterAfter(e.target.value);
+                              setBkQuickFilter('all');
+                              setBkFilterDate('');
+                            }}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Before Date</label>
+                          <input
+                            id="admin-filter-before"
+                            type="date"
+                            value={bkFilterBefore}
+                            onChange={(e) => {
+                              setBkFilterBefore(e.target.value);
+                              setBkQuickFilter('all');
+                              setBkFilterDate('');
+                            }}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sort + Reset */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3">
+                        <div className="w-full sm:w-48">
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Sort By</label>
+                          <div className="relative">
+                            <HiSortDescending className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
+                            <select
+                              id="admin-filter-sort"
+                              value={bkFilterSort}
+                              onChange={(e) => setBkFilterSort(e.target.value)}
+                              className="input-field text-sm py-2 pl-9 rounded-xl w-full"
+                            >
+                              <option value="newest">Newest First</option>
+                              <option value="oldest">Oldest First</option>
+                              <option value="nearest">Nearest Date</option>
+                              <option value="furthest">Furthest Date</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {isBkFilterActive && (
+                          <button
+                            id="admin-reset-filters"
+                            onClick={resetBkFilters}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-crimson-600 dark:text-crimson-400 bg-crimson-50 dark:bg-crimson-950/20 border border-crimson-200 dark:border-crimson-900/40 hover:bg-crimson-100 dark:hover:bg-crimson-900/30 transition-colors cursor-pointer"
+                          >
+                            <HiRefresh className="text-sm" /> Reset Filters
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Active filter summary (collapsed) */}
+                  {isBkFilterActive && !showBookingFilters && (
+                    <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-saffron-50/50 dark:bg-saffron-950/10 border border-saffron-200/50 dark:border-saffron-900/30 text-xs text-saffron-700 dark:text-saffron-400 font-medium animate-fade-in">
+                      <HiFilter className="text-sm shrink-0" />
+                      <span>Filters active</span>
+                      <button
+                        onClick={resetBkFilters}
+                        className="ml-auto text-[10px] font-bold underline hover:no-underline cursor-pointer"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                  )}
+
+                  {bkFilterLoading ? (
+                    <LoadingSpinner />
+                  ) : bookings.length === 0 ? (
+                    <div className="card p-10 text-center">
+                      <HiCalendar className="text-5xl text-stone-300 dark:text-stone-600 mx-auto mb-3" />
+                      <p className="text-stone-500 dark:text-stone-400">
+                        {isBkFilterActive
+                          ? 'No bookings found for the selected filters.'
+                          : 'No bookings yet'}
+                      </p>
+                      {isBkFilterActive && (
+                        <button onClick={resetBkFilters} className="btn-secondary btn-sm mt-4 inline-flex items-center gap-1.5 cursor-pointer">
+                          <HiRefresh className="text-sm" /> Reset Filters
+                        </button>
+                      )}
+                    </div>
+                  ) : (
                   <div className="space-y-2">
                     {bookings.map((b) => (
                       <div key={b._id} className="card p-4 flex items-center gap-3 flex-wrap">
@@ -761,6 +1004,7 @@ const AdminDashboard = () => {
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
               )}
 
