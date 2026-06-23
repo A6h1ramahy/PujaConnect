@@ -65,14 +65,15 @@ const BookingPage = () => {
 
   const selectedRitual = rituals.find((r) => r._id === form.ritualId);
 
+  const getLocalDateString = (d = new Date()) => {
+    const offset = d.getTimezoneOffset();
+    const localDate = new Date(d.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().slice(0, 10);
+  };
+
   const isTodaySelected = () => {
     if (!form.date) return false;
-    const now = new Date();
-    const offset = now.getTimezoneOffset();
-    const localToday = new Date(now.getTime() - (offset * 60 * 1000));
-    const todayStr = localToday.toISOString().slice(0, 10);
-    const bookingDateStr = form.date.slice(0, 10);
-    return bookingDateStr === todayStr;
+    return form.date === getLocalDateString();
   };
 
   const getMinTimeForToday = () => {
@@ -102,7 +103,7 @@ const BookingPage = () => {
         const [panditRes, ritualsRes, availRes] = await Promise.all([
           getPanditById(panditId),
           getRituals(),
-          getPanditAvailability(panditId, { from: new Date().toISOString() }),
+          getPanditAvailability(panditId, { from: getLocalDateString() }),
         ]);
         setPandit(panditRes.data.pandit);
         const panditRitualIds = panditRes.data.pandit.supportedRituals?.map((r) => r._id) || [];
@@ -149,16 +150,45 @@ const BookingPage = () => {
   }, [panditId, ritualParam, ritualState.ritualId, ritualState.ritualSlug, ritualState.ritualName, ritualState.source]);
 
   const availableDates = availability.filter((s) => s.status === 'available');
-  const selectedDateSlots = availableDates.find((s) => s.date?.slice(0, 10) === form.date || new Date(s.date).toISOString().slice(0, 10) === form.date);
+  const selectedDateSlots = availableDates.find((s) => getLocalDateString(new Date(s.date)) === form.date);
   
+  const convertSlotTimeTo24h = (timeStr) => {
+    if (!timeStr) return null;
+    const singleTime = timeStr.includes(' - ') ? timeStr.split(' - ')[0].trim() : timeStr.trim();
+    const match12 = singleTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (match12) {
+      let hours = parseInt(match12[1], 10);
+      const minutes = match12[2];
+      const ampm = match12[3].toUpperCase();
+      if (ampm === 'PM' && hours < 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+      return `${String(hours).padStart(2, '0')}:${minutes}:00`;
+    }
+    const match24 = singleTime.match(/^(\d{1,2}):(\d{2})$/);
+    if (match24) {
+      const hours = String(match24[1]).padStart(2, '0');
+      const minutes = match24[2];
+      return `${hours}:${minutes}:00`;
+    }
+    return null;
+  };
+
   const getFilteredFreeSlots = () => {
     const slots = selectedDateSlots?.timeSlots?.filter((ts) => !ts.isBooked) || [];
     if (isTodaySelected()) {
       const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const minimumTime = new Date(now.getTime() + 60 * 60 * 1000);
       return slots.filter((ts) => {
-        const slotMinutes = parseTimeToMinutes(ts.time);
-        return slotMinutes !== null && slotMinutes >= currentMinutes + 60;
+        const time24 = convertSlotTimeTo24h(ts.time);
+        if (!time24) return false;
+        const slotDateTime = new Date(`${form.date}T${time24}`);
+        
+        console.log("Current Time:", now);
+        console.log("Minimum Time:", minimumTime);
+        console.log("Slot:", ts.time);
+        console.log("Slot Date:", slotDateTime);
+
+        return slotDateTime.getTime() >= minimumTime.getTime();
       });
     }
     return slots;
