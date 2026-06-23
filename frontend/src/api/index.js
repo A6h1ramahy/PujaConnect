@@ -24,6 +24,7 @@ export const markMessagesRead    = (id)          => api.put(`/bookings/${id}/mes
 
 export const getMyAvailability  = ()     => api.get('/availability/me');
 export const setPanditAvail     = (data) => api.post('/availability', data);
+export const updatePanditAvail  = (id, data) => api.put(`/availability/${id}`, data);
 export const deletePanditAvail  = (id)   => api.delete(`/availability/${id}`);
 export const getPanditAvailability = (panditId, params) => api.get(`/availability/pandit/${panditId}`, { params });
 
