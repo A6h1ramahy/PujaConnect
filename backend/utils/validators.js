@@ -149,7 +149,9 @@ const bookingRules = [
       
       if (bookingDateStr === todayStr) {
         const parseTimeToMinutes = (timeStr) => {
-          const match12 = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+          if (!timeStr) return null;
+          const singleTime = timeStr.includes(' - ') ? timeStr.split(' - ')[0].trim() : timeStr.trim();
+          const match12 = singleTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
           if (match12) {
             let hours = parseInt(match12[1], 10);
             const minutes = parseInt(match12[2], 10);
@@ -158,7 +160,7 @@ const bookingRules = [
             if (ampm === 'AM' && hours === 12) hours = 0;
             return hours * 60 + minutes;
           }
-          const match24 = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+          const match24 = singleTime.match(/^(\d{1,2}):(\d{2})$/);
           if (match24) {
             const hours = parseInt(match24[1], 10);
             const minutes = parseInt(match24[2], 10);
