@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   HiCalendar, HiUser, HiSearch, HiClipboardList, HiShieldCheck,
   HiPhone, HiLocationMarker, HiMail, HiCheckCircle, HiClock, HiBan, HiX,
+  HiFilter, HiSortDescending, HiRefresh, HiChevronDown,
 } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
@@ -51,6 +52,16 @@ const UserDashboard = () => {
   const [saving, setSaving]       = useState(false);
   const [userDetail, setUserDetail] = useState(null);
 
+  /* ── Filter / Sort state ─────────────────────────────────── */
+  const [showFilters, setShowFilters]     = useState(false);
+  const [filterStatus, setFilterStatus]   = useState('');
+  const [filterDate, setFilterDate]       = useState('');
+  const [filterBefore, setFilterBefore]   = useState('');
+  const [filterAfter, setFilterAfter]     = useState('');
+  const [filterSort, setFilterSort]       = useState('newest');
+  const [quickFilter, setQuickFilter]     = useState('all');
+  const [filterLoading, setFilterLoading] = useState(false);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
@@ -70,6 +81,43 @@ const UserDashboard = () => {
       toast.error(err?.response?.data?.message || 'Failed to delete account');
     }
   };
+
+  const getLocalDateString = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const local = new Date(now.getTime() - (offset * 60 * 1000));
+    return local.toISOString().slice(0, 10);
+  };
+
+  const fetchBookingsList = useCallback(async () => {
+    setFilterLoading(true);
+    try {
+      const params = {};
+      if (filterStatus) params.status = filterStatus;
+      if (filterSort)   params.sort = filterSort;
+
+      if (quickFilter === 'today') {
+        params.date = getLocalDateString();
+      } else if (quickFilter === 'upcoming') {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const offset = yesterday.getTimezoneOffset();
+        const local = new Date(yesterday.getTime() - (offset * 60 * 1000));
+        params.after = local.toISOString().slice(0, 10);
+      } else if (quickFilter === 'past') {
+        params.before = getLocalDateString();
+      } else {
+        if (filterDate)   params.date   = filterDate;
+        if (filterBefore) params.before = filterBefore;
+        if (filterAfter)  params.after  = filterAfter;
+      }
+
+      const { data } = await getMyBookings(params);
+      setBookings(data.bookings || []);
+    } catch { } finally {
+      setFilterLoading(false);
+    }
+  }, [filterStatus, filterDate, filterBefore, filterAfter, filterSort, quickFilter]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -91,6 +139,11 @@ const UserDashboard = () => {
     };
     fetchAll();
   }, []);
+
+  /* Re-fetch bookings whenever filters change */
+  useEffect(() => {
+    if (!loading) fetchBookingsList();
+  }, [fetchBookingsList]);
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
@@ -127,11 +180,22 @@ const UserDashboard = () => {
     }
   };
 
-  /* derived booking stats */
+  /* derived booking stats (always use the current bookings list) */
   const upcoming  = bookings.filter((b) => b.status === 'accepted'  && new Date(b.date) >= new Date());
   const pending   = bookings.filter((b) => b.status === 'pending');
   const completed = bookings.filter((b) => b.status === 'completed');
   const cancelled = bookings.filter((b) => ['rejected', 'cancelled', 'expired'].includes(b.status));
+
+  const isAnyFilterActive = filterStatus || filterDate || filterBefore || filterAfter || filterSort !== 'newest' || quickFilter !== 'all';
+
+  const resetFilters = () => {
+    setFilterStatus('');
+    setFilterDate('');
+    setFilterBefore('');
+    setFilterAfter('');
+    setFilterSort('newest');
+    setQuickFilter('all');
+  };
 
   /** Count messages sent by the other party that this user hasn't read yet */
   const getUnreadCount = (booking) => {
@@ -229,15 +293,195 @@ const UserDashboard = () => {
               {/* ── Bookings Tab ── */}
               {activeTab === 'bookings' && (
                 <div className="animate-fade-in">
-                  <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100 mb-4">Booking History</h2>
-                  {loading ? (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <h2 className="font-display text-xl font-bold text-stone-900 dark:text-stone-100">Booking History</h2>
+                    <button
+                      id="toggle-booking-filters"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                        showFilters || isAnyFilterActive
+                          ? 'bg-saffron-500 text-white shadow-glow-saffron'
+                          : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                      }`}
+                    >
+                      <HiFilter className="text-sm" />
+                      Filters
+                      <HiChevronDown className={`text-sm transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} />
+                    </button>
+                  </div>
+
+                  {/* ── Collapsible Filter Panel ── */}
+                  {showFilters && (
+                    <div className="card p-5 mb-4 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl animate-fade-in space-y-4">
+                      {/* Quick Filter Pills */}
+                      <div>
+                        <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2 block">Quick Filters</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: 'all', label: 'All Dates' },
+                            { id: 'today', label: 'Today' },
+                            { id: 'upcoming', label: 'Upcoming' },
+                            { id: 'past', label: 'Past' },
+                          ].map((qf) => (
+                            <button
+                              key={qf.id}
+                              id={`quick-filter-${qf.id}`}
+                              onClick={() => {
+                                setQuickFilter(qf.id);
+                                if (qf.id !== 'all') {
+                                  setFilterDate('');
+                                  setFilterBefore('');
+                                  setFilterAfter('');
+                                }
+                              }}
+                              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border-2 transition-all duration-200 cursor-pointer ${
+                                quickFilter === qf.id
+                                  ? 'border-saffron-500 bg-saffron-50 dark:bg-saffron-900/20 text-saffron-700 dark:text-saffron-400'
+                                  : 'border-light-border dark:border-dark-border text-stone-500 dark:text-stone-400 hover:border-saffron-300'
+                              }`}
+                            >
+                              {qf.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Date / Status / Sort Row */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {/* Status */}
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Status</label>
+                          <select
+                            id="filter-status"
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          >
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="expired">Expired</option>
+                          </select>
+                        </div>
+
+                        {/* Exact Date */}
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Exact Date</label>
+                          <input
+                            id="filter-date"
+                            type="date"
+                            value={filterDate}
+                            onChange={(e) => {
+                              setFilterDate(e.target.value);
+                              setQuickFilter('all');
+                              setFilterBefore('');
+                              setFilterAfter('');
+                            }}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          />
+                        </div>
+
+                        {/* After Date */}
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">After Date</label>
+                          <input
+                            id="filter-after"
+                            type="date"
+                            value={filterAfter}
+                            onChange={(e) => {
+                              setFilterAfter(e.target.value);
+                              setQuickFilter('all');
+                              setFilterDate('');
+                            }}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          />
+                        </div>
+
+                        {/* Before Date */}
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Before Date</label>
+                          <input
+                            id="filter-before"
+                            type="date"
+                            value={filterBefore}
+                            onChange={(e) => {
+                              setFilterBefore(e.target.value);
+                              setQuickFilter('all');
+                              setFilterDate('');
+                            }}
+                            className="input-field text-sm py-2 rounded-xl w-full"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Sort + Reset Row */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3">
+                        <div className="w-full sm:w-48">
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Sort By</label>
+                          <div className="relative">
+                            <HiSortDescending className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
+                            <select
+                              id="filter-sort"
+                              value={filterSort}
+                              onChange={(e) => setFilterSort(e.target.value)}
+                              className="input-field text-sm py-2 pl-9 rounded-xl w-full"
+                            >
+                              <option value="newest">Newest First</option>
+                              <option value="oldest">Oldest First</option>
+                              <option value="nearest">Nearest Date</option>
+                              <option value="furthest">Furthest Date</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {isAnyFilterActive && (
+                          <button
+                            id="reset-filters"
+                            onClick={resetFilters}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-crimson-600 dark:text-crimson-400 bg-crimson-50 dark:bg-crimson-950/20 border border-crimson-200 dark:border-crimson-900/40 hover:bg-crimson-100 dark:hover:bg-crimson-900/30 transition-colors cursor-pointer"
+                          >
+                            <HiRefresh className="text-sm" /> Reset Filters
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Active filter summary */}
+                  {isAnyFilterActive && !showFilters && (
+                    <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-saffron-50/50 dark:bg-saffron-950/10 border border-saffron-200/50 dark:border-saffron-900/30 text-xs text-saffron-700 dark:text-saffron-400 font-medium animate-fade-in">
+                      <HiFilter className="text-sm shrink-0" />
+                      <span>Filters active</span>
+                      <button
+                        onClick={resetFilters}
+                        className="ml-auto text-[10px] font-bold underline hover:no-underline cursor-pointer"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                  )}
+
+                  {loading || filterLoading ? (
                     <LoadingSpinner />
                   ) : bookings.length === 0 ? (
                     <ScrollReveal>
                       <div className="card p-10 text-center">
                         <HiCalendar className="text-5xl text-stone-300 dark:text-stone-600 mx-auto mb-3" />
-                        <p className="text-stone-500 dark:text-stone-400">No bookings yet</p>
-                        <Link to="/pandits" className="btn-primary btn-sm mt-4 inline-flex">Find a Pandit</Link>
+                        <p className="text-stone-500 dark:text-stone-400">
+                          {isAnyFilterActive
+                            ? 'No bookings found for the selected filters.'
+                            : 'No bookings yet'}
+                        </p>
+                        {isAnyFilterActive ? (
+                          <button onClick={resetFilters} className="btn-secondary btn-sm mt-4 inline-flex items-center gap-1.5 cursor-pointer">
+                            <HiRefresh className="text-sm" /> Reset Filters
+                          </button>
+                        ) : (
+                          <Link to="/pandits" className="btn-primary btn-sm mt-4 inline-flex">Find a Pandit</Link>
+                        )}
                       </div>
                     </ScrollReveal>
                   ) : (
