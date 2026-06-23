@@ -150,7 +150,21 @@ const BookingPage = () => {
 
   const availableDates = availability.filter((s) => s.status === 'available');
   const selectedDateSlots = availableDates.find((s) => s.date?.slice(0, 10) === form.date || new Date(s.date).toISOString().slice(0, 10) === form.date);
-  const freeSlots = selectedDateSlots?.timeSlots?.filter((ts) => !ts.isBooked) || [];
+  
+  const getFilteredFreeSlots = () => {
+    const slots = selectedDateSlots?.timeSlots?.filter((ts) => !ts.isBooked) || [];
+    if (isTodaySelected()) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      return slots.filter((ts) => {
+        const slotMinutes = parseTimeToMinutes(ts.time);
+        return slotMinutes !== null && slotMinutes >= currentMinutes + 60;
+      });
+    }
+    return slots;
+  };
+
+  const freeSlots = getFilteredFreeSlots();
 
   const panditName = pandit?.userId?.name || 'Pandit';
 
@@ -411,44 +425,52 @@ const BookingPage = () => {
 
               {form.date && (
                 <div className="form-group">
-                  <label className="label">Time Slot</label>
-                  {freeSlots.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {freeSlots.map((ts) => {
-                        const now = new Date();
-                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-                        const slotMinutes = parseTimeToMinutes(ts.time);
-                        const isSlotDisabled = isTodaySelected() && slotMinutes !== null && slotMinutes < currentMinutes + 60;
-
-                        return (
-                          <button
-                            key={ts._id}
-                            id={`time-slot-${ts.time}`}
-                            disabled={isSlotDisabled}
-                            onClick={() => setForm({ ...form, time: ts.time })}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
-                              isSlotDisabled
-                                ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-600 border-stone-200 dark:border-stone-850 cursor-not-allowed opacity-50'
-                                : form.time === ts.time
-                                ? 'bg-saffron-500 border-saffron-500 text-white'
-                                : 'border-light-border dark:border-dark-border hover:border-saffron-400 text-stone-700 dark:text-stone-200'
-                            }`}
-                          >
-                            {ts.time}
-                          </button>
-                        );
-                      })}
+                  {selectedDateSlots ? (
+                    <div>
+                      <label className="label mb-2 block font-semibold text-stone-700 dark:text-stone-300">Available Slots</label>
+                      {freeSlots.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {freeSlots.map((ts) => (
+                            <button
+                              key={ts._id}
+                              id={`time-slot-${ts.time}`}
+                              type="button"
+                              onClick={() => setForm({ ...form, time: ts.time })}
+                              className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all cursor-pointer ${
+                                form.time === ts.time
+                                  ? 'bg-saffron-500 border-saffron-500 text-white'
+                                  : 'border-light-border dark:border-dark-border hover:border-saffron-400 text-stone-700 dark:text-stone-200'
+                              }`}
+                            >
+                              {ts.time}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-450 text-sm font-semibold flex items-center gap-2">
+                          <span>⚠️</span>
+                          <span>
+                            {isTodaySelected()
+                              ? "This Pandit has no remaining availability for today. Please choose another date."
+                              : "This Pandit has no remaining availability for this date. Please choose another date."
+                            }
+                          </span>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div>
-                      <p className="text-sm text-stone-400 mb-3">No preset availability for this date. Enter a preferred time:</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mb-3 bg-stone-50 dark:bg-stone-900/30 p-3 rounded-xl border border-light-border dark:border-dark-border">
+                        No availability schedule exists for this date. Please choose a preferred time.
+                      </p>
+                      <label htmlFor="booking-time-manual" className="label">Preferred Time</label>
                       <input
                         id="booking-time-manual"
                         type="time"
                         value={form.time}
                         min={getMinTimeForToday()}
                         onChange={(e) => setForm({ ...form, time: e.target.value })}
-                        className="input-field"
+                        className="input-field max-w-xs"
                       />
                     </div>
                   )}
