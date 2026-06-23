@@ -15,7 +15,10 @@ const availabilityRoutes = require('./routes/availabilityRoutes');
 const adminRoutes        = require('./routes/adminRoutes');
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(() => {
+  const { startExpirationJob } = require('./controllers/bookingController');
+  startExpirationJob();
+});
 
 const app = express();
 
