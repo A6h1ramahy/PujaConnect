@@ -44,6 +44,7 @@ const TimelineIcon = ({ status }) => {
     completed: <HiShieldCheck className="text-blue-500   text-lg" />,
     rejected:  <HiX           className="text-crimson-500 text-lg" />,
     cancelled: <HiBan         className="text-crimson-600 text-lg" />,
+    expired:   <HiBan         className="text-stone-500  text-lg" />,
   };
   return map[status] || <HiInformationCircle className="text-stone-400 text-lg" />;
 };
@@ -103,6 +104,7 @@ const AdminBookingDetail = () => {
     completed: 'bg-blue-50   dark:bg-blue-950/20   text-blue-700   border-blue-100   dark:border-blue-900/30',
     rejected:  'bg-crimson-50 dark:bg-crimson-950/20 text-crimson-700 border-crimson-100 dark:border-crimson-900/30',
     cancelled: 'bg-stone-50  dark:bg-stone-900/30  text-stone-600  border-stone-200  dark:border-stone-800',
+    expired:   'bg-stone-50  dark:bg-stone-900/30  text-stone-600  border-stone-200  dark:border-stone-800',
   };
 
   return (
@@ -255,6 +257,14 @@ const AdminBookingDetail = () => {
                         <p className="text-[11px] font-semibold text-red-500 uppercase tracking-wider">Rejection Reason</p>
                         <p className="text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/20 rounded-xl p-3 border border-red-100 dark:border-red-900/30">
                           {booking.rejectionReason}
+                        </p>
+                      </div>
+                    )}
+                    {booking.status === 'expired' && (
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider">Expired Request Status</p>
+                        <p className="text-sm text-stone-700 dark:text-stone-300 bg-stone-50 dark:bg-stone-900/30 rounded-xl p-3 border border-stone-200 dark:border-stone-800/40">
+                          This booking request has expired because the ritual time passed before the Pandit accepted or rejected the request.
                         </p>
                       </div>
                     )}
