@@ -70,15 +70,15 @@
   .dark input[type="date"]::-webkit-calendar-picker-indicator,
   .dark input[type="time"]::-webkit-calendar-picker-indicator,
   .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    /* Saffron-gold matching the theme by default in dark mode (suggested #FFB347/saffron-300) */
-    filter: invert(79%) sepia(85%) saturate(687%) hue-rotate(342deg) brightness(103%) contrast(102%);
+    /* Pure white in dark mode by default for maximum visibility */
+    filter: invert(1) !important;
   }
 
   .dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
   .dark input[type="time"]::-webkit-calendar-picker-indicator:hover,
   .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-    /* Glowing white on hover in dark mode */
-    filter: invert(1) brightness(1.2);
+    /* Theme saffron/orange tint on hover in dark mode */
+    filter: invert(79%) sepia(85%) saturate(687%) hue-rotate(342deg) brightness(103%) contrast(102%) !important;
   }
 }
 
