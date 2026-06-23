@@ -64,6 +64,25 @@ const BookingPage = () => {
 
   const selectedRitual = rituals.find((r) => r._id === form.ritualId);
 
+  const isTodaySelected = () => {
+    if (!form.date) return false;
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const localToday = new Date(now.getTime() - (offset * 60 * 1000));
+    const todayStr = localToday.toISOString().slice(0, 10);
+    const bookingDateStr = form.date.slice(0, 10);
+    return bookingDateStr === todayStr;
+  };
+
+  const getMinTimeForToday = () => {
+    if (!isTodaySelected()) return undefined;
+    const now = new Date();
+    const minTimeObj = new Date(now.getTime() + 60 * 60 * 1000);
+    const hours = String(minTimeObj.getHours()).padStart(2, '0');
+    const minutes = String(minTimeObj.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   useEffect(() => {
     if (selectedRitual) {
       const type = selectedRitual.locationType; // 'Home', 'Temple', 'Both'
@@ -394,20 +413,30 @@ const BookingPage = () => {
                   <label className="label">Time Slot</label>
                   {freeSlots.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {freeSlots.map((ts) => (
-                        <button
-                          key={ts._id}
-                          id={`time-slot-${ts.time}`}
-                          onClick={() => setForm({ ...form, time: ts.time })}
-                          className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
-                            form.time === ts.time
-                              ? 'bg-saffron-500 border-saffron-500 text-white'
-                              : 'border-light-border dark:border-dark-border hover:border-saffron-400 text-stone-700 dark:text-stone-200'
-                          }`}
-                        >
-                          {ts.time}
-                        </button>
-                      ))}
+                      {freeSlots.map((ts) => {
+                        const now = new Date();
+                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                        const slotMinutes = parseTimeToMinutes(ts.time);
+                        const isSlotDisabled = isTodaySelected() && slotMinutes !== null && slotMinutes < currentMinutes + 60;
+
+                        return (
+                          <button
+                            key={ts._id}
+                            id={`time-slot-${ts.time}`}
+                            disabled={isSlotDisabled}
+                            onClick={() => setForm({ ...form, time: ts.time })}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
+                              isSlotDisabled
+                                ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-600 border-stone-200 dark:border-stone-850 cursor-not-allowed opacity-50'
+                                : form.time === ts.time
+                                ? 'bg-saffron-500 border-saffron-500 text-white'
+                                : 'border-light-border dark:border-dark-border hover:border-saffron-400 text-stone-700 dark:text-stone-200'
+                            }`}
+                          >
+                            {ts.time}
+                          </button>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div>
@@ -416,6 +445,7 @@ const BookingPage = () => {
                         id="booking-time-manual"
                         type="time"
                         value={form.time}
+                        min={getMinTimeForToday()}
                         onChange={(e) => setForm({ ...form, time: e.target.value })}
                         className="input-field"
                       />
