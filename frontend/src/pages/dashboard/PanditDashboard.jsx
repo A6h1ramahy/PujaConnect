@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle, HiShieldCheck, HiBan } from 'react-icons/hi';
+import { HiChevronDown, HiChevronRight, HiCalendar, HiCheck, HiX, HiUser, HiClock, HiPlus, HiTrash, HiCheckCircle, HiShieldCheck, HiBan, HiFilter, HiSortDescending, HiRefresh } from 'react-icons/hi';
 import { MdOutlineTempleHindu } from 'react-icons/md';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -65,6 +65,16 @@ const PanditDashboard = () => {
   const [isSupportedRitualsOpen, setIsSupportedRitualsOpen] = useState(false);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
 
+  /* ── Filter / Sort state ─────────────────────────────────── */
+  const [showFilters, setShowFilters]     = useState(false);
+  const [filterStatus, setFilterStatus]   = useState('');
+  const [filterDate, setFilterDate]       = useState('');
+  const [filterBefore, setFilterBefore]   = useState('');
+  const [filterAfter, setFilterAfter]     = useState('');
+  const [filterSort, setFilterSort]       = useState('nearest');
+  const [quickFilter, setQuickFilter]     = useState('all');
+  const [filterLoading, setFilterLoading] = useState(false);
+
   useEffect(() => {
     fetchAll();
   }, []);
@@ -100,6 +110,48 @@ const PanditDashboard = () => {
       setLoading(false);
     }
   };
+
+  const getLocalDateString = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const local = new Date(now.getTime() - (offset * 60 * 1000));
+    return local.toISOString().slice(0, 10);
+  };
+
+  const fetchPanditBookingsList = useCallback(async () => {
+    setFilterLoading(true);
+    try {
+      const params = {};
+      if (filterStatus) params.status = filterStatus;
+      if (filterSort)   params.sort = filterSort;
+
+      if (quickFilter === 'today') {
+        params.date = getLocalDateString();
+      } else if (quickFilter === 'upcoming') {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const offset = yesterday.getTimezoneOffset();
+        const local = new Date(yesterday.getTime() - (offset * 60 * 1000));
+        params.after = local.toISOString().slice(0, 10);
+      } else if (quickFilter === 'past') {
+        params.before = getLocalDateString();
+      } else {
+        if (filterDate)   params.date   = filterDate;
+        if (filterBefore) params.before = filterBefore;
+        if (filterAfter)  params.after  = filterAfter;
+      }
+
+      const { data } = await getPanditBookings(params);
+      setBookings(data.bookings || []);
+    } catch { } finally {
+      setFilterLoading(false);
+    }
+  }, [filterStatus, filterDate, filterBefore, filterAfter, filterSort, quickFilter]);
+
+  /* Re-fetch bookings whenever filters change */
+  useEffect(() => {
+    if (!loading) fetchPanditBookingsList();
+  }, [fetchPanditBookingsList]);
 
   const handleAccept = async (id) => {
     try {
@@ -355,6 +407,17 @@ const PanditDashboard = () => {
   const pending  = bookings.filter((b) => b.status === 'pending');
   const upcoming = bookings.filter((b) => b.status === 'accepted' && new Date(b.date) >= new Date());
 
+  const isAnyFilterActive = filterStatus || filterDate || filterBefore || filterAfter || filterSort !== 'nearest' || quickFilter !== 'all';
+
+  const resetFilters = () => {
+    setFilterStatus('');
+    setFilterDate('');
+    setFilterBefore('');
+    setFilterAfter('');
+    setFilterSort('nearest');
+    setQuickFilter('all');
+  };
+
   /** Count unread messages from the devotee (for pandit dashboard) */
   const getUnreadCount = (booking) => {
     if (!['accepted', 'completed'].includes(booking.status)) return 0;
@@ -450,6 +513,246 @@ const PanditDashboard = () => {
                 {/* Bookings */}
                 {activeTab === 'bookings' && (
                   <div className="animate-fade-in space-y-4">
+                    {/* Filter Toggle */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100">Bookings</h3>
+                      <button
+                        id="toggle-pandit-booking-filters"
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                          showFilters || isAnyFilterActive
+                            ? 'bg-saffron-500 text-white shadow-glow-saffron'
+                            : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                        }`}
+                      >
+                        <HiFilter className="text-sm" />
+                        Filters
+                        <HiChevronDown className={`text-sm transition-transform duration-300 ${showFilters ? 'rotate-180' : ''}`} />
+                      </button>
+                    </div>
+
+                    {/* Collapsible Filter Panel */}
+                    {showFilters && (
+                      <div className="card p-5 bg-white dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl animate-fade-in space-y-4">
+                        {/* Quick Filter Pills */}
+                        <div>
+                          <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2 block">Quick Filters</label>
+                          <div className="flex flex-wrap gap-2">
+                            {[
+                              { id: 'all', label: 'All Dates' },
+                              { id: 'today', label: 'Today' },
+                              { id: 'upcoming', label: 'Upcoming' },
+                              { id: 'past', label: 'Past' },
+                            ].map((qf) => (
+                              <button
+                                key={qf.id}
+                                id={`pandit-quick-filter-${qf.id}`}
+                                onClick={() => {
+                                  setQuickFilter(qf.id);
+                                  if (qf.id !== 'all') {
+                                    setFilterDate('');
+                                    setFilterBefore('');
+                                    setFilterAfter('');
+                                  }
+                                }}
+                                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border-2 transition-all duration-200 cursor-pointer ${
+                                  quickFilter === qf.id
+                                    ? 'border-saffron-500 bg-saffron-50 dark:bg-saffron-900/20 text-saffron-700 dark:text-saffron-400'
+                                    : 'border-light-border dark:border-dark-border text-stone-500 dark:text-stone-400 hover:border-saffron-300'
+                                }`}
+                              >
+                                {qf.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Date / Status / Sort */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                          <div>
+                            <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Status</label>
+                            <select
+                              id="pandit-filter-status"
+                              value={filterStatus}
+                              onChange={(e) => setFilterStatus(e.target.value)}
+                              className="input-field text-sm py-2 rounded-xl w-full"
+                            >
+                              <option value="">All Statuses</option>
+                              <option value="pending">Pending</option>
+                              <option value="accepted">Accepted</option>
+                              <option value="completed">Completed</option>
+                              <option value="cancelled">Cancelled</option>
+                              <option value="rejected">Rejected</option>
+                              <option value="expired">Expired</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Exact Date</label>
+                            <input
+                              id="pandit-filter-date"
+                              type="date"
+                              value={filterDate}
+                              onChange={(e) => {
+                                setFilterDate(e.target.value);
+                                setQuickFilter('all');
+                                setFilterBefore('');
+                                setFilterAfter('');
+                              }}
+                              className="input-field text-sm py-2 rounded-xl w-full"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">After Date</label>
+                            <input
+                              id="pandit-filter-after"
+                              type="date"
+                              value={filterAfter}
+                              onChange={(e) => {
+                                setFilterAfter(e.target.value);
+                                setQuickFilter('all');
+                                setFilterDate('');
+                              }}
+                              className="input-field text-sm py-2 rounded-xl w-full"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Before Date</label>
+                            <input
+                              id="pandit-filter-before"
+                              type="date"
+                              value={filterBefore}
+                              onChange={(e) => {
+                                setFilterBefore(e.target.value);
+                                setQuickFilter('all');
+                                setFilterDate('');
+                              }}
+                              className="input-field text-sm py-2 rounded-xl w-full"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Sort + Reset */}
+                        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3">
+                          <div className="w-full sm:w-48">
+                            <label className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-1.5 block">Sort By</label>
+                            <div className="relative">
+                              <HiSortDescending className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm" />
+                              <select
+                                id="pandit-filter-sort"
+                                value={filterSort}
+                                onChange={(e) => setFilterSort(e.target.value)}
+                                className="input-field text-sm py-2 pl-9 rounded-xl w-full"
+                              >
+                                <option value="nearest">Nearest Date</option>
+                                <option value="furthest">Furthest Date</option>
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          {isAnyFilterActive && (
+                            <button
+                              id="pandit-reset-filters"
+                              onClick={resetFilters}
+                              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-crimson-600 dark:text-crimson-400 bg-crimson-50 dark:bg-crimson-950/20 border border-crimson-200 dark:border-crimson-900/40 hover:bg-crimson-100 dark:hover:bg-crimson-900/30 transition-colors cursor-pointer"
+                            >
+                              <HiRefresh className="text-sm" /> Reset Filters
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Active filter summary (collapsed) */}
+                    {isAnyFilterActive && !showFilters && (
+                      <div className="flex items-center gap-2 p-3 rounded-xl bg-saffron-50/50 dark:bg-saffron-950/10 border border-saffron-200/50 dark:border-saffron-900/30 text-xs text-saffron-700 dark:text-saffron-400 font-medium animate-fade-in">
+                        <HiFilter className="text-sm shrink-0" />
+                        <span>Filters active</span>
+                        <button
+                          onClick={resetFilters}
+                          className="ml-auto text-[10px] font-bold underline hover:no-underline cursor-pointer"
+                        >
+                          Clear all
+                        </button>
+                      </div>
+                    )}
+
+                    {filterLoading ? (
+                      <LoadingSpinner />
+                    ) : isAnyFilterActive ? (
+                      /* ── Unified Filtered Bookings View ── */
+                      <div>
+                        <h3 className="font-display font-semibold text-lg text-stone-900 dark:text-stone-100 mb-3">
+                          Filtered Bookings ({bookings.length})
+                        </h3>
+                        {bookings.length === 0 ? (
+                          <div className="card p-8 text-center">
+                            <HiCalendar className="text-5xl text-stone-300 dark:text-stone-600 mx-auto mb-2" />
+                            <p className="text-stone-400">No bookings found for the selected filters.</p>
+                            <button onClick={resetFilters} className="btn-secondary btn-sm mt-4 inline-flex items-center gap-1.5 cursor-pointer">
+                              <HiRefresh className="text-sm" /> Reset Filters
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {bookings.map((b) => (
+                              <div
+                                key={b._id}
+                                onClick={() => navigate(`/dashboard/pandit/booking/${b._id}`)}
+                                className="card p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-saffron-300 dark:hover:border-saffron-700 hover:shadow-md transition-all duration-200 group"
+                              >
+                                <div className="flex-1">
+                                  <p className="font-medium text-stone-900 dark:text-stone-100 text-sm group-hover:text-saffron-600 dark:group-hover:text-saffron-400 transition-colors">
+                                    {b.ritual?.pujaName} — {b.user?.name}
+                                  </p>
+                                  <p className="text-xs text-stone-400">
+                                    {b.date ? format(new Date(b.date), 'MMM dd, yyyy') : ''} · {b.time}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <StatusBadge status={b.status} />
+                                  {(() => {
+                                    const unread = getUnreadCount(b);
+                                    return unread > 0 ? (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-saffron-500 text-white text-[10px] font-bold animate-pulse">
+                                        💬 {unread}
+                                      </span>
+                                    ) : null;
+                                  })()}
+                                  {b.status === 'pending' && (
+                                    <>
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleAccept(b._id); }}
+                                        className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors"
+                                      >
+                                        Accept
+                                      </button>
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleReject(b._id); }}
+                                        className="px-3 py-1.5 rounded-lg border-2 border-crimson-500 text-crimson-600 dark:text-crimson-400 text-xs font-semibold transition-colors"
+                                      >
+                                        Reject
+                                      </button>
+                                    </>
+                                  )}
+                                  {b.status === 'accepted' && (
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleComplete(b._id); }}
+                                      className="px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition-colors"
+                                    >
+                                      Mark Completed
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      /* ── Default Separated Layout ── */
+                      <>
                     {/* Pending requests */}
                     {pending.length > 0 && (
                       <div>
@@ -568,6 +871,8 @@ const PanditDashboard = () => {
                         </div>
                       )}
                     </div>
+                      </>
+                    )}
                   </div>
                 )}
 
