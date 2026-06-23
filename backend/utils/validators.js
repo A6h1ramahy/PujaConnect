@@ -134,7 +134,52 @@ const bookingRules = [
   body('time')
     .notEmpty().withMessage('Booking time is required')
     .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]( (AM|PM))?$/i)
-    .withMessage('Time must be in HH:MM or HH:MM AM/PM format'),
+    .withMessage('Time must be in HH:MM or HH:MM AM/PM format')
+    .custom((value, { req }) => {
+      const { date } = req.body;
+      if (!date) return true;
+      
+      const now = new Date();
+      
+      // Formats Date object as YYYY-MM-DD in the local timezone
+      const offset = now.getTimezoneOffset();
+      const localDate = new Date(now.getTime() - (offset * 60 * 1000));
+      const todayStr = localDate.toISOString().slice(0, 10);
+      const bookingDateStr = date.slice(0, 10);
+      
+      if (bookingDateStr === todayStr) {
+        const parseTimeToMinutes = (timeStr) => {
+          const match12 = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+          if (match12) {
+            let hours = parseInt(match12[1], 10);
+            const minutes = parseInt(match12[2], 10);
+            const ampm = match12[3].toUpperCase();
+            if (ampm === 'PM' && hours < 12) hours += 12;
+            if (ampm === 'AM' && hours === 12) hours = 0;
+            return hours * 60 + minutes;
+          }
+          const match24 = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+          if (match24) {
+            const hours = parseInt(match24[1], 10);
+            const minutes = parseInt(match24[2], 10);
+            return hours * 60 + minutes;
+          }
+          return null;
+        };
+
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const selectedMinutes = parseTimeToMinutes(value);
+        
+        if (selectedMinutes === null) {
+          throw new Error('Invalid time format');
+        }
+        
+        if (selectedMinutes < currentMinutes + 60) {
+          throw new Error('This booking time is no longer available. Please choose a later time.');
+        }
+      }
+      return true;
+    }),
 
   body('location')
     .notEmpty().withMessage('Location is required')
