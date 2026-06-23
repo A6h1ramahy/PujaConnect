@@ -237,10 +237,41 @@ const createBooking = async (req, res, next) => {
 const getMyBookings = async (req, res, next) => {
   try {
     await expireStaleBookings();
-    const bookings = await Booking.find({ user: req.user._id })
+    const { status, date, before, after, sort } = req.query;
+    const filter = { user: req.user._id };
+
+    if (status) filter.status = status;
+    if (date) {
+      const start = new Date(date);
+      start.setUTCHours(0, 0, 0, 0);
+      const end = new Date(date);
+      end.setUTCHours(23, 59, 59, 999);
+      filter.date = { $gte: start, $lte: end };
+    } else {
+      if (before || after) {
+        filter.date = {};
+        if (before) {
+          const beforeDate = new Date(before);
+          beforeDate.setUTCHours(0, 0, 0, 0);
+          filter.date.$lt = beforeDate;
+        }
+        if (after) {
+          const afterDate = new Date(after);
+          afterDate.setUTCHours(23, 59, 59, 999);
+          filter.date.$gt = afterDate;
+        }
+      }
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === 'oldest') sortOption = { createdAt: 1 };
+    else if (sort === 'nearest') sortOption = { date: 1 };
+    else if (sort === 'furthest') sortOption = { date: -1 };
+
+    const bookings = await Booking.find(filter)
       .populate({ path: 'pandit', populate: { path: 'userId', select: 'name email phone' } })
       .populate('ritual', 'pujaName duration')
-      .sort({ createdAt: -1 });
+      .sort(sortOption);
 
     res.json({ bookings });
   } catch (error) {
@@ -257,10 +288,42 @@ const getPanditBookings = async (req, res, next) => {
     const pandit = await Pandit.findOne({ userId: req.user._id });
     if (!pandit) return res.status(404).json({ message: 'Pandit profile not found' });
 
-    const bookings = await Booking.find({ pandit: pandit._id })
+    const { status, date, before, after, sort } = req.query;
+    const filter = { pandit: pandit._id };
+
+    if (status) filter.status = status;
+    if (date) {
+      const start = new Date(date);
+      start.setUTCHours(0, 0, 0, 0);
+      const end = new Date(date);
+      end.setUTCHours(23, 59, 59, 999);
+      filter.date = { $gte: start, $lte: end };
+    } else {
+      if (before || after) {
+        filter.date = {};
+        if (before) {
+          const beforeDate = new Date(before);
+          beforeDate.setUTCHours(0, 0, 0, 0);
+          filter.date.$lt = beforeDate;
+        }
+        if (after) {
+          const afterDate = new Date(after);
+          afterDate.setUTCHours(23, 59, 59, 999);
+          filter.date.$gt = afterDate;
+        }
+      }
+    }
+
+    let sortOption = { date: 1 };
+    if (sort === 'newest') sortOption = { createdAt: -1 };
+    else if (sort === 'oldest') sortOption = { createdAt: 1 };
+    else if (sort === 'nearest') sortOption = { date: 1 };
+    else if (sort === 'furthest') sortOption = { date: -1 };
+
+    const bookings = await Booking.find(filter)
       .populate('user', 'name email phone city region')
       .populate('ritual', 'pujaName duration priceRange')
-      .sort({ date: 1 });
+      .sort(sortOption);
 
     res.json({ bookings });
   } catch (error) {
@@ -418,16 +481,45 @@ const cancelBooking = async (req, res, next) => {
 const getAllBookings = async (req, res, next) => {
   try {
     await expireStaleBookings();
-    const { status, page = 1, limit = 20 } = req.query;
-    const filter = status ? { status } : {};
-    const skip   = (Number(page) - 1) * Number(limit);
+    const { status, date, before, after, sort, page = 1, limit = 20 } = req.query;
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (date) {
+      const start = new Date(date);
+      start.setUTCHours(0, 0, 0, 0);
+      const end = new Date(date);
+      end.setUTCHours(23, 59, 59, 999);
+      filter.date = { $gte: start, $lte: end };
+    } else {
+      if (before || after) {
+        filter.date = {};
+        if (before) {
+          const beforeDate = new Date(before);
+          beforeDate.setUTCHours(0, 0, 0, 0);
+          filter.date.$lt = beforeDate;
+        }
+        if (after) {
+          const afterDate = new Date(after);
+          afterDate.setUTCHours(23, 59, 59, 999);
+          filter.date.$gt = afterDate;
+        }
+      }
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === 'oldest') sortOption = { createdAt: 1 };
+    else if (sort === 'nearest') sortOption = { date: 1 };
+    else if (sort === 'furthest') sortOption = { date: -1 };
+
+    const skip = (Number(page) - 1) * Number(limit);
 
     const total = await Booking.countDocuments(filter);
     const bookings = await Booking.find(filter)
       .populate('user', 'name email')
       .populate({ path: 'pandit', populate: { path: 'userId', select: 'name email' } })
       .populate('ritual', 'pujaName')
-      .sort({ createdAt: -1 })
+      .sort(sortOption)
       .skip(skip)
       .limit(Number(limit));
 
