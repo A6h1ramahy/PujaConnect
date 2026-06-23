@@ -36,6 +36,50 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { @apply bg-transparent; }
   ::-webkit-scrollbar-thumb { @apply bg-saffron-400 rounded-full; }
+
+  /* ── Date and Time Picker Icons ── */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    color-scheme: light;
+  }
+
+  .dark input[type="date"],
+  .dark input[type="time"],
+  .dark input[type="datetime-local"] {
+    color-scheme: dark;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+    opacity: 1; /* Fully visible by default */
+    /* Darker saffron/brown theme color by default in light mode for clear contrast */
+    filter: invert(24%) sepia(43%) saturate(2225%) hue-rotate(342deg) brightness(96%) contrast(92%);
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    /* Vibrant saffron on hover in light mode */
+    filter: invert(47%) sepia(93%) saturate(1354%) hue-rotate(345deg) brightness(100%) contrast(101%);
+  }
+
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator,
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    /* Saffron-gold matching the theme by default in dark mode (suggested #FFB347/saffron-300) */
+    filter: invert(79%) sepia(85%) saturate(687%) hue-rotate(342deg) brightness(103%) contrast(102%);
+  }
+
+  .dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    /* Glowing white on hover in dark mode */
+    filter: invert(1) brightness(1.2);
+  }
 }
 
 /* ── Components ── */
