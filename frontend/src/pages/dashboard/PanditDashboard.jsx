@@ -104,6 +104,7 @@ const PanditDashboard = () => {
       await acceptBooking(id);
       toast.success('Booking accepted!');
       setBookings((prev) => prev.map((b) => b._id === id ? { ...b, status: 'accepted' } : b));
+      getMyAvailability().then(({ data }) => setAvailability(data.slots || [])).catch(() => {});
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to accept');
     }
@@ -115,6 +116,7 @@ const PanditDashboard = () => {
       await rejectBooking(id, reason || '');
       toast.success('Booking rejected');
       setBookings((prev) => prev.map((b) => b._id === id ? { ...b, status: 'rejected' } : b));
+      getMyAvailability().then(({ data }) => setAvailability(data.slots || [])).catch(() => {});
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to reject');
     }
@@ -126,6 +128,7 @@ const PanditDashboard = () => {
       await completeBooking(id);
       toast.success('Booking completed! 🙏');
       setBookings((prev) => prev.map((b) => b._id === id ? { ...b, status: 'completed' } : b));
+      getMyAvailability().then(({ data }) => setAvailability(data.slots || [])).catch(() => {});
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to complete booking');
     }
