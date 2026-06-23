@@ -10,6 +10,77 @@ const pushHistory = (booking, status, userId, note) => {
   booking.statusHistory.push({ status, changedBy: userId, note, changedAt: new Date() });
 };
 
+const getLocalDateString = (d) => {
+  const offset = d.getTimezoneOffset();
+  const localDate = new Date(d.getTime() - (offset * 60 * 1000));
+  return localDate.toISOString().slice(0, 10);
+};
+
+const parseTimeToMinutes = (timeStr) => {
+  const match12 = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (match12) {
+    let hours = parseInt(match12[1], 10);
+    const minutes = parseInt(match12[2], 10);
+    const ampm = match12[3].toUpperCase();
+    if (ampm === 'PM' && hours < 12) hours += 12;
+    if (ampm === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  }
+  const match24 = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+  if (match24) {
+    const hours = parseInt(match24[1], 10);
+    const minutes = parseInt(match24[2], 10);
+    return hours * 60 + minutes;
+  }
+  return null;
+};
+
+const getBookingDateTime = (booking) => {
+  const baseDate = new Date(booking.date);
+  const minutes = parseTimeToMinutes(booking.time);
+  if (minutes === null) return baseDate;
+  
+  const year = baseDate.getUTCFullYear();
+  const month = baseDate.getUTCMonth();
+  const day = baseDate.getUTCDate();
+  
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  
+  return new Date(year, month, day, hours, mins);
+};
+
+const expireStaleBookings = async () => {
+  try {
+    const now = new Date();
+    const pendingBookings = await Booking.find({ status: 'pending' });
+    let updatedCount = 0;
+    
+    for (const booking of pendingBookings) {
+      const bookingDateTime = getBookingDateTime(booking);
+      if (bookingDateTime < now) {
+        booking.status = 'expired';
+        booking.statusHistory.push({
+          status: 'expired',
+          note: 'Automatically expired because selected ritual time has passed.'
+        });
+        await booking.save();
+        updatedCount++;
+      }
+    }
+    if (updatedCount > 0) {
+      console.log(`[Auto-Expiration] Automatically expired ${updatedCount} stale pending bookings.`);
+    }
+  } catch (error) {
+    console.error('Error during auto-expiration check:', error);
+  }
+};
+
+const startExpirationJob = () => {
+  expireStaleBookings();
+  setInterval(expireStaleBookings, 2 * 60 * 1000);
+};
+
 
 
 // @desc  Create a booking (user only)
@@ -60,6 +131,24 @@ const createBooking = async (req, res, next) => {
     }
 
     const bookingDate = new Date(date);
+    const now = new Date();
+    const todayStr = getLocalDateString(now);
+    const bookingDateStr = date.slice(0, 10);
+
+    if (bookingDateStr < todayStr) {
+      return res.status(400).json({ message: 'Cannot book a date in the past.' });
+    }
+
+    if (bookingDateStr === todayStr) {
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const selectedMinutes = parseTimeToMinutes(time);
+      if (selectedMinutes === null) {
+        return res.status(400).json({ message: 'Invalid time format' });
+      }
+      if (selectedMinutes < currentMinutes + 60) {
+        return res.status(400).json({ message: 'This booking time is no longer available. Please choose a later time.' });
+      }
+    }
 
     // Check availability & prevent double-booking
     const availability = await Availability.findOne({
@@ -126,6 +215,7 @@ const createBooking = async (req, res, next) => {
 // @access User
 const getMyBookings = async (req, res, next) => {
   try {
+    await expireStaleBookings();
     const bookings = await Booking.find({ user: req.user._id })
       .populate({ path: 'pandit', populate: { path: 'userId', select: 'name email phone' } })
       .populate('ritual', 'pujaName duration')
@@ -142,6 +232,7 @@ const getMyBookings = async (req, res, next) => {
 // @access Pandit
 const getPanditBookings = async (req, res, next) => {
   try {
+    await expireStaleBookings();
     const pandit = await Pandit.findOne({ userId: req.user._id });
     if (!pandit) return res.status(404).json({ message: 'Pandit profile not found' });
 
@@ -169,6 +260,17 @@ const acceptBooking = async (req, res, next) => {
     if (booking.pandit.toString() !== pandit._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this booking' });
     }
+    
+    const bookingDateTime = getBookingDateTime(booking);
+    if (booking.status === 'expired' || bookingDateTime < new Date()) {
+      if (booking.status !== 'expired') {
+        booking.status = 'expired';
+        booking.statusHistory.push({ status: 'expired', note: 'Automatically expired because selected ritual time has passed.' });
+        await booking.save();
+      }
+      return res.status(400).json({ message: 'This booking request has expired because the selected ritual time has passed.' });
+    }
+    
     if (booking.status !== 'pending') {
       return res.status(400).json({ message: `Booking is already ${booking.status}` });
     }
@@ -196,6 +298,17 @@ const rejectBooking = async (req, res, next) => {
     if (booking.pandit.toString() !== pandit._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this booking' });
     }
+    
+    const bookingDateTime = getBookingDateTime(booking);
+    if (booking.status === 'expired' || bookingDateTime < new Date()) {
+      if (booking.status !== 'expired') {
+        booking.status = 'expired';
+        booking.statusHistory.push({ status: 'expired', note: 'Automatically expired because selected ritual time has passed.' });
+        await booking.save();
+      }
+      return res.status(400).json({ message: 'This booking request has expired because the selected ritual time has passed.' });
+    }
+    
     if (booking.status !== 'pending') {
       return res.status(400).json({ message: `Booking is already ${booking.status}` });
     }
@@ -294,6 +407,7 @@ const cancelBooking = async (req, res, next) => {
 // @access Admin
 const getAllBookings = async (req, res, next) => {
   try {
+    await expireStaleBookings();
     const { status, page = 1, limit = 20 } = req.query;
     const filter = status ? { status } : {};
     const skip   = (Number(page) - 1) * Number(limit);
@@ -318,6 +432,7 @@ const getAllBookings = async (req, res, next) => {
 // @access User (own bookings only) | Pandit (assigned bookings only)
 const getBookingByIdUser = async (req, res, next) => {
   try {
+    await expireStaleBookings();
     let booking;
 
     if (req.user.role === 'pandit') {
@@ -536,5 +651,7 @@ module.exports = {
   getBookingMessages,
   sendBookingMessage,
   markMessagesRead,
+  expireStaleBookings,
+  startExpirationJob,
 };
 
