@@ -116,7 +116,7 @@ const UserBookingDetail = () => {
   const handleCancel = async () => {
     setCancelling(true);
     try {
-      await cancelBooking(id, 'Cancelled by user');
+      const { data } = await cancelBooking(id, 'Cancelled by user');
       setBooking((prev) => ({
         ...prev,
         status: 'cancelled',
@@ -125,7 +125,7 @@ const UserBookingDetail = () => {
           { status: 'cancelled', changedAt: new Date().toISOString(), note: 'Cancelled by user' },
         ],
       }));
-      toast.success('Booking cancelled successfully');
+      toast.success(data?.message || "Booking cancelled successfully.\n\nThe selected slot has been released back to the Pandit's availability.");
       setShowConfirm(false);
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to cancel booking');
