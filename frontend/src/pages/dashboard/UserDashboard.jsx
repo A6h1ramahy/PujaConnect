@@ -131,7 +131,7 @@ const UserDashboard = () => {
   const upcoming  = bookings.filter((b) => b.status === 'accepted'  && new Date(b.date) >= new Date());
   const pending   = bookings.filter((b) => b.status === 'pending');
   const completed = bookings.filter((b) => b.status === 'completed');
-  const cancelled = bookings.filter((b) => ['rejected', 'cancelled'].includes(b.status));
+  const cancelled = bookings.filter((b) => ['rejected', 'cancelled', 'expired'].includes(b.status));
 
   /** Count messages sent by the other party that this user hasn't read yet */
   const getUnreadCount = (booking) => {
@@ -345,7 +345,7 @@ const UserDashboard = () => {
                         <StatMini value={bookings.length} label="Total Bookings"   color="text-saffron-600 dark:text-saffron-400" />
                         <StatMini value={upcoming.length}  label="Upcoming"         color="text-emerald-600 dark:text-emerald-400" />
                         <StatMini value={completed.length} label="Completed"        color="text-blue-600 dark:text-blue-400" />
-                        <StatMini value={cancelled.length} label="Cancelled"        color="text-stone-500 dark:text-stone-400" />
+                        <StatMini value={cancelled.length} label="Cancelled / Expired" color="text-stone-500 dark:text-stone-400" />
                       </div>
                     </div>
                   </ScrollReveal>
