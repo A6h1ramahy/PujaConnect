@@ -10,6 +10,22 @@ const pushHistory = (booking, status, userId, note) => {
   booking.statusHistory.push({ status, changedBy: userId, note, changedAt: new Date() });
 };
 
+const unlockAvailability = async (booking) => {
+  if (booking.availabilitySlotId) {
+    const availability = await Availability.findById(booking.availabilitySlotId);
+    if (availability) {
+      const slot = availability.timeSlots.find(
+        (s) => s.bookingId?.toString() === booking._id.toString() || (s.time === booking.time && s.isBooked)
+      );
+      if (slot) {
+        slot.isBooked  = false;
+        slot.bookingId = null;
+        await availability.save();
+      }
+    }
+  }
+};
+
 const getLocalDateString = (d) => {
   const offset = d.getTimezoneOffset();
   const localDate = new Date(d.getTime() - (offset * 60 * 1000));
@@ -65,6 +81,7 @@ const expireStaleBookings = async () => {
           note: 'Automatically expired because selected ritual time has passed.'
         });
         await booking.save();
+        await unlockAvailability(booking);
         updatedCount++;
       }
     }
@@ -267,6 +284,7 @@ const acceptBooking = async (req, res, next) => {
         booking.status = 'expired';
         booking.statusHistory.push({ status: 'expired', note: 'Automatically expired because selected ritual time has passed.' });
         await booking.save();
+        await unlockAvailability(booking);
       }
       return res.status(400).json({ message: 'This booking request has expired because the selected ritual time has passed.' });
     }
@@ -305,6 +323,7 @@ const rejectBooking = async (req, res, next) => {
         booking.status = 'expired';
         booking.statusHistory.push({ status: 'expired', note: 'Automatically expired because selected ritual time has passed.' });
         await booking.save();
+        await unlockAvailability(booking);
       }
       return res.status(400).json({ message: 'This booking request has expired because the selected ritual time has passed.' });
     }
@@ -317,21 +336,7 @@ const rejectBooking = async (req, res, next) => {
     booking.rejectionReason = req.body.reason || '';
     pushHistory(booking, 'rejected', req.user._id, req.body.reason);
     await booking.save();
-
-    // Free up the availability slot
-    if (booking.availabilitySlotId) {
-      const availability = await Availability.findById(booking.availabilitySlotId);
-      if (availability) {
-        const slot = availability.timeSlots.find(
-          (s) => s.bookingId?.toString() === booking._id.toString()
-        );
-        if (slot) {
-          slot.isBooked  = false;
-          slot.bookingId = null;
-          await availability.save();
-        }
-      }
-    }
+    await unlockAvailability(booking);
 
     res.json({ message: 'Booking rejected', booking });
   } catch (error) {
@@ -395,8 +400,9 @@ const cancelBooking = async (req, res, next) => {
     booking.status = 'cancelled';
     pushHistory(booking, 'cancelled', req.user._id, req.body.reason || 'Cancelled by user');
     await booking.save();
+    await unlockAvailability(booking);
 
-    res.json({ message: 'Booking cancelled', booking });
+    res.json({ message: "Booking cancelled successfully.\n\nThe selected slot has been released back to the Pandit's availability.", booking });
   } catch (error) {
     next(error);
   }
