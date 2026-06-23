@@ -5,7 +5,7 @@ const User = require('../models/User');
 const Ritual = require('../models/Ritual');
 const ritualsData = require('./ritualsData');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/pujaconnect';
+const MONGO_URI = process.env.MONGO_URI;
 
 const seed = async () => {
   try {
@@ -15,6 +15,10 @@ const seed = async () => {
 
     if (!adminEmail || !adminPass) {
       throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required to seed the database.");
+    }
+
+    if (!MONGO_URI) {
+      throw new Error('MONGO_URI environment variable is required to seed the database.');
     }
 
     await mongoose.connect(MONGO_URI);

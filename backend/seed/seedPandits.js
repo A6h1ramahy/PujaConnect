@@ -15,10 +15,14 @@ const {
   generateBio
 } = require('./panditsData');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/pujaconnect';
+const MONGO_URI = process.env.MONGO_URI;
 
 const seedPandits = async () => {
   try {
+    if (!MONGO_URI) {
+      throw new Error('MONGO_URI environment variable is required to seed pandits.');
+    }
+
     await mongoose.connect(MONGO_URI);
     console.log('✅ Connected to MongoDB');
 

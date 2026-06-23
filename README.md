@@ -544,75 +544,9 @@ PujaConnect/
 
 ---
 
-## 🚀 Installation & Setup
+## 🔧 Runtime Configuration
 
-### Prerequisites
-- Node.js v18 or later
-- MongoDB instance running locally (or MongoDB Atlas connection)
-- Cloudinary free tier account
-
-### 1. Clone & Install Dependencies
-
-```bash
-# Clone the repository
-git clone https://github.com/A6h1ramahy/PujaConnect.git
-cd PujaConnect
-
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
-```
-
-### 2. Configure Environment Variables
-
-Create a `.env` file in the `backend/` directory:
-```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/pujaconnect
-JWT_SECRET=your_super_jwt_secret_key_change_in_production
-JWT_EXPIRES_IN=7d
-NODE_ENV=development
-
-# Cloudinary Integration Keys
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-# Default Admin Seed Config
-ADMIN_EMAIL=admin@pujaconnect.com
-ADMIN_PASSWORD=Admin@1234
-```
-
-Create a `.env` file in the `frontend/` directory:
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-```
-
-### 3. Run the Idempotent Database Seeder
-Seed default rituals, availability ranges, and the default platform admin account:
-```bash
-cd backend
-npm run seed
-```
-
-### 4. Running the Application locally
-
-Start the Express backend:
-```bash
-cd backend
-npm run dev
-```
-
-Start the React frontend dev server:
-```bash
-cd frontend
-npm run dev
-```
-Open **http://localhost:3000** in your browser to view the application.
+PujaConnect is designed to run with environment-managed configuration in production. Backend service credentials, frontend API endpoints, and storage integrations are supplied by the deployment platform and are not hardcoded in the repository.
 
 ---
 
