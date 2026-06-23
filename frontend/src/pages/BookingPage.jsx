@@ -9,6 +9,26 @@ import { format } from 'date-fns';
 import { validateBookingForm } from '../utils/validators';
 import { useAuth } from '../context/AuthContext';
 
+const parseTimeToMinutes = (timeStr) => {
+  if (!timeStr) return null;
+  const match12 = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (match12) {
+    let hours = parseInt(match12[1], 10);
+    const minutes = parseInt(match12[2], 10);
+    const ampm = match12[3].toUpperCase();
+    if (ampm === 'PM' && hours < 12) hours += 12;
+    if (ampm === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  }
+  const match24 = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+  if (match24) {
+    const hours = parseInt(match24[1], 10);
+    const minutes = parseInt(match24[2], 10);
+    return hours * 60 + minutes;
+  }
+  return null;
+};
+
 const STEPS = ['Ritual', 'Date & Time', 'Location', 'Confirm'];
 
 const BookingPage = () => {
