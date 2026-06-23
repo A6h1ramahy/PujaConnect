@@ -168,20 +168,23 @@ const createBooking = async (req, res, next) => {
       }
     }
 
-    // Check availability & prevent double-booking
+    // Check availability & prevent double-booking/custom bypass
     const availability = await Availability.findOne({
       pandit: panditId,
       date: {
         $gte: new Date(bookingDate.toDateString()),
         $lt:  new Date(new Date(bookingDate.toDateString()).getTime() + 24 * 60 * 60 * 1000),
-      },
-      status: 'available',
+      }
     });
 
     if (availability) {
+      if (availability.status === 'unavailable') {
+        return res.status(400).json({ message: 'The Pandit is not available on this date. Please choose another date.' });
+      }
+
       const slot = availability.timeSlots.find((s) => s.time === time);
       if (!slot) {
-        return res.status(400).json({ message: `Time slot ${time} is not listed for this Pandit on this date` });
+        return res.status(400).json({ message: `Time slot ${time} is not available for booking on this date` });
       }
       if (slot.isBooked) {
         return res.status(409).json({ message: 'This time slot is already booked. Please choose another.' });
