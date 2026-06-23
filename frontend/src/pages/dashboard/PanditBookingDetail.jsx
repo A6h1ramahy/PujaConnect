@@ -43,6 +43,7 @@ const TimelineIcon = ({ status }) => {
     completed: <HiShieldCheck className="text-blue-500   text-lg" />,
     rejected:  <HiX           className="text-red-500    text-lg" />,
     cancelled: <HiBan         className="text-stone-500  text-lg" />,
+    expired:   <HiBan         className="text-stone-500  text-lg" />,
   };
   return map[status] || <HiInformationCircle className="text-stone-400 text-lg" />;
 };
@@ -204,6 +205,7 @@ const PanditBookingDetail = () => {
     completed: 'bg-blue-50    dark:bg-blue-950/20    text-blue-700    border-blue-200    dark:border-blue-800',
     rejected:  'bg-red-50     dark:bg-red-950/20     text-red-700     border-red-200     dark:border-red-800',
     cancelled: 'bg-stone-50   dark:bg-stone-900/30   text-stone-600   border-stone-200   dark:border-stone-700',
+    expired:   'bg-stone-50   dark:bg-stone-900/30   text-stone-600   border-stone-200   dark:border-stone-700',
   };
 
   // Setup modal attributes based on action type
@@ -313,6 +315,18 @@ const PanditBookingDetail = () => {
                       "{booking.statusHistory.slice().reverse().find(h => h.status === 'cancelled').note}"
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* Expired alert */}
+              {booking.status === 'expired' && (
+                <div className="mt-5 p-4 rounded-xl bg-stone-50 dark:bg-stone-900/40 border border-stone-200 dark:border-stone-700 space-y-1.5 animate-fade-in">
+                  <p className="text-sm font-semibold text-stone-700 dark:text-stone-300 flex items-center gap-2">
+                    <HiBan className="text-stone-500" /> Expired Request
+                  </p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+                    This booking request has expired because the ritual time passed before it was accepted or rejected.
+                  </p>
                 </div>
               )}
 
@@ -601,6 +615,7 @@ const PanditBookingDetail = () => {
                         {booking.status === 'completed' ? 'This booking is completed.' :
                          booking.status === 'cancelled' ? 'This booking has been cancelled by the devotee.' :
                          booking.status === 'rejected' ? 'This request was rejected.' :
+                         booking.status === 'expired' ? 'This request has expired.' :
                          'No actions available.'}
                       </p>
                     )}
