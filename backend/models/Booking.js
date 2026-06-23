@@ -191,7 +191,6 @@ bookingSchema.pre('save', async function (next) {
           );
           if (slot) {
             slot.isBooked = false;
-            slot.bookingId = null;
             await availability.save();
           }
         }
