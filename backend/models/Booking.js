@@ -178,6 +178,31 @@ bookingSchema.pre('save', function (next) {
   next();
 });
 
+// ── Pre-save: auto-release availability slot on status changes ──
+bookingSchema.pre('save', async function (next) {
+  if (this.isModified('status') && ['cancelled', 'rejected', 'expired'].includes(this.status)) {
+    if (this.availabilitySlotId) {
+      try {
+        const Availability = mongoose.model('Availability');
+        const availability = await Availability.findById(this.availabilitySlotId);
+        if (availability) {
+          const slot = availability.timeSlots.find(
+            (s) => s.bookingId?.toString() === this._id.toString() || (s.time === this.time && s.isBooked)
+          );
+          if (slot) {
+            slot.isBooked = false;
+            slot.bookingId = null;
+            await availability.save();
+          }
+        }
+      } catch (err) {
+        console.error('Error auto-releasing availability slot in pre-save hook:', err);
+      }
+    }
+  }
+  next();
+});
+
 
 
 module.exports = mongoose.model('Booking', bookingSchema);
